@@ -51,7 +51,6 @@ class TestKovenant {
 				.success { Log.i(TAG, "test2 success") }
 				.fail { Log.i(TAG, "test2 fail") }
 
-
 		Log.i(TAG, "all")
 		all(fun1(1), fun2(1), fun1(1))
 				.success { Log.i(TAG, "all success") }
@@ -85,6 +84,24 @@ class TestKovenant {
 					deferred.reject(it)
 				}
 		return promise
+	}
+
+	fun test3(): Promise<String, Exception> {
+		Log.i(TAG, "test3 start")
+		return fun1(1)
+				.then {
+					Log.i(TAG, "test3 fun1")
+					return@then "bla"
+				}
+				.then {
+					fun2(2)
+				}.unwrap()
+				.then {
+					Log.i(TAG, "test3 fun2")
+				}
+				.then {
+					return@then fun3(1) // Same as without the return
+				}.unwrap()
 	}
 
 	private abstract class AsyncDummy : AsyncTask<Int, Void, String>() {

@@ -1,17 +1,13 @@
 package rocks.crownstone.dev_app
 
-import android.Manifest
 import android.app.Application
-import android.content.pm.PackageManager
+import android.os.Handler
 import android.util.Log
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
-import rocks.crownstone.bluenet.BleCore
-import rocks.crownstone.bluenet.BleScanner
-import rocks.crownstone.bluenet.BleServiceManager
-import rocks.crownstone.bluenet.EventBus
+import rocks.crownstone.bluenet.*
 import rocks.crownstone.dev_app.cloud.Spheres
 import rocks.crownstone.dev_app.cloud.User
 
@@ -34,10 +30,10 @@ class MainApp : Application() {
 	lateinit var volleyQueue: RequestQueue
 	lateinit var user: User
 	lateinit var spheres: Spheres
-	lateinit var service: BleServiceManager
-	val eventBus = EventBus()
-	lateinit var bleScanner: BleScanner
-	lateinit var bleCore: BleCore
+	val bluenet = Bluenet()
+
+	val handler = Handler()
+	var testHandlerNextNum = 0
 
 	override fun onCreate() {
 		super.onCreate()
@@ -48,6 +44,7 @@ class MainApp : Application() {
 		user = User(this, volleyQueue)
 		spheres = Spheres(this, volleyQueue)
 
+		bluenet.init(instance)
 
 //		service = BleServiceManager(this, eventBus)
 //		service.runInBackground()
@@ -59,6 +56,17 @@ class MainApp : Application() {
 
 		val test = TestKovenant()
 		test.test()
+
+		testHandlerNextNum = 0
+		for (i in 0 until 1000000) {
+//		for (i in 0..1000 step 2) {
+			handler.post {
+				if (testHandlerNextNum != i) {
+					Log.e(TAG, "$i not ordered!")
+				}
+				testHandlerNextNum = i+1
+			}
+		}
 	}
 
 	override fun onTerminate() {

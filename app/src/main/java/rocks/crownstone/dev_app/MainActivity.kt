@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
 //		}
 //		false
 //	}
-	val REQUEST_LOCATION = 1
 
 	private val mOnNavigationItemSelectedListener = object : BottomNavigationView.OnNavigationItemSelectedListener {
 		override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -58,39 +57,34 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-//		setContentView(R.layout.activity_main)
-//		navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-//		setContentView(R.layout.activity_tabbed)
+		setContentView(R.layout.activity_main)
+		navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+		setContentView(R.layout.activity_tabbed)
 
 
-		if (Build.VERSION.SDK_INT >= 23) {
-//			when (PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-//				PackageManager.PERMISSION_GRANTED -> MainApp.instance.bleScanner.startScan()
-//				else -> requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), REQUEST_LOCATION)
-//			}
-		}
-		else {
-//			MainApp.instance.bleScanner.startScan()
-		}
+		MainApp.instance.bluenet.makeScannerReady(this)
+				.success {
+					MainApp.instance.bluenet.startScanning()
+				}
 
 //		val intent = Intent(this, TabbedActivity::class.java)
-		val intent = Intent(this, LoginActivity::class.java)
-		this.startActivity(intent)
+//		val intent = Intent(this, LoginActivity::class.java)
+//		this.startActivity(intent)
 
 	}
 
-	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-		when (requestCode) {
-			REQUEST_LOCATION -> {
-				if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
-					Log.d(TAG, "onRequestPermissionsResult PERMISSION_GRANTED")
-//					MainApp.instance.bleScanner.startScan()
-				}
-				else {
-					Log.d(TAG, "onRequestPermissionsResult PERMISSION_DENIED")
-				}
-			}
-			else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+		if (MainApp.instance.bluenet.handleActivityResult(requestCode, resultCode, data)) {
+			return
 		}
+		super.onActivityResult(requestCode, resultCode, data)
+	}
+
+	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+		if (MainApp.instance.bluenet.handlePermissionResult(requestCode, permissions, grantResults)) {
+			return
+		}
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 	}
 }
