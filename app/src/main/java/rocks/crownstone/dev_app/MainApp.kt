@@ -1,6 +1,8 @@
 package rocks.crownstone.dev_app
 
 import android.app.Application
+import android.arch.lifecycle.*
+//import android.arch.lifecycle.ProcessLifecycleOwner
 import android.util.Log
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
@@ -23,7 +25,8 @@ import rocks.crownstone.dev_app.cloud.User
 //}
 
 
-class MainApp : Application() {
+//class MainApp : Application(), DefaultLifecycleObserver { // Requires min api 24
+class MainApp : Application(), LifecycleObserver {
 	private val TAG = MainApp::class.java.canonicalName
 //	val volleyQueue = Volley.newRequestQueue(this)
 	lateinit var volleyQueue: RequestQueue
@@ -33,7 +36,7 @@ class MainApp : Application() {
 
 
 	override fun onCreate() {
-		super.onCreate()
+		super<Application>.onCreate()
 		Log.i(TAG, "onCreate")
 		instance = this
 		startKovenant() // Start thread(s)
@@ -41,21 +44,43 @@ class MainApp : Application() {
 		user = User(this, volleyQueue)
 		spheres = Spheres(this, volleyQueue)
 
+		ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+
 		bluenet.init(instance)
-
-//		service = BleServiceManager(this, eventBus)
-//		service.runInBackground()
-//
-//		bleCore = BleCore(this, eventBus)
-//		bleCore.init()
-//		bleScanner = BleScanner(eventBus, bleCore)
-
+				.success {
+					Log.i(TAG, "initialized")
+				}
+				.fail {
+					Log.e(TAG, "init failed: $it")
+				}
 
 		val test = TestKovenant()
 		test.test()
+	}
 
+	@OnLifecycleEvent(Lifecycle.Event.ON_START)
+	fun onAppForegrounded() {
+		Log.i(TAG, "onAppForegrounded")
+		if (bluenet.isScannerReady()) {
+			bluenet.startScanning()
 		}
 	}
+
+	@OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+	fun onAppBackgrounded() {
+		Log.i(TAG, "onAppBackgrounded")
+		if (bluenet.isScannerReady()) {
+			bluenet.stopScanning()
+		}
+	}
+
+//	override fun onStart(owner: LifecycleOwner) {
+//		Log.i(TAG, "onStart")
+//	}
+//
+//	override fun onStop(owner: LifecycleOwner) {
+//		Log.i(TAG, "onStop")
+//	}
 
 	override fun onTerminate() {
 		super.onTerminate()

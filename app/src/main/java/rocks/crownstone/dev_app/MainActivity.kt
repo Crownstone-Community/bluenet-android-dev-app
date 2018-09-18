@@ -64,7 +64,12 @@ class MainActivity : AppCompatActivity() {
 
 		MainApp.instance.bluenet.makeScannerReady(this)
 				.success {
+					Log.i(TAG, "start scanning")
 					MainApp.instance.bluenet.startScanning()
+				}
+				.fail {
+					Log.w(TAG, "unable to start scanning: $it")
+					it.printStackTrace()
 				}
 
 //		val intent = Intent(this, TabbedActivity::class.java)
@@ -72,6 +77,8 @@ class MainActivity : AppCompatActivity() {
 //		this.startActivity(intent)
 
 	}
+
+
 
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
