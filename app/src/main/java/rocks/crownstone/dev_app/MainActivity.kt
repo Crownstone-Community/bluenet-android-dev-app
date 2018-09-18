@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
+import rocks.crownstone.bluenet.BluenetEvent
 
 class MainActivity : AppCompatActivity() {
 	private val TAG = this.javaClass.canonicalName
@@ -61,7 +62,16 @@ class MainActivity : AppCompatActivity() {
 		navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 		setContentView(R.layout.activity_tabbed)
 
+//		val intent = Intent(this, TabbedActivity::class.java)
+//		val intent = Intent(this, LoginActivity::class.java)
+//		this.startActivity(intent)
 
+		MainApp.instance.bluenet.subscribe(BluenetEvent.INITIALIZED, ::onBluenetInitialized)
+
+	}
+
+	fun onBluenetInitialized(data: Any) {
+		Log.i(TAG, "onBluenetInitialized")
 		MainApp.instance.bluenet.makeScannerReady(this)
 				.success {
 					Log.i(TAG, "start scanning")
@@ -71,15 +81,7 @@ class MainActivity : AppCompatActivity() {
 					Log.w(TAG, "unable to start scanning: $it")
 					it.printStackTrace()
 				}
-
-//		val intent = Intent(this, TabbedActivity::class.java)
-//		val intent = Intent(this, LoginActivity::class.java)
-//		this.startActivity(intent)
-
 	}
-
-
-
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 		if (MainApp.instance.bluenet.handleActivityResult(requestCode, resultCode, data)) {
