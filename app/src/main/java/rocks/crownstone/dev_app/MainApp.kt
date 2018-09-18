@@ -1,7 +1,6 @@
 package rocks.crownstone.dev_app
 
 import android.app.Application
-import android.os.Handler
 import android.util.Log
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
@@ -32,8 +31,6 @@ class MainApp : Application() {
 	lateinit var spheres: Spheres
 	val bluenet = Bluenet()
 
-	val handler = Handler()
-	var testHandlerNextNum = 0
 
 	override fun onCreate() {
 		super.onCreate()
@@ -57,15 +54,6 @@ class MainApp : Application() {
 		val test = TestKovenant()
 		test.test()
 
-		testHandlerNextNum = 0
-		for (i in 0 until 1000000) {
-//		for (i in 0..1000 step 2) {
-			handler.post {
-				if (testHandlerNextNum != i) {
-					Log.e(TAG, "$i not ordered!")
-				}
-				testHandlerNextNum = i+1
-			}
 		}
 	}
 

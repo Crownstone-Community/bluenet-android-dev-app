@@ -1,11 +1,14 @@
 package rocks.crownstone.dev_app
 
 import android.os.AsyncTask
+import android.os.Handler
 import android.util.Log
 import nl.komponents.kovenant.*
 
 class TestKovenant {
 	val TAG = TestKovenant::class.java.canonicalName
+	val handler = Handler()
+	var testHandlerNextNum = 0
 
 	fun test() {
 		Log.i(TAG, "test")
@@ -68,6 +71,18 @@ class TestKovenant {
 				.fail { Log.i(TAG, "test3 fail $it") }
 				.always { Log.i(TAG, "test3 always") }
 		Kovenant.cancel(promise3, Exception("test3 cancel"))
+
+
+		testHandlerNextNum = 0
+		for (i in 0 until 1000) {
+//		for (i in 0..1000 step 2) {
+			handler.post {
+				if (testHandlerNextNum != i) {
+					Log.e(TAG, "$i not ordered!")
+				}
+				testHandlerNextNum = i+1
+			}
+		}
 	}
 
 	fun test2(nr: Int): Promise<Unit, Exception> {
