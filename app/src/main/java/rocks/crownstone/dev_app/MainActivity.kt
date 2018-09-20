@@ -1,12 +1,8 @@
 package rocks.crownstone.dev_app
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
-import android.support.v4.content.PermissionChecker
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
@@ -67,6 +63,7 @@ class MainActivity : AppCompatActivity() {
 //		this.startActivity(intent)
 
 		MainApp.instance.bluenet.subscribe(BluenetEvent.INITIALIZED, ::onBluenetInitialized)
+		MainApp.instance.bluenet.subscribe(BluenetEvent.SCANNER_READY, ::onScannerReady)
 
 	}
 
@@ -79,11 +76,17 @@ class MainActivity : AppCompatActivity() {
 				}
 				.fail {
 					Log.w(TAG, "unable to start scanning: $it")
-					it.printStackTrace()
 				}
+//		MainApp.instance.bluenet.tryMakeScannerReady(this)
+	}
+
+	fun onScannerReady(data: Any) {
+		Log.i(TAG, "onScannerReady")
+//		MainApp.instance.bluenet.startScanning()
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+		Log.i(TAG, "onActivityResult $requestCode $resultCode")
 		if (MainApp.instance.bluenet.handleActivityResult(requestCode, resultCode, data)) {
 			return
 		}
@@ -91,6 +94,7 @@ class MainActivity : AppCompatActivity() {
 	}
 
 	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+		Log.i(TAG, "onRequestPermissionsResult $requestCode")
 		if (MainApp.instance.bluenet.handlePermissionResult(requestCode, permissions, grantResults)) {
 			return
 		}
