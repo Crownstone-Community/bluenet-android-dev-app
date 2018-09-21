@@ -1,54 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="rocks.crownstone.dev_app">
+	package="rocks.crownstone.dev_app">
 
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <!--
+	<!-- To auto-complete the email text field in the login form with the user's emails -->
+	<!--
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-permission android:name="android.permission.READ_PROFILE"/>
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
     -->
-    <!-- To communicate with cloud -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+	<!-- To communicate with cloud -->
+	<uses-permission android:name="android.permission.INTERNET" />
 
-    <application
-            android:name=".MainApp"
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:theme="@style/AppTheme">
-        <activity
-                android:name=".MainActivity"
-                android:label="Crownstone dev">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+	<application
+		android:name=".MainApp"
+		android:allowBackup="true"
+		android:icon="@mipmap/ic_launcher"
+		android:label="@string/app_name"
+		android:roundIcon="@mipmap/ic_launcher_round"
+		android:supportsRtl="true"
+		android:theme="@style/AppTheme">
+		<activity
+			android:name=".MainActivity"
+			android:label="Crownstone dev">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-        <activity
-                android:name=".TabbedActivity"
-                android:label="@string/title_activity_tabbed"
-                android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
-                android:name=".LoginActivity"
-                android:label="@string/title_activity_login">
-        </activity>
-        <!--
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		<activity
+			android:name=".TabbedActivity"
+			android:label="@string/title_activity_tabbed"
+			android:theme="@style/AppTheme.NoActionBar" />
+		<activity
+			android:name=".LoginActivity"
+			android:label="@string/title_activity_login" />
+		<!--
         <activity
                 android:name=".LoginActivity2"
                 android:label="@string/title_activity_login2">
         </activity>
         -->
-        <service
-            android:name="rocks.crownstone.bluenet.BleService"
-            android:enabled="true"
-            android:exported="false"
-            android:label="Crownstone dev">
-        </service>
-    </application>
+		<service
+			android:name="rocks.crownstone.bluenet.BleService"
+			android:enabled="true"
+			android:exported="false"
+			android:label="Crownstone dev" />
+	</application>
 
 </manifest>

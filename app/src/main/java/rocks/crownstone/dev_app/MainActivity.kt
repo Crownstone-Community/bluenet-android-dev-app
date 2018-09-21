@@ -1,82 +1,50 @@
 package rocks.crownstone.dev_app
 
 import android.content.Intent
-import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_main.*
-import rocks.crownstone.bluenet.BluenetEvent
+import nl.komponents.kovenant.then
+import nl.komponents.kovenant.unwrap
 
 class MainActivity : AppCompatActivity() {
 	private val TAG = this.javaClass.canonicalName
 
-//	private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-//		when (item.itemId) {
-//
-//			R.id.navigation_home -> {
-//				messageView.setText(R.string.title_home)
-//				return@OnNavigationItemSelectedListener true
-//			}
-//			R.id.navigation_dashboard -> {
-//				messageView.setText(R.string.title_dashboard)
-//				return@OnNavigationItemSelectedListener true
-//			}
-//			R.id.navigation_notifications -> {
-//				messageView.setText(R.string.title_notifications)
-//				return@OnNavigationItemSelectedListener true
-//			}
-//		}
-//		false
-//	}
-
-	private val mOnNavigationItemSelectedListener = object : BottomNavigationView.OnNavigationItemSelectedListener {
-		override fun onNavigationItemSelected(item: MenuItem): Boolean {
-			when (item.itemId) {
-				R.id.navigation_home -> {
-					messageView.setText(R.string.title_home)
-					return true
-				}
-				R.id.navigation_dashboard -> {
-					messageView.setText(R.string.title_dashboard)
-					return true
-				}
-				R.id.navigation_notifications -> {
-					messageView.setText(R.string.title_notifications)
-					return true
-				}
-			}
-			return false
-		}
-	}
-
-
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		Log.i(TAG, "onCreate")
 		setContentView(R.layout.activity_main)
-		navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-		setContentView(R.layout.activity_tabbed)
 
 //		val intent = Intent(this, TabbedActivity::class.java)
 //		val intent = Intent(this, LoginActivity::class.java)
 //		this.startActivity(intent)
 
-		MainApp.instance.bluenet.subscribe(BluenetEvent.INITIALIZED, ::onBluenetInitialized)
-		MainApp.instance.bluenet.subscribe(BluenetEvent.SCANNER_READY, ::onScannerReady)
+//		MainApp.instance.bluenet.subscribe(BluenetEvent.INITIALIZED, ::onBluenetInitialized)
+//		MainApp.instance.bluenet.subscribe(BluenetEvent.SCANNER_READY, ::onScannerReady)
 
-	}
-
-	fun onBluenetInitialized(data: Any) {
-		Log.i(TAG, "onBluenetInitialized")
-		MainApp.instance.bluenet.makeScannerReady(this)
-				.success {
+		Log.i(TAG, "init bluenet")
+//		MainApp.instance.bluenet.init(this)
+		MainApp.instance.bluenet.init(applicationContext)
+				.then {
+					Log.i(TAG, "make scanner ready")
+					MainApp.instance.bluenet.makeScannerReady(this)
+				}.unwrap()
+				.then {
 					Log.i(TAG, "start scanning")
 					MainApp.instance.bluenet.startScanning()
 				}
-				.fail {
-					Log.w(TAG, "unable to start scanning: $it")
-				}
+	}
+
+	fun onBluenetInitialized(data: Any) {
+//		Log.i(TAG, "onBluenetInitialized")
+//		MainApp.instance.bluenet.makeScannerReady(this)
+//				.success {
+//					Log.i(TAG, "start scanning")
+//					MainApp.instance.bluenet.startScanning()
+//				}
+//				.fail {
+//					Log.w(TAG, "unable to start scanning: $it")
+//				}
 //		MainApp.instance.bluenet.tryMakeScannerReady(this)
 	}
 

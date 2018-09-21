@@ -46,16 +46,17 @@ class MainApp : Application(), LifecycleObserver {
 
 		ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-		bluenet.init(instance)
-				.success {
-					Log.i(TAG, "initialized")
-				}
-				.fail {
-					Log.e(TAG, "init failed: $it")
-				}
+//		bluenet.init(instance)
+//				.success {
+//					Log.i(TAG, "bluenet initialized")
+//				}
+//				.fail {
+//					Log.e(TAG, "bluenet init failed: $it")
+//				}
 
-		val test = TestKovenant()
-		test.test()
+//		val test = TestKovenant()
+//		test.test()
+
 	}
 
 	@OnLifecycleEvent(Lifecycle.Event.ON_START)
