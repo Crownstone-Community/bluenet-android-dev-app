@@ -9,8 +9,10 @@ import com.android.volley.toolbox.Volley
 import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
 import rocks.crownstone.bluenet.*
+import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.dev_app.cloud.Spheres
 import rocks.crownstone.dev_app.cloud.User
+import java.util.*
 
 // Singleton class that is accessible in all activities
 //object MainApp : Application() {
@@ -46,6 +48,8 @@ class MainApp : Application(), LifecycleObserver {
 
 		ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
+		bluenet.subscribe(BluenetEvent.SCAN_RESULT, ::onScan)
+
 //		bluenet.init(instance)
 //				.success {
 //					Log.i(TAG, "bluenet initialized")
@@ -56,6 +60,16 @@ class MainApp : Application(), LifecycleObserver {
 
 //		val test = TestKovenant()
 //		test.test()
+
+
+//		val uuid = UUID.fromString("0000C002-0000-1000-8000-00805F9B34FB")
+//		when (uuid) {
+//			null -> Log.i(TAG, "null")
+//			BluenetProtocol.SERVICE_DATA_UUID_CROWNSTONE_PLUG -> Log.i(TAG, "plug")
+//			BluenetProtocol.SERVICE_DATA_UUID_CROWNSTONE_BUILTIN -> Log.i(TAG, "builtin")
+//			BluenetProtocol.SERVICE_DATA_UUID_GUIDESTONE -> Log.i(TAG, "guide")
+//			else -> Log.i(TAG, "unknown")
+//		}
 
 	}
 
@@ -86,6 +100,17 @@ class MainApp : Application(), LifecycleObserver {
 	override fun onTerminate() {
 		super.onTerminate()
 		stopKovenant() // Stop thread(s)
+	}
+
+	private fun onScan(data: Any?) {
+		if (data == null) {
+			return
+		}
+		val device = data as ScannedDevice
+		Log.v(TAG, "onScan: $device")
+		if (device.validated) {
+			Log.i(TAG, "validated: $device")
+		}
 	}
 
 	//	companion object {

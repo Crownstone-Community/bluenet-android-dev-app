@@ -16,10 +16,10 @@ import rocks.crownstone.dev_app.util.CsError
 
 class User(context: Context, volleyQueue: RequestQueue) {
 	private val TAG = User::class.java.canonicalName
-	private val _volleyQueue = volleyQueue
-	private val _context = context
+	private val volleyQueue = volleyQueue
+	private val context = context
 
-	private lateinit var _userData: UserData
+	private var userData: UserData? = null
 
 	private fun hashPassword(password: String): Promise<String, Exception> {
 		val deferred = deferred<String, Exception>()
@@ -63,7 +63,7 @@ class User(context: Context, volleyQueue: RequestQueue) {
 				}
 		)
 
-		_volleyQueue.add(jsonObjectRequest)
+		volleyQueue.add(jsonObjectRequest)
 		return deferred.promise
 	}
 
@@ -74,7 +74,7 @@ class User(context: Context, volleyQueue: RequestQueue) {
 			val accessToken = json.getString("id")
 			val ttl = json.getLong("ttl")
 			val creationDate = json.getString("created")
-			_userData = UserData(userId, accessToken, ttl, creationDate)
+			userData = UserData(userId, accessToken, ttl, creationDate)
 		}
 	}
 
@@ -91,11 +91,13 @@ class User(context: Context, volleyQueue: RequestQueue) {
 
 	fun getUserData(): Promise<UserData, Exception> {
 		val deferred = deferred<UserData, Exception>()
-		if (this::_userData.isInitialized) {
+		val data = userData
+		if (data == null) {
 			deferred.reject(Exception("not logged in"))
+			return deferred.promise
 		}
 		// TODO: check if access token is valid
-		deferred.resolve(_userData.copy())
+		deferred.resolve(data)
 		return deferred.promise
 	}
 

@@ -17,7 +17,7 @@ class Spheres(context: Context, volleyQueue: RequestQueue) {
 	private val _volleyQueue = volleyQueue
 	private val _context = context
 
-	private var _spheres = HashMap<String, SphereData>()
+	private var _spheres = HashMap<String, SphereData>() // Map with: sphere id as key.
 
 
 	fun getSpheres(user: User): Promise<Unit, Exception> {
@@ -37,6 +37,10 @@ class Spheres(context: Context, volleyQueue: RequestQueue) {
 				.then {
 					parseSphereKeysResponse(it)
 				}.unwrap()
+	}
+
+	fun getSpheres(): HashMap<String, SphereData> {
+		return _spheres
 	}
 
 	override fun toString(): String {
@@ -122,13 +126,13 @@ class Spheres(context: Context, volleyQueue: RequestQueue) {
 
 	private fun parseSphereKeysJson(json: JSONObject): KeySet {
 		val keySet = KeySet(null, null, null)
-		keySet.adminKey = Key(json.optString("admin", null))
-		keySet.memberKey = Key(json.optString("member", null))
-		keySet.memberKey = Key(json.optString("member", null))
+		keySet.adminKey = json.optString("admin", null)
+		keySet.memberKey = json.optString("member", null)
+		keySet.guestKey = json.optString("guest", null)
 		return keySet
 	}
 
-	private fun parseSphereKeyString(key: String?): Key {
-		return Key(key) // Key is just a string
+	private fun parseSphereKeyString(key: String?): Key? {
+		return key // Key is just a string
 	}
 }

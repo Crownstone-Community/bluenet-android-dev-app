@@ -2,6 +2,7 @@ package rocks.crownstone.dev_app
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.app.Activity
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
@@ -164,27 +165,16 @@ class LoginActivity : AppCompatActivity() {
 					}
 					.failUi {
 						Toast.makeText(this@LoginActivity, "Error: %s".format(it.toString()), Toast.LENGTH_LONG).show()
+						Log.e(TAG, "Error: ${it.message}")
+						it.printStackTrace()
 					}
 					.alwaysUi {
 						_authTask = null
 						showProgress(false)
 						Log.i(TAG, "done")
+						setResult(Activity.RESULT_OK)
 						finish()
 					}
 		}
-	}
-
-	companion object {
-
-		/**
-		 * Id to identity READ_CONTACTS permission request.
-		 */
-		private val REQUEST_READ_CONTACTS = 0
-
-		/**
-		 * A dummy authentication store containing known user names and passwords.
-		 * TODO: remove after connecting to a real authentication system.
-		 */
-		private val DUMMY_CREDENTIALS = arrayOf("a@b:12", "bar@example.com:world")
 	}
 }
