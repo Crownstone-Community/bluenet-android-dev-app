@@ -8,6 +8,8 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
+import nl.komponents.kovenant.then
+import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.*
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.dev_app.cloud.Spheres
@@ -110,6 +112,27 @@ class MainApp : Application(), LifecycleObserver {
 		Log.v(TAG, "onScan: $device")
 		if (device.validated) {
 			Log.i(TAG, "validated: $device")
+			bluenet.connect(device.address)
+					.then {
+						bluenet.discoverServices()
+					}.unwrap()
+					.then {
+						bluenet.read(BluenetProtocol.DEVICE_INFO_SERVICE_UUID, BluenetProtocol.CHAR_FIRMWARE_REVISION_UUID)
+					}.unwrap()
+					.then {
+						val writeData = ByteArray(1)
+						writeData[0] = 5
+						bluenet.write(BluenetProtocol.CROWNSTONE_SERVICE_UUID, BluenetProtocol.CHAR_CONTROL_UUID, writeData)
+					}.unwrap()
+					.then {
+						bluenet.disconnect(true)
+					}
+					.fail {
+						Log.e(TAG, "error: ${it.message}")
+					}
+					.always {
+//						bluenet.disconnect(true)
+					}
 		}
 	}
 
