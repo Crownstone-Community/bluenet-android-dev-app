@@ -2,6 +2,7 @@ package rocks.crownstone.dev_app
 
 import android.app.Application
 import android.arch.lifecycle.*
+import android.os.Handler
 //import android.arch.lifecycle.ProcessLifecycleOwner
 import android.util.Log
 import com.android.volley.RequestQueue
@@ -38,6 +39,8 @@ class MainApp : Application(), LifecycleObserver {
 	lateinit var spheres: Spheres
 	val bluenet = Bluenet()
 
+	var nearestDeviceAddress: DeviceAddress? = null
+	var handler = Handler()
 
 	override fun onCreate() {
 		super<Application>.onCreate()
@@ -51,6 +54,8 @@ class MainApp : Application(), LifecycleObserver {
 		ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
 		bluenet.subscribe(BluenetEvent.SCAN_RESULT, ::onScan)
+		bluenet.subscribe(BluenetEvent.NEAREST_VALIDATED_NORMAL, ::onNearest)
+		handler.postDelayed(connectRunnable, 1000)
 
 //		bluenet.init(instance)
 //				.success {
@@ -110,30 +115,48 @@ class MainApp : Application(), LifecycleObserver {
 		}
 		val device = data as ScannedDevice
 		Log.v(TAG, "onScan: $device")
-		if (device.validated) {
-			Log.i(TAG, "validated: $device")
-			bluenet.connect(device.address)
-					.then {
-						bluenet.discoverServices()
-					}.unwrap()
-					.then {
-						bluenet.read(BluenetProtocol.DEVICE_INFO_SERVICE_UUID, BluenetProtocol.CHAR_FIRMWARE_REVISION_UUID)
-					}.unwrap()
-					.then {
-						val writeData = ByteArray(1)
-						writeData[0] = 5
-						bluenet.write(BluenetProtocol.CROWNSTONE_SERVICE_UUID, BluenetProtocol.CHAR_CONTROL_UUID, writeData)
-					}.unwrap()
-					.then {
-						bluenet.disconnect(true)
-					}
-					.fail {
-						Log.e(TAG, "error: ${it.message}")
-					}
-					.always {
-//						bluenet.disconnect(true)
-					}
+	}
+
+	private fun onNearest(data: Any) {
+		val nearest = data as NearestDeviceListEntry
+		Log.d(TAG, "nearest=${nearest.deviceAddress}")
+		nearestDeviceAddress = nearest.deviceAddress
+	}
+
+	private val connectRunnable = Runnable {
+		val address = nearestDeviceAddress
+		connect(address)
+	}
+
+	private fun connect(address: DeviceAddress?) {
+		if (address == null) {
+			handler.postDelayed(connectRunnable, 1000)
+			return
 		}
+		bluenet.connect(address)
+				.then {
+					bluenet.discoverServices()
+				}.unwrap()
+				.then {
+					bluenet.read(BluenetProtocol.DEVICE_INFO_SERVICE_UUID, BluenetProtocol.CHAR_FIRMWARE_REVISION_UUID)
+				}.unwrap()
+				.then {
+					val writeData = ByteArray(1)
+					writeData[0] = 5
+					bluenet.write(BluenetProtocol.CROWNSTONE_SERVICE_UUID, BluenetProtocol.CHAR_CONTROL_UUID, writeData)
+				}.unwrap()
+				.then {
+					bluenet.disconnect(true)
+				}.unwrap()
+				.success {
+					Log.i(TAG, "success")
+				}
+				.fail {
+					Log.e(TAG, "error: ${it.message}")
+				}
+				.always {
+					handler.post(connectRunnable)
+				}
 	}
 
 	//	companion object {
