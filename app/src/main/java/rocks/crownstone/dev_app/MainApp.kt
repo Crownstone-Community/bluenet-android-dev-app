@@ -32,7 +32,7 @@ import java.util.*
 
 //class MainApp : Application(), DefaultLifecycleObserver { // Requires min api 24
 class MainApp : Application(), LifecycleObserver {
-	private val TAG = MainApp::class.java.canonicalName
+	private val TAG = MainApp::class.java.simpleName
 //	val volleyQueue = Volley.newRequestQueue(this)
 	lateinit var volleyQueue: RequestQueue
 	lateinit var user: User
@@ -83,17 +83,17 @@ class MainApp : Application(), LifecycleObserver {
 	@OnLifecycleEvent(Lifecycle.Event.ON_START)
 	fun onAppForegrounded() {
 		Log.i(TAG, "onAppForegrounded")
-		if (bluenet.isScannerReady()) {
-			bluenet.startScanning()
-		}
+//		if (bluenet.isScannerReady()) {
+//			bluenet.startScanning()
+//		}
 	}
 
 	@OnLifecycleEvent(Lifecycle.Event.ON_STOP)
 	fun onAppBackgrounded() {
 		Log.i(TAG, "onAppBackgrounded")
-		if (bluenet.isScannerReady()) {
-			bluenet.stopScanning()
-		}
+//		if (bluenet.isScannerReady()) {
+//			bluenet.stopScanning()
+//		}
 	}
 
 //	override fun onStart(owner: LifecycleOwner) {
@@ -133,26 +133,31 @@ class MainApp : Application(), LifecycleObserver {
 			handler.postDelayed(connectRunnable, 1000)
 			return
 		}
+		Log.i(TAG, "---- connect ----")
 		bluenet.connect(address)
 				.then {
+					Log.i(TAG, "---- discover services ----")
 					bluenet.discoverServices()
 				}.unwrap()
 				.then {
+					Log.i(TAG, "---- read ----")
 					bluenet.read(BluenetProtocol.DEVICE_INFO_SERVICE_UUID, BluenetProtocol.CHAR_FIRMWARE_REVISION_UUID)
 				}.unwrap()
 				.then {
+					Log.i(TAG, "---- write ----")
 					val writeData = ByteArray(1)
 					writeData[0] = 5
 					bluenet.write(BluenetProtocol.CROWNSTONE_SERVICE_UUID, BluenetProtocol.CHAR_CONTROL_UUID, writeData)
 				}.unwrap()
 				.then {
+					Log.i(TAG, "---- disconnect ----")
 					bluenet.disconnect(true)
 				}.unwrap()
 				.success {
-					Log.i(TAG, "success")
+					Log.i(TAG, "---- success ----")
 				}
 				.fail {
-					Log.e(TAG, "error: ${it.message}")
+					Log.e(TAG, "---- error: ${it.message} ----")
 				}
 				.always {
 					handler.post(connectRunnable)
