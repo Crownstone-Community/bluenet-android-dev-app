@@ -6,7 +6,7 @@ import android.util.Log
 import nl.komponents.kovenant.*
 
 class TestKovenant {
-	val TAG = TestKovenant::class.java.canonicalName
+	val TAG = this.javaClass.simpleName
 	val handler = Handler()
 	var testHandlerNextNum = 0
 

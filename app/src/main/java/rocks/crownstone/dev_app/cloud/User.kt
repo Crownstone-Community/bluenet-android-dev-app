@@ -15,7 +15,7 @@ import java.security.NoSuchAlgorithmException
 import rocks.crownstone.dev_app.util.CsError
 
 class User(context: Context, volleyQueue: RequestQueue) {
-	private val TAG = User::class.java.canonicalName
+	private val TAG = this.javaClass.simpleName
 	private val volleyQueue = volleyQueue
 	private val context = context
 

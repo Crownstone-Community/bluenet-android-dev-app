@@ -13,7 +13,7 @@ import org.json.JSONObject
 import rocks.crownstone.dev_app.util.CsError
 
 class Spheres(context: Context, volleyQueue: RequestQueue) {
-	private val TAG = User::class.java.canonicalName
+	private val TAG = this.javaClass.simpleName
 	private val _volleyQueue = volleyQueue
 	private val _context = context
 

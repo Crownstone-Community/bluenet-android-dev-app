@@ -19,7 +19,7 @@ import java.util.*
 
 // Singleton class that is accessible in all activities
 //object MainApp : Application() {
-//	private val TAG = MainApp::class.java.canonicalName
+//	private val TAG = this.javaClass.simpleName
 //	lateinit var volleyQueue: RequestQueue
 //
 //	override fun onCreate() {
@@ -32,7 +32,7 @@ import java.util.*
 
 //class MainApp : Application(), DefaultLifecycleObserver { // Requires min api 24
 class MainApp : Application(), LifecycleObserver {
-	private val TAG = MainApp::class.java.simpleName
+	private val TAG = this.javaClass.simpleName
 //	val volleyQueue = Volley.newRequestQueue(this)
 	lateinit var volleyQueue: RequestQueue
 	lateinit var user: User

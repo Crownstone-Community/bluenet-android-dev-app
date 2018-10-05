@@ -13,7 +13,7 @@ import rocks.crownstone.bluenet.encryption.KeySet
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
-	private val TAG = this.javaClass.canonicalName
+	private val TAG = this.javaClass.simpleName
 
 	private val REQUEST_CODE_LOGIN = 1
 

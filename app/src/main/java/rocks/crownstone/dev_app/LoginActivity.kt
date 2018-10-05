@@ -29,7 +29,7 @@ class LoginActivity : AppCompatActivity() {
 	 * Keep track of the login task to ensure we can cancel it if requested.
 	 */
 	private var _authTask: UserLoginTask? = null
-	private val TAG = this.javaClass.canonicalName
+	private val TAG = this.javaClass.simpleName
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
