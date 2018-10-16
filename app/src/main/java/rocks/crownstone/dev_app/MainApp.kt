@@ -69,6 +69,9 @@ class MainApp : Application(), LifecycleObserver {
 //		test.test()
 
 
+		val testTemplate = TestTemplate()
+		testTemplate.test()
+
 //		val uuid = UUID.fromString("0000C002-0000-1000-8000-00805F9B34FB")
 //		when (uuid) {
 //			null -> Log.i(TAG, "null")
