@@ -42,7 +42,7 @@
         </activity>
         -->
 		<service
-			android:name="rocks.crownstone.bluenet.BleService"
+			android:name="rocks.crownstone.bluenet.BackgroundService"
 			android:enabled="true"
 			android:exported="false"
 			android:label="Crownstone dev" />
