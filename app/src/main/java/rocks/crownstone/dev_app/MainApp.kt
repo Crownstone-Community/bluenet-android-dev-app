@@ -155,12 +155,14 @@ class MainApp : Application(), LifecycleObserver {
 				}.unwrap()
 				.success {
 					Log.i(TAG, "---- success ----")
+					handler.post(connectRunnable)
 				}
 				.fail {
 					Log.e(TAG, "---- error: ${it.message} ----")
+					handler.postDelayed(connectRunnable, 100)
 				}
 				.always {
-					handler.post(connectRunnable)
+
 				}
 	}
 
