@@ -9,11 +9,11 @@ class TestTemplate {
 	fun test() {
 		var arr = byteArrayOf(-100)
 		someFun<Uint8>(arr)
-		Log.i(TAG, "${arr[0]} = ${Conversion.byteArrayToSigned<Uint8>(arr)}")
+		Log.i(TAG, "${arr[0]} = ${Conversion.byteArrayTo<Uint8>(arr)}")
 		arr = byteArrayOf(0)
-		Log.i(TAG, "0 = ${Conversion.byteArrayToSigned<Uint8>(arr)}")
+		Log.i(TAG, "0 = ${Conversion.byteArrayTo<Uint8>(arr)}")
 		arr = byteArrayOf(100)
-		Log.i(TAG, "100 = ${Conversion.byteArrayToSigned<Uint8>(arr)}")
+		Log.i(TAG, "100 = ${Conversion.byteArrayTo<Uint8>(arr)}")
 	}
 
 	inline fun <reified T> someFun(array: ByteArray): T {
@@ -34,6 +34,6 @@ class TestTemplate {
 			Float::class ->
 				Log.i(TAG, "float")
 		}
-		return Conversion.byteArrayToSigned(array)
+		return Conversion.byteArrayTo(array)
 	}
 }
