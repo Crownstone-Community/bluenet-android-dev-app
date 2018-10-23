@@ -15,7 +15,6 @@ import rocks.crownstone.bluenet.*
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.dev_app.cloud.Spheres
 import rocks.crownstone.dev_app.cloud.User
-import java.util.*
 
 // Singleton class that is accessible in all activities
 //object MainApp : Application() {
@@ -65,8 +64,8 @@ class MainApp : Application(), LifecycleObserver {
 //					Log.e(TAG, "bluenet init failed: $it")
 //				}
 
-//		val test = TestKovenant()
-//		test.test()
+		val testKovenant = TestKovenant()
+		testKovenant.testRecover()
 
 
 		val testTemplate = TestTemplate()

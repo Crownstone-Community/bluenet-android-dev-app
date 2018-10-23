@@ -4,6 +4,7 @@ import android.os.AsyncTask
 import android.os.Handler
 import android.util.Log
 import nl.komponents.kovenant.*
+import rocks.crownstone.bluenet.util.Util
 
 class TestKovenant {
 	val TAG = this.javaClass.simpleName
@@ -119,23 +120,42 @@ class TestKovenant {
 				}.unwrap()
 	}
 
-	fun test4() {
-		fun1(-1)
-				.fail {
-					Log.i(TAG, "fail ${it.message}")
-				}
+	fun testRecover() {
+//		Log.i(TAG, "testRecover")
+//		fun1(-1)
+//				.fail {
+//					Log.i(TAG, "fail ${it.message}")
+//				}
+//				.then {
+//					Log.i(TAG, "then")
+//				}
+//				.then {
+//					Log.i(TAG, "then2")
+//					fun1(-2)
+//				}.unwrap()
+//				.success {
+//					Log.i(TAG, "success $it")
+//				}
+//				.fail {
+//					Log.i(TAG, "fail2 ${it.message}")
+//				}
+		Log.i(TAG, "testRecover")
+//		Util.recoverablePromise(fun4(-1), {error: Exception -> true})
+//		Util.recoverablePromise(fun4(-1), {error: Exception -> return@recoverablePromise true})
+		Util.recoverablePromise(fun4(-1), fun (error: Exception): Boolean { return true })
 				.then {
-					Log.i(TAG, "then")
-				}
-				.then {
-					Log.i(TAG, "then2")
-					fun1(-2)
+					Log.i(TAG, "then: recovered")
+					Util.waitPromise(500, handler)
 				}.unwrap()
-				.success {
-					Log.i(TAG, "success $it")
+				.then {
+					Log.i(TAG, "then: waited")
+					Util.recoverablePromise(fun4(-2), {error -> error is Exception})
+				}
+				.then {
+					Log.i(TAG, "then: recovered again")
 				}
 				.fail {
-					Log.i(TAG, "fail2 ${it.message}")
+					Log.i(TAG, "fail")
 				}
 	}
 
@@ -204,6 +224,19 @@ class TestKovenant {
 		val task = DummyTask()
 		task.execute(nr)
 
+		return deferred.promise
+	}
+
+	fun fun4(nr: Int): Promise<Unit, Exception> {
+		Log.i(TAG, "fun4 start nr=$nr")
+		val deferred = deferred<Unit, Exception>()
+		if (nr < 0) {
+			deferred.reject(Exception("fun4 needs some positivity! Not $nr"))
+		}
+		else {
+			Log.i(TAG, "fun1 success with $nr")
+			deferred.resolve()
+		}
 		return deferred.promise
 	}
 
