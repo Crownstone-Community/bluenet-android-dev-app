@@ -54,19 +54,11 @@ class MainApp : Application(), LifecycleObserver {
 
 		bluenet.subscribe(BluenetEvent.SCAN_RESULT, ::onScan)
 		bluenet.subscribe(BluenetEvent.NEAREST_VALIDATED_NORMAL, ::onNearest)
-		handler.postDelayed(connectRunnable, 1000)
 
-//		bluenet.init(instance)
-//				.success {
-//					Log.i(TAG, "bluenet initialized")
-//				}
-//				.fail {
-//					Log.e(TAG, "bluenet init failed: $it")
-//				}
+//		handler.postDelayed(connectRunnable, 1000)
 
 		val testKovenant = TestKovenant()
 		testKovenant.testRecover()
-
 
 		val testTemplate = TestTemplate()
 		testTemplate.test()
