@@ -65,6 +65,10 @@ class DeviceListFragment : Fragment() {
 
 
 	fun onScannedDevice(device: ScannedDevice) {
+		if (!device.validated) {
+			return
+		}
+
 //		deviceMap[device.address] = device
 		var found = false
 		for (i in deviceList.indices) {
