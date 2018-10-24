@@ -127,37 +127,37 @@ class MainApp : Application(), LifecycleObserver {
 			handler.postDelayed(connectRunnable, 1000)
 			return
 		}
-		Log.i(TAG, "---- connect ----")
-		bluenet.connect(address)
-				.then {
-					Log.i(TAG, "---- discover services ----")
-					bluenet.discoverServices()
-				}.unwrap()
-				.then {
-					Log.i(TAG, "---- read ----")
-					bluenet.read(BluenetProtocol.DEVICE_INFO_SERVICE_UUID, BluenetProtocol.CHAR_FIRMWARE_REVISION_UUID)
-				}.unwrap()
-				.then {
-					Log.i(TAG, "---- write ----")
-					val writeData = ByteArray(1)
-					writeData[0] = 5
-					bluenet.write(BluenetProtocol.CROWNSTONE_SERVICE_UUID, BluenetProtocol.CHAR_CONTROL_UUID, writeData)
-				}.unwrap()
-				.then {
-					Log.i(TAG, "---- disconnect ----")
-					bluenet.disconnect(true)
-				}.unwrap()
-				.success {
-					Log.i(TAG, "---- success ----")
-					handler.post(connectRunnable)
-				}
-				.fail {
-					Log.e(TAG, "---- error: ${it.message} ----")
-					handler.postDelayed(connectRunnable, 100)
-				}
-				.always {
-
-				}
+//		Log.i(TAG, "---- connect ----")
+//		bluenet.connect(address)
+//				.then {
+//					Log.i(TAG, "---- discover services ----")
+//					bluenet.discoverServices()
+//				}.unwrap()
+//				.then {
+//					Log.i(TAG, "---- read ----")
+//					bluenet.read(BluenetProtocol.DEVICE_INFO_SERVICE_UUID, BluenetProtocol.CHAR_FIRMWARE_REVISION_UUID)
+//				}.unwrap()
+//				.then {
+//					Log.i(TAG, "---- write ----")
+//					val writeData = ByteArray(1)
+//					writeData[0] = 5
+//					bluenet.write(BluenetProtocol.CROWNSTONE_SERVICE_UUID, BluenetProtocol.CHAR_CONTROL_UUID, writeData)
+//				}.unwrap()
+//				.then {
+//					Log.i(TAG, "---- disconnect ----")
+//					bluenet.disconnect(true)
+//				}.unwrap()
+//				.success {
+//					Log.i(TAG, "---- success ----")
+//					handler.post(connectRunnable)
+//				}
+//				.fail {
+//					Log.e(TAG, "---- error: ${it.message} ----")
+//					handler.postDelayed(connectRunnable, 100)
+//				}
+//				.always {
+//
+//				}
 	}
 
 	//	companion object {
