@@ -10,8 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import nl.komponents.kovenant.then
 import rocks.crownstone.bluenet.BluenetEvent
 import rocks.crownstone.bluenet.DeviceAddress
+import rocks.crownstone.bluenet.OperationMode
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 
 
@@ -97,5 +99,12 @@ class DeviceListFragment : Fragment() {
 
 	private fun onDeviceClick(device: ScannedDevice, longClick: Boolean) {
 		Log.i(TAG, "onDeviceClick ${device.address}")
+
+		if (device.operationMode == OperationMode.SETUP) {
+			MainApp.instance.bluenet.connect(device.address)
+					.then {
+//						MainApp.instance.bluenet.setup.setup()
+					}
+		}
 	}
 }
