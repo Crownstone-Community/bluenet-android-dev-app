@@ -63,9 +63,9 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 		val ibeaconData = device.ibeaconData
 		if (ibeaconData != null) {
 			holder.iBeacon.visibility = View.VISIBLE
-			holder.uuid.text =  ibeaconData.uuid.toString()
-			holder.major.text = ibeaconData.major.toString()
-			holder.minor.text = ibeaconData.minor.toString()
+			holder.uuid.text =  "uuid: ${ibeaconData.uuid}"
+			holder.major.text = "major: ${ibeaconData.major}"
+			holder.minor.text = "minor: ${ibeaconData.minor}"
 		}
 		else {
 			holder.iBeacon.visibility = View.GONE
