@@ -12,11 +12,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
-import rocks.crownstone.bluenet.BluenetEvent
-import rocks.crownstone.bluenet.DeviceAddress
-import rocks.crownstone.bluenet.OperationMode
+import rocks.crownstone.bluenet.*
 import rocks.crownstone.bluenet.encryption.KeySet
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
+import rocks.crownstone.bluenet.util.Conversion
 import java.util.*
 
 
@@ -104,15 +103,31 @@ class DeviceListFragment : Fragment() {
 		Log.i(TAG, "onDeviceClick ${device.address}")
 
 		if (device.operationMode == OperationMode.SETUP) {
-			MainApp.instance.bluenet.connect(device.address)
+
+			MainApp.instance.selectSphereAlert(this)
 					.then {
-						val spheres = MainApp.instance.sphere.spheres
-						for (sphere in spheres.values) {
-							val keySet = KeySet(sphere.keySet?.adminKey, sphere.keySet?.memberKey, sphere.keySet?.guestKey)
-							val uuid = UUID.fromString(sphere.iBeaconUUID)
-						}
-//						MainApp.instance.spheres.
-//						MainApp.instance.bluenet.setup.setup()
+						MainApp.instance.bluenet.connect(device.address)
+					}.unwrap()
+					.then { sphere ->
+						MainApp.instance.user.getUserData()
+					}.unwrap()
+					.then {
+						val name = device.name ?: ""
+						MainApp.instance.stone.createStone(it, sphere, name, device.address)
+					}.unwrap()
+					.then {
+						val keySet = KeySet(sphere.keySet?.adminKey, sphere.keySet?.memberKey, sphere.keySet?.guestKey)
+						val meshAccessAddress = Conversion.byteArrayTo<Uint32>(Conversion.hexStringToBytes(sphere.meshAccessAddress))
+						val ibeaconData = IbeaconData(UUID.fromString(it.iBeaconUUID), it.iBeaconMajor, it.iBeaconMinor, 0)
+						val stoneId = it.stoneId
+						MainApp.instance.bluenet.setup.setup(stoneId.toShort(), keySet, meshAccessAddress, ibeaconData)
+					}.unwrap()
+					.success {
+						Log.i(TAG, "Setup complete!")
+					}
+					.fail {
+						Log.i(TAG, "Setup failed: ${it.message}")
+						MainApp.instance.bluenet.disconnect()
 					}
 		}
 
