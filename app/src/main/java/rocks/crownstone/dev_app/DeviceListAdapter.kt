@@ -12,6 +12,7 @@ import android.widget.TextView
 
 
 import kotlinx.android.synthetic.main.device_list_item.view.*
+import rocks.crownstone.bluenet.DeviceType
 import rocks.crownstone.bluenet.OperationMode
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 
@@ -71,10 +72,20 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 			holder.iBeacon.visibility = View.GONE
 		}
 
+		val serviceData = device.serviceData
+
 		when (device.operationMode) {
-			OperationMode.DFU ->    holder.view.setBackgroundColor(0xFF8000A0.toInt())
-			OperationMode.SETUP ->  holder.view.setBackgroundColor(0xFF0080D0.toInt())
-			OperationMode.NORMAL -> holder.view.setBackgroundColor(0xFF60A000.toInt())
+			OperationMode.DFU ->    holder.view.setBackgroundColor(0xFF8000A0.toInt()) // Purple
+			OperationMode.SETUP ->  holder.view.setBackgroundColor(0xFF0080D0.toInt()) // Blue
+			OperationMode.NORMAL -> {
+				when (serviceData?.deviceType) {
+					DeviceType.CROWNSTONE_PLUG ->    holder.view.setBackgroundColor(0xFF60A000.toInt()) // Light green
+					DeviceType.CROWNSTONE_BUILTIN -> holder.view.setBackgroundColor(0xFF008000.toInt()) // Green
+					DeviceType.GUIDESTONE ->         holder.view.setBackgroundColor(0xFFA0E000.toInt()) // Yellow green
+					DeviceType.CROWNSTONE_DONGLE ->  holder.view.setBackgroundColor(0xFF00A0A0.toInt()) // Cyan
+					else ->                          holder.view.setBackgroundColor(0xFF000000.toInt())
+				}
+			}
 			else ->                 holder.view.setBackgroundColor(0xFF000000.toInt())
 		}
 
