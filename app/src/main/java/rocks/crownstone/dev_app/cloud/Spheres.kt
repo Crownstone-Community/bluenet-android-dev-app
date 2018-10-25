@@ -71,7 +71,7 @@ class Spheres(context: Context, volleyQueue: RequestQueue) {
 				},
 				Response.ErrorListener { error ->
 					Log.e(TAG, "Error: %s".format(error.toString()))
-					deferred.reject(CsError.LoginException("Login failed"))
+					deferred.reject(Exception("Failed to get spheres: $error"))
 				}
 		)
 
@@ -105,7 +105,7 @@ class Spheres(context: Context, volleyQueue: RequestQueue) {
 				},
 				Response.ErrorListener { error ->
 					Log.e(TAG, "Error: %s".format(error.toString()))
-					deferred.reject(CsError.LoginException("Login failed"))
+					deferred.reject(Exception("Failed to get keys: $error"))
 				}
 		)
 

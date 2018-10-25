@@ -59,7 +59,7 @@ class User(context: Context, volleyQueue: RequestQueue) {
 				},
 				Response.ErrorListener { error ->
 					Log.e(TAG, "Error: %s".format(error.toString()))
-					deferred.reject(CsError.LoginException("Login failed"))
+					deferred.reject(Exception("Login failed: $error"))
 				}
 		)
 
