@@ -1,19 +1,27 @@
 package rocks.crownstone.dev_app
 
+import android.app.Activity
 import android.app.Application
 import android.arch.lifecycle.*
 import android.os.Handler
+import android.support.v7.app.AlertDialog
 //import android.arch.lifecycle.ProcessLifecycleOwner
 import android.util.Log
+import android.widget.ArrayAdapter
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
+import nl.komponents.kovenant.Promise
 import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
+import nl.komponents.kovenant.deferred
 import rocks.crownstone.bluenet.*
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.dev_app.cloud.Sphere
 import rocks.crownstone.dev_app.cloud.Stone
 import rocks.crownstone.dev_app.cloud.User
+import rocks.crownstone.dev_app.cloud.SphereData
+
+
 
 // Singleton class that is accessible in all activities
 //object MainApp : Application() {
@@ -56,7 +64,7 @@ class MainApp : Application(), LifecycleObserver {
 		bluenet.subscribe(BluenetEvent.SCAN_RESULT, ::onScan)
 		bluenet.subscribe(BluenetEvent.NEAREST_VALIDATED_NORMAL, ::onNearest)
 
-//		handler.postDelayed(connectRunnable, 1000)
+//		handler.postDelayed(testBluenetRunnable, 1000)
 
 		val testKovenant = TestKovenant()
 		testKovenant.testRecover()
@@ -118,16 +126,16 @@ class MainApp : Application(), LifecycleObserver {
 		nearestDeviceAddress = nearest.deviceAddress
 	}
 
-	private val connectRunnable = Runnable {
+	private val testBluenetRunnable = Runnable {
 		val address = nearestDeviceAddress
-		connect(address)
+		testBluenet(address)
 	}
 
-	private fun connect(address: DeviceAddress?) {
-		if (address == null) {
-			handler.postDelayed(connectRunnable, 1000)
-			return
-		}
+	private fun testBluenet(address: DeviceAddress?) {
+//		if (address == null) {
+//			handler.postDelayed(testBluenetRunnable, 1000)
+//			return
+//		}
 //		Log.i(TAG, "---- connect ----")
 //		bluenet.connect(address)
 //				.then {
@@ -160,6 +168,38 @@ class MainApp : Application(), LifecycleObserver {
 //
 //				}
 	}
+
+	/**
+	 * Show the list of spheres and let the user pick one.
+	 *
+	 * @param activity The activity to show the dialog.
+	 * @param return Promise with the selected sphere when resolved.
+	 */
+	fun selectSphereAlert(activity: Activity): Promise<SphereData, Exception> {
+		val deferred = deferred<SphereData, Exception>()
+		val adapter = ArrayAdapter<String>(activity, android.R.layout.select_dialog_item)
+		val sphereArray = ArrayList(sphere.spheres.values)
+		for (sphereData in sphereArray) {
+			adapter.add(sphereData.name)
+		}
+		val builder = AlertDialog.Builder(activity)
+		builder.setTitle("Select a sphere")
+		builder.setAdapter(adapter) { dialog, which ->
+			Log.i(TAG, "clicked $which ${sphereArray[which].name} == ${adapter.getItem(which)}")
+			deferred.resolve(sphereArray[which])
+		}
+		builder.setNegativeButton(android.R.string.cancel) { dialog, which ->
+			dialog.dismiss()
+		}
+		builder.setOnDismissListener {
+			deferred.reject(Exception("Canceled"))
+		}
+		builder.show()
+		return deferred.promise
+	}
+
+
+
 
 	//	companion object {
 //		private val _instance: MainApp = MainApp()
