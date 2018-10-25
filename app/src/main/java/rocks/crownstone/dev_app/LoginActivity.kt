@@ -156,12 +156,12 @@ class LoginActivity : AppCompatActivity() {
 			Log.i(TAG, "execute")
 			MainApp.instance.user.login(_email, _password)
 					.then {
-						MainApp.instance.spheres.getSpheres(MainApp.instance.user)
+						MainApp.instance.sphere.getSpheres(MainApp.instance.user)
 					}.unwrap()
 					.successUi {
 //						this@LoginActivity.runOnUiThread { Toast.makeText(this@LoginActivity, "Response: %s".format(it), Toast.LENGTH_LONG).show() }
 						Toast.makeText(this@LoginActivity, "Login successful", Toast.LENGTH_LONG).show()
-						Log.i(TAG, MainApp.instance.spheres.toString())
+						Log.i(TAG, MainApp.instance.sphere.toString())
 					}
 					.failUi {
 						Toast.makeText(this@LoginActivity, "Error: %s".format(it.toString()), Toast.LENGTH_LONG).show()
