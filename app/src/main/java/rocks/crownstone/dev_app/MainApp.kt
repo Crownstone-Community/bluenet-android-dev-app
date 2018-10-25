@@ -14,6 +14,7 @@ import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.*
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.dev_app.cloud.Spheres
+import rocks.crownstone.dev_app.cloud.Stone
 import rocks.crownstone.dev_app.cloud.User
 
 // Singleton class that is accessible in all activities
@@ -36,6 +37,7 @@ class MainApp : Application(), LifecycleObserver {
 	lateinit var volleyQueue: RequestQueue
 	lateinit var user: User
 	lateinit var spheres: Spheres
+	lateinit var stone: Stone
 	val bluenet = Bluenet()
 
 	var nearestDeviceAddress: DeviceAddress? = null
@@ -49,6 +51,7 @@ class MainApp : Application(), LifecycleObserver {
 		volleyQueue = Volley.newRequestQueue(this)
 		user = User(this, volleyQueue)
 		spheres = Spheres(this, volleyQueue)
+		stone = Stone(this, volleyQueue)
 
 		ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 

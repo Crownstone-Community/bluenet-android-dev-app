@@ -11,10 +11,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import nl.komponents.kovenant.then
+import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.BluenetEvent
 import rocks.crownstone.bluenet.DeviceAddress
 import rocks.crownstone.bluenet.OperationMode
+import rocks.crownstone.bluenet.encryption.KeySet
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
+import java.util.*
 
 
 /**
@@ -103,8 +106,33 @@ class DeviceListFragment : Fragment() {
 		if (device.operationMode == OperationMode.SETUP) {
 			MainApp.instance.bluenet.connect(device.address)
 					.then {
+						val spheres = MainApp.instance.spheres.getSpheres()
+						for (sphere in spheres.values) {
+							val keySet = KeySet(sphere.keySet?.adminKey, sphere.keySet?.memberKey, sphere.keySet?.guestKey)
+							val uuid = UUID.fromString(sphere.iBeaconUUID)
+						}
+//						MainApp.instance.spheres.
 //						MainApp.instance.bluenet.setup.setup()
 					}
+		}
+
+		if (device.operationMode == OperationMode.NORMAL) {
+			val spheres = MainApp.instance.spheres.getSpheres()
+			for (sphere in spheres.values) {
+				val uuid = UUID.fromString(sphere.iBeaconUUID)
+				if (uuid == device.ibeaconData?.uuid) {
+					MainApp.instance.user.getUserData()
+							.then {
+								MainApp.instance.stone.getStoneData(it, sphere, device.address)
+							}.unwrap()
+							.then {
+								Log.i(TAG, "stoneData: $it")
+							}
+							.fail {
+								Log.w(TAG, it.message)
+							}
+				}
+			}
 		}
 	}
 }
