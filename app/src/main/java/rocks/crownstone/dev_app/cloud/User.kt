@@ -12,8 +12,6 @@ import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
-import rocks.crownstone.dev_app.util.CsError
-
 class User(context: Context, volleyQueue: RequestQueue) {
 	private val TAG = this.javaClass.simpleName
 	private val volleyQueue = volleyQueue

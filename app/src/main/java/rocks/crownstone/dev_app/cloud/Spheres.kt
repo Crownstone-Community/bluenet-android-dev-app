@@ -10,7 +10,6 @@ import com.android.volley.toolbox.JsonObjectRequest
 import nl.komponents.kovenant.*
 import org.json.JSONArray
 import org.json.JSONObject
-import rocks.crownstone.dev_app.util.CsError
 
 class Spheres(context: Context, volleyQueue: RequestQueue) {
 	private val TAG = this.javaClass.simpleName
