@@ -9,11 +9,9 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
-import nl.komponents.kovenant.then
-import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.*
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
-import rocks.crownstone.dev_app.cloud.Spheres
+import rocks.crownstone.dev_app.cloud.Sphere
 import rocks.crownstone.dev_app.cloud.Stone
 import rocks.crownstone.dev_app.cloud.User
 
@@ -36,7 +34,7 @@ class MainApp : Application(), LifecycleObserver {
 //	val volleyQueue = Volley.newRequestQueue(this)
 	lateinit var volleyQueue: RequestQueue
 	lateinit var user: User
-	lateinit var spheres: Spheres
+	lateinit var sphere: Sphere
 	lateinit var stone: Stone
 	val bluenet = Bluenet()
 
@@ -50,7 +48,7 @@ class MainApp : Application(), LifecycleObserver {
 		startKovenant() // Start thread(s)
 		volleyQueue = Volley.newRequestQueue(this)
 		user = User(this, volleyQueue)
-		spheres = Spheres(this, volleyQueue)
+		sphere = Sphere(this, volleyQueue)
 		stone = Stone(this, volleyQueue)
 
 		ProcessLifecycleOwner.get().lifecycle.addObserver(this)

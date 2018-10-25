@@ -106,7 +106,7 @@ class DeviceListFragment : Fragment() {
 		if (device.operationMode == OperationMode.SETUP) {
 			MainApp.instance.bluenet.connect(device.address)
 					.then {
-						val spheres = MainApp.instance.spheres.getSpheres()
+						val spheres = MainApp.instance.sphere.spheres
 						for (sphere in spheres.values) {
 							val keySet = KeySet(sphere.keySet?.adminKey, sphere.keySet?.memberKey, sphere.keySet?.guestKey)
 							val uuid = UUID.fromString(sphere.iBeaconUUID)
@@ -117,7 +117,7 @@ class DeviceListFragment : Fragment() {
 		}
 
 		if (device.operationMode == OperationMode.NORMAL) {
-			val spheres = MainApp.instance.spheres.getSpheres()
+			val spheres = MainApp.instance.sphere.spheres
 			for (sphere in spheres.values) {
 				val uuid = UUID.fromString(sphere.iBeaconUUID)
 				if (uuid == device.ibeaconData?.uuid) {

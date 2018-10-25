@@ -12,17 +12,13 @@ import nl.komponents.kovenant.Promise
 import nl.komponents.kovenant.deferred
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
-import org.json.JSONArray
 import org.json.JSONObject
 import rocks.crownstone.bluenet.DeviceAddress
-import rocks.crownstone.bluenet.SphereId
 import java.net.URLEncoder
-import java.util.*
 
 class Stone(context: Context, volleyQueue: RequestQueue) {
 	private val TAG = this.javaClass.simpleName
 	private val volleyQueue = volleyQueue
-	private val context = context
 
 	fun createStone(user: UserData, sphere: SphereData, name: String, address: DeviceAddress): Promise<StoneData, Exception> {
 		val deferred = deferred<StoneData, Exception>()

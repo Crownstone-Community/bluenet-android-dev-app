@@ -6,17 +6,15 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.JsonObjectRequest
 import nl.komponents.kovenant.*
 import org.json.JSONArray
 import org.json.JSONObject
 
-class Spheres(context: Context, volleyQueue: RequestQueue) {
+class Sphere(context: Context, volleyQueue: RequestQueue) {
 	private val TAG = this.javaClass.simpleName
-	private val _volleyQueue = volleyQueue
-	private val _context = context
+	private val volleyQueue = volleyQueue
 
-	private var _spheres = HashMap<String, SphereData>() // Map with: sphere id as key.
+	var spheres = HashMap<String, SphereData>(); private set // Map with: sphere id as key.
 
 
 	fun getSpheres(user: User): Promise<Unit, Exception> {
@@ -38,14 +36,10 @@ class Spheres(context: Context, volleyQueue: RequestQueue) {
 				}.unwrap()
 	}
 
-	fun getSpheres(): HashMap<String, SphereData> {
-		return _spheres
-	}
-
 	override fun toString(): String {
 		val sb = StringBuilder()
 		sb.append("spheres:\n")
-		for (sphere in _spheres.values) {
+		for (sphere in spheres.values) {
 			sb.append("id=")
 			sb.append(sphere.id)
 			sb.append(" UUID=")
@@ -60,7 +54,7 @@ class Spheres(context: Context, volleyQueue: RequestQueue) {
 
 
 	private fun getAllSpheres(userData: UserData): Promise<JSONArray, Exception> {
-		_spheres.clear()
+		spheres.clear()
 		val deferred = deferred<JSONArray, Exception>()
 		val url = "https://my.crownstone.rocks/api/users/${userData.id}/spheres/?access_token=${userData.accessToken}"
 		val jsonRequest = JsonArrayRequest(Request.Method.GET, url, null,
@@ -74,7 +68,7 @@ class Spheres(context: Context, volleyQueue: RequestQueue) {
 				}
 		)
 
-		_volleyQueue.add(jsonRequest)
+		volleyQueue.add(jsonRequest)
 		return deferred.promise
 	}
 
@@ -88,7 +82,7 @@ class Spheres(context: Context, volleyQueue: RequestQueue) {
 				val meshAccessAddress = sphereJson.getString("meshAccessAddress")
 
 				val sphere = SphereData(id, name, null, meshAccessAddress, iBeaconUUID)
-				_spheres[id] = sphere
+				spheres[id] = sphere
 			}
 		}
 	}
@@ -108,7 +102,7 @@ class Spheres(context: Context, volleyQueue: RequestQueue) {
 				}
 		)
 
-		_volleyQueue.add(jsonRequest)
+		volleyQueue.add(jsonRequest)
 		return deferred.promise
 	}
 
@@ -118,7 +112,7 @@ class Spheres(context: Context, volleyQueue: RequestQueue) {
 				val sphereJson = response.getJSONObject(i)
 				val id = sphereJson.getString("sphereId")
 				val keysJson = sphereJson.getJSONObject("keys")
-				_spheres[id]?.keySet = parseSphereKeysJson(keysJson)
+				spheres[id]?.keySet = parseSphereKeysJson(keysJson)
 			}
 		}
 	}

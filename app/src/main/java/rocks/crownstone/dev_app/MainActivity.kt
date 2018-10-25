@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 	fun onLogin(resultCode: Int) {
 		Log.i(TAG, "onLogin result=$resultCode")
 
-		val spheres = MainApp.instance.spheres.getSpheres()
+		val spheres = MainApp.instance.sphere.spheres
 		val keys = Keys()
 		for (sphere in spheres.values) {
 			val keySet = KeySet(sphere.keySet?.adminKey, sphere.keySet?.memberKey, sphere.keySet?.guestKey)
