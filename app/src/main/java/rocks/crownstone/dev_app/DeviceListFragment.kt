@@ -16,6 +16,10 @@ import rocks.crownstone.bluenet.*
 import rocks.crownstone.bluenet.encryption.KeySet
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.util.Conversion
+import rocks.crownstone.bluenet.util.Util
+import rocks.crownstone.dev_app.cloud.SphereData
+import rocks.crownstone.dev_app.cloud.StoneData
+import rocks.crownstone.dev_app.cloud.UserData
 import java.util.*
 
 
@@ -104,29 +108,39 @@ class DeviceListFragment : Fragment() {
 
 		if (device.operationMode == OperationMode.SETUP) {
 
-			MainApp.instance.selectSphereAlert(this)
+			var sphere: SphereData? = null
+			var stoneData: StoneData? = null
+			var userData: UserData? = null
+			val activity = activity ?: return
+			MainApp.instance.selectSphereAlert(activity)
 					.then {
-						MainApp.instance.bluenet.connect(device.address)
-					}.unwrap()
-					.then { sphere ->
+						sphere = it
 						MainApp.instance.user.getUserData()
 					}.unwrap()
 					.then {
+						userData = it
 						val name = device.name ?: ""
-						MainApp.instance.stone.createStone(it, sphere, name, device.address)
+						Util.recoverablePromise(MainApp.instance.stone.createStone(userData!!, sphere!!, name, device.address), { error ->
+							return@recoverablePromise MainApp.instance.stone.getStoneData(userData!!, sphere!!, device.address)
+						})
 					}.unwrap()
 					.then {
-						val keySet = KeySet(sphere.keySet?.adminKey, sphere.keySet?.memberKey, sphere.keySet?.guestKey)
-						val meshAccessAddress = Conversion.byteArrayTo<Uint32>(Conversion.hexStringToBytes(sphere.meshAccessAddress))
-						val ibeaconData = IbeaconData(UUID.fromString(it.iBeaconUUID), it.iBeaconMajor, it.iBeaconMinor, 0)
-						val stoneId = it.stoneId
+						stoneData = it
+						MainApp.instance.bluenet.connect(device.address)
+					}.unwrap()
+					.then {
+						val keySet = KeySet(sphere?.keySet?.adminKey, sphere?.keySet?.memberKey, sphere?.keySet?.guestKey)
+						val meshAccessAddress = Conversion.byteArrayTo<Uint32>(Conversion.hexStringToBytes(sphere!!.meshAccessAddress))
+						val ibeaconData = IbeaconData(UUID.fromString(stoneData!!.iBeaconUUID), stoneData!!.iBeaconMajor, stoneData!!.iBeaconMinor, 0)
+						val stoneId = stoneData!!.stoneId
 						MainApp.instance.bluenet.setup.setup(stoneId.toShort(), keySet, meshAccessAddress, ibeaconData)
 					}.unwrap()
 					.success {
 						Log.i(TAG, "Setup complete!")
 					}
 					.fail {
-						Log.i(TAG, "Setup failed: ${it.message}")
+						Log.e(TAG, "Setup failed: ${it.message}")
+						it.printStackTrace()
 						MainApp.instance.bluenet.disconnect()
 					}
 		}
