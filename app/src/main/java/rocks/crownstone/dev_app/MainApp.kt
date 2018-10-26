@@ -3,6 +3,7 @@ package rocks.crownstone.dev_app
 import android.app.Activity
 import android.app.Application
 import android.arch.lifecycle.*
+import android.content.Context
 import android.os.Handler
 import android.support.v7.app.AlertDialog
 //import android.arch.lifecycle.ProcessLifecycleOwner
@@ -189,10 +190,18 @@ class MainApp : Application(), LifecycleObserver {
 			deferred.resolve(sphereArray[which])
 		}
 		builder.setNegativeButton(android.R.string.cancel) { dialog, which ->
+			Log.d(TAG, "negative button")
+			deferred.reject(Exception("Canceled"))
 			dialog.dismiss()
 		}
-		builder.setOnDismissListener {
+		builder.setOnCancelListener {
+			Log.d(TAG, "canceled")
+			// triggers when clicked next to dialog, or back button
 			deferred.reject(Exception("Canceled"))
+		}
+		builder.setOnDismissListener {
+			Log.d(TAG, "dismissed")
+			// tiggers when dialog goes away (either via button, or cancel)
 		}
 		builder.show()
 		return deferred.promise
