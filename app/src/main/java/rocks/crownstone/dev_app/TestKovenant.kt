@@ -142,14 +142,14 @@ class TestKovenant {
 		Log.i(TAG, "testRecover")
 //		Util.recoverablePromise(fun4(-1), {error: Exception -> true})
 //		Util.recoverablePromise(fun4(-1), {error: Exception -> return@recoverablePromise true})
-		Util.recoverablePromise(fun4(-1), fun (error: Exception): Boolean { return true })
+		Util.recoverablePromise(fun4(-1), fun (error: Exception): Promise<Unit, Exception> { return Promise.ofSuccess(Unit) })
 				.then {
 					Log.i(TAG, "then: recovered")
 					Util.waitPromise(500, handler)
 				}.unwrap()
 				.then {
 					Log.i(TAG, "then: waited")
-					Util.recoverablePromise(fun4(-2), {error -> error is Exception})
+					Util.recoverableUnitPromise(fun4(-2), {error -> error is Exception })
 				}
 				.then {
 					Log.i(TAG, "then: recovered again")
