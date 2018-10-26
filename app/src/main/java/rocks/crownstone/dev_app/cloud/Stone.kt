@@ -26,6 +26,8 @@ class Stone(context: Context, volleyQueue: RequestQueue) {
 		val data = JSONObject()
 		data.put("name", name)
 		data.put("address", address)
+		Log.i(TAG, "createStone url=$url")
+		Log.i(TAG, "createStone data=$data")
 		val request = JsonObjectRequest(Request.Method.POST, url, data,
 				Response.Listener { response ->
 					Log.i(TAG, "Response: %s".format(response.toString()))
