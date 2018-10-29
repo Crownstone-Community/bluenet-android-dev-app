@@ -9,19 +9,22 @@ import android.support.v7.app.AlertDialog
 //import android.arch.lifecycle.ProcessLifecycleOwner
 import android.util.Log
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import nl.komponents.kovenant.Promise
 import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
 import nl.komponents.kovenant.deferred
+import nl.komponents.kovenant.then
+import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.*
+import rocks.crownstone.bluenet.encryption.KeySet
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
-import rocks.crownstone.dev_app.cloud.Sphere
-import rocks.crownstone.dev_app.cloud.Stone
-import rocks.crownstone.dev_app.cloud.User
-import rocks.crownstone.dev_app.cloud.SphereData
-
+import rocks.crownstone.bluenet.util.Conversion
+import rocks.crownstone.bluenet.util.Util
+import rocks.crownstone.dev_app.cloud.*
+import java.util.*
 
 
 // Singleton class that is accessible in all activities
@@ -170,6 +173,114 @@ class MainApp : Application(), LifecycleObserver {
 //				}
 	}
 
+	fun setup(device: ScannedDevice, activity: Activity) {
+		var sphere: SphereData? = null
+		var stoneData: StoneData? = null
+		var userData: UserData? = null
+		selectSphereAlert(activity)
+				.then {
+					sphere = it
+					user.getUserData()
+				}.unwrap()
+				.then {
+					userData = it
+					val name = device.name ?: ""
+					Util.recoverablePromise(stone.createStone(userData!!, sphere!!, name, device.address), { error ->
+						return@recoverablePromise stone.getStoneData(userData!!, sphere!!, device.address)
+					})
+				}.unwrap()
+				.then {
+					stoneData = it
+					bluenet.connect(device.address)
+				}.unwrap()
+				.then {
+					val keySet = KeySet(sphere?.keySet?.adminKey, sphere?.keySet?.memberKey, sphere?.keySet?.guestKey)
+					val meshAccessAddress = Conversion.byteArrayTo<Uint32>(Conversion.hexStringToBytes(sphere!!.meshAccessAddress))
+					val ibeaconData = IbeaconData(UUID.fromString(stoneData!!.iBeaconUUID), stoneData!!.iBeaconMajor, stoneData!!.iBeaconMinor, 0)
+					val stoneId = stoneData!!.stoneId
+					bluenet.setup.setup(stoneId.toShort(), keySet, meshAccessAddress, ibeaconData)
+				}.unwrap()
+				.success {
+					Log.i(TAG, "Setup complete!")
+					showResult("setup success", activity)
+				}
+				.fail {
+					Log.e(TAG, "Setup failed: ${it.message}")
+					it.printStackTrace()
+					showResult("setup failed: ${it.message}", activity)
+					bluenet.disconnect()
+				}
+	}
+
+	fun factoryReset(device: ScannedDevice, activity: Activity) {
+//		val spheres = sphere.spheres
+//		for (sphere in spheres.values) {
+//			val uuid = UUID.fromString(sphere.iBeaconUUID)
+//			if (uuid == device.ibeaconData?.uuid) {
+//				user.getUserData()
+//						.then {
+//							stone.getStoneData(it, sphere, device.address)
+//						}.unwrap()
+//						.then {
+//							Log.i(TAG, "stoneData: $it")
+//						}
+//						.fail {
+//							Log.w(TAG, it.message)
+//						}
+//			}
+//		}
+		confirmAlert(activity, "factory reset", "Do you want to factory reset this device?")
+				.success { confirmed ->
+					if (!confirmed) {
+						return@success
+					}
+					bluenet.connect(device.address)
+							.then {
+								bluenet.control.factoryReset()
+							}.unwrap()
+							.success {
+								Log.i(TAG, "factory reset success")
+								showResult("factory reset success", activity)
+								bluenet.disconnect(true)
+							}
+							.fail {
+								Log.e(TAG, "factory reset failed: ${it.message}")
+								showResult("factory reset failed: ${it.message}", activity)
+							}
+				}
+	}
+
+	fun showResult(msg: String, activity: Activity) {
+		activity.runOnUiThread {
+			Toast.makeText(activity, msg, Toast.LENGTH_LONG).show()
+		}
+	}
+
+
+	fun confirmAlert(activity: Activity, title: String, question: String): Promise<Boolean, Exception> {
+		val deferred = deferred<Boolean, Exception>()
+		val builder = AlertDialog.Builder(activity)
+		builder.setTitle(title)
+		builder.setMessage(question)
+		builder.setPositiveButton(android.R.string.yes) { dialog, which ->
+			Log.d(TAG, "yes")
+			deferred.resolve(true)
+			dialog.dismiss()
+		}
+		builder.setNegativeButton(android.R.string.no) { dialog, which ->
+			Log.d(TAG, "no")
+			deferred.resolve(false)
+			dialog.dismiss()
+		}
+		builder.setOnCancelListener {
+			Log.d(TAG, "canceled")
+			// triggers when clicked next to dialog, or back button
+			deferred.resolve(false)
+		}
+		builder.show()
+		return deferred.promise
+	}
+
 	/**
 	 * Show the list of spheres and let the user pick one.
 	 *
@@ -206,9 +317,6 @@ class MainApp : Application(), LifecycleObserver {
 		builder.show()
 		return deferred.promise
 	}
-
-
-
 
 	//	companion object {
 //		private val _instance: MainApp = MainApp()

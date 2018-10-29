@@ -105,62 +105,15 @@ class DeviceListFragment : Fragment() {
 
 	private fun onDeviceClick(device: ScannedDevice, longClick: Boolean) {
 		Log.i(TAG, "onDeviceClick ${device.address}")
+		val activity = activity ?: return
 
 		if (device.operationMode == OperationMode.SETUP) {
-
-			var sphere: SphereData? = null
-			var stoneData: StoneData? = null
-			var userData: UserData? = null
-			val activity = activity ?: return
-			MainApp.instance.selectSphereAlert(activity)
-					.then {
-						sphere = it
-						MainApp.instance.user.getUserData()
-					}.unwrap()
-					.then {
-						userData = it
-						val name = device.name ?: ""
-						Util.recoverablePromise(MainApp.instance.stone.createStone(userData!!, sphere!!, name, device.address), { error ->
-							return@recoverablePromise MainApp.instance.stone.getStoneData(userData!!, sphere!!, device.address)
-						})
-					}.unwrap()
-					.then {
-						stoneData = it
-						MainApp.instance.bluenet.connect(device.address)
-					}.unwrap()
-					.then {
-						val keySet = KeySet(sphere?.keySet?.adminKey, sphere?.keySet?.memberKey, sphere?.keySet?.guestKey)
-						val meshAccessAddress = Conversion.byteArrayTo<Uint32>(Conversion.hexStringToBytes(sphere!!.meshAccessAddress))
-						val ibeaconData = IbeaconData(UUID.fromString(stoneData!!.iBeaconUUID), stoneData!!.iBeaconMajor, stoneData!!.iBeaconMinor, 0)
-						val stoneId = stoneData!!.stoneId
-						MainApp.instance.bluenet.setup.setup(stoneId.toShort(), keySet, meshAccessAddress, ibeaconData)
-					}.unwrap()
-					.success {
-						Log.i(TAG, "Setup complete!")
-					}
-					.fail {
-						Log.e(TAG, "Setup failed: ${it.message}")
-						it.printStackTrace()
-						MainApp.instance.bluenet.disconnect()
-					}
+			MainApp.instance.setup(device, activity)
 		}
 
 		if (device.operationMode == OperationMode.NORMAL) {
-			val spheres = MainApp.instance.sphere.spheres
-			for (sphere in spheres.values) {
-				val uuid = UUID.fromString(sphere.iBeaconUUID)
-				if (uuid == device.ibeaconData?.uuid) {
-					MainApp.instance.user.getUserData()
-							.then {
-								MainApp.instance.stone.getStoneData(it, sphere, device.address)
-							}.unwrap()
-							.then {
-								Log.i(TAG, "stoneData: $it")
-							}
-							.fail {
-								Log.w(TAG, it.message)
-							}
-				}
+			if (longClick) {
+				MainApp.instance.factoryReset(device, activity)
 			}
 		}
 	}
