@@ -174,6 +174,7 @@ class MainApp : Application(), LifecycleObserver {
 	}
 
 	fun setup(device: ScannedDevice, activity: Activity) {
+		bluenet.stopScanning()
 		var sphere: SphereData? = null
 		var stoneData: StoneData? = null
 		var userData: UserData? = null
@@ -210,25 +211,12 @@ class MainApp : Application(), LifecycleObserver {
 					showResult("setup failed: ${it.message}", activity)
 					bluenet.disconnect()
 				}
+				.always {
+					bluenet.startScanning()
+				}
 	}
 
 	fun factoryReset(device: ScannedDevice, activity: Activity) {
-//		val spheres = sphere.spheres
-//		for (sphere in spheres.values) {
-//			val uuid = UUID.fromString(sphere.iBeaconUUID)
-//			if (uuid == device.ibeaconData?.uuid) {
-//				user.getUserData()
-//						.then {
-//							stone.getStoneData(it, sphere, device.address)
-//						}.unwrap()
-//						.then {
-//							Log.i(TAG, "stoneData: $it")
-//						}
-//						.fail {
-//							Log.w(TAG, it.message)
-//						}
-//			}
-//		}
 		confirmAlert(activity, "factory reset", "Do you want to factory reset this device?")
 				.success { confirmed ->
 					if (!confirmed) {
@@ -242,12 +230,38 @@ class MainApp : Application(), LifecycleObserver {
 								Log.i(TAG, "factory reset success")
 								showResult("factory reset success", activity)
 								bluenet.disconnect(true)
+										.then {
+											removeStoneFromCloud(device)
+										}.unwrap()
+										.success {
+											Log.i(TAG, "removed from cloud")
+											showResult("removed from cloud", activity)
+										}
+										.fail {
+											Log.e(TAG, "failed to remove from cloud: ${it.message}")
+											showResult("failed to remove from cloud: ${it.message}", activity)
+										}
 							}
 							.fail {
 								Log.e(TAG, "factory reset failed: ${it.message}")
 								showResult("factory reset failed: ${it.message}", activity)
+								bluenet.disconnect(true)
 							}
 				}
+	}
+
+	fun removeStoneFromCloud(device: ScannedDevice): Promise<Unit, Exception> {
+		val spheres = sphere.spheres
+		for (sphere in spheres.values) {
+			val uuid = UUID.fromString(sphere.iBeaconUUID)
+			if (uuid == device.ibeaconData?.uuid) {
+				return user.getUserData()
+						.then {
+							stone.removeStone(it, sphere, device.address)
+						}.unwrap()
+			}
+		}
+		return Promise.ofFail(Exception("Unknown sphere"))
 	}
 
 	fun showResult(msg: String, activity: Activity) {
