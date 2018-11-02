@@ -68,6 +68,29 @@ class Stone(context: Context, volleyQueue: RequestQueue) {
 		return deferred.promise
 	}
 
+	fun getAllStones(user: UserData, sphere: SphereData): Promise<List<StoneData>, Exception> {
+		val deferred = deferred<List<StoneData>, Exception>()
+		var url = "https://my.crownstone.rocks/api/Spheres/${sphere.id}/ownedStones?access_token=${user.accessToken}"
+		Log.i(TAG, "getStoneData url=$url")
+		val request = JsonArrayRequest(Request.Method.GET, url, null,
+				Response.Listener { response ->
+//					Log.i(TAG, "Response: %s".format(response.toString()))
+					val list = ArrayList<StoneData>()
+					for (i in 0 until response.length()) {
+						val stoneData = jsonToStoneData(response.getJSONObject(i), sphere.iBeaconUUID)
+						list.add(stoneData)
+					}
+					deferred.resolve(list)
+				},
+				Response.ErrorListener { error ->
+					Log.e(TAG, "Error: %s".format(error.toString()))
+					deferred.reject(Exception("Failed to get stone: $error"))
+				}
+		)
+		volleyQueue.add(request)
+		return deferred.promise
+	}
+
 	fun removeStone(user: UserData, sphere: SphereData, address: DeviceAddress): Promise<Unit, Exception> {
 		return getStoneData(user, sphere, address)
 				.then {
