@@ -3,14 +3,11 @@ package rocks.crownstone.dev_app
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
 import android.util.Log
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
-import rocks.crownstone.bluenet.BluenetProtocol
-import rocks.crownstone.bluenet.KeyData
-import rocks.crownstone.bluenet.Keys
-import rocks.crownstone.bluenet.encryption.EncryptionManager
+import rocks.crownstone.bluenet.structs.KeyData
+import rocks.crownstone.bluenet.structs.Keys
 import rocks.crownstone.bluenet.encryption.KeySet
 import java.util.*
 
@@ -41,7 +38,8 @@ class MainActivity : AppCompatActivity() {
 					MainApp.instance.bluenet.makeScannerReady(this)
 				}.unwrap()
 				.then {
-					MainApp.instance.bluenet.addIbeaconFilter(BluenetProtocol.SETUP_IBEACON_UUID)
+//					MainApp.instance.bluenet.filterForIbeacons(true)
+					MainApp.instance.bluenet.filterForCrownstones(true)
 					Log.i(TAG, "start scanning")
 					MainApp.instance.bluenet.startScanning()
 				}
@@ -73,7 +71,7 @@ class MainActivity : AppCompatActivity() {
 		for (sphere in spheres.values) {
 			val keySet = KeySet(sphere.keySet?.adminKey, sphere.keySet?.memberKey, sphere.keySet?.guestKey)
 			val uuid = UUID.fromString(sphere.iBeaconUUID)
-			MainApp.instance.bluenet.addIbeaconFilter(uuid)
+//			MainApp.instance.bluenet.addIbeaconFilter(uuid)
 			val keyData = KeyData(keySet, uuid)
 			keys.put(sphere.id, keyData)
 		}

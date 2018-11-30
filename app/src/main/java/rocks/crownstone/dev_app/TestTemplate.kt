@@ -1,7 +1,7 @@
 package rocks.crownstone.dev_app
 
 import android.util.Log
-import rocks.crownstone.bluenet.*
+import rocks.crownstone.bluenet.structs.*
 import rocks.crownstone.bluenet.util.Conversion
 
 class TestTemplate {

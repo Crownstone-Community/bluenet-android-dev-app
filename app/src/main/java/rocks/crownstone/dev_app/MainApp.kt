@@ -3,7 +3,6 @@ package rocks.crownstone.dev_app
 import android.app.Activity
 import android.app.Application
 import android.arch.lifecycle.*
-import android.content.Context
 import android.os.Handler
 import android.support.v7.app.AlertDialog
 //import android.arch.lifecycle.ProcessLifecycleOwner
@@ -20,7 +19,12 @@ import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.*
 import rocks.crownstone.bluenet.encryption.KeySet
+import rocks.crownstone.bluenet.scanhandling.NearestDeviceListEntry
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
+import rocks.crownstone.bluenet.structs.BluenetEvent
+import rocks.crownstone.bluenet.structs.DeviceAddress
+import rocks.crownstone.bluenet.structs.IbeaconData
+import rocks.crownstone.bluenet.structs.Uint32
 import rocks.crownstone.bluenet.util.Conversion
 import rocks.crownstone.bluenet.util.Util
 import rocks.crownstone.dev_app.cloud.*

@@ -1,6 +1,5 @@
 package rocks.crownstone.dev_app
 
-import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -10,16 +9,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import nl.komponents.kovenant.then
-import nl.komponents.kovenant.unwrap
-import rocks.crownstone.bluenet.*
-import rocks.crownstone.bluenet.encryption.KeySet
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
-import rocks.crownstone.bluenet.util.Conversion
-import rocks.crownstone.bluenet.util.Util
-import rocks.crownstone.dev_app.cloud.SphereData
-import rocks.crownstone.dev_app.cloud.StoneData
-import rocks.crownstone.dev_app.cloud.UserData
+import rocks.crownstone.bluenet.structs.BluenetEvent
+import rocks.crownstone.bluenet.structs.DeviceAddress
+import rocks.crownstone.bluenet.structs.OperationMode
 import java.util.*
 
 
@@ -66,7 +59,7 @@ class DeviceListFragment : Fragment() {
 		}
 
 
-		MainApp.instance.bluenet.subscribe(BluenetEvent.SCAN_RESULT, {data -> onScannedDevice(data as ScannedDevice)})
+		MainApp.instance.bluenet.subscribe(BluenetEvent.SCAN_RESULT, { data -> onScannedDevice(data as ScannedDevice)})
 		MainApp.instance.bluenet.startScanning()
 		return view
 	}
