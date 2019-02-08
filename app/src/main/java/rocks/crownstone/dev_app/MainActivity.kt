@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 //					MainApp.instance.bluenet.filterForIbeacons(true)
 					MainApp.instance.bluenet.filterForCrownstones(true)
 					Log.i(TAG, "start scanning")
-					MainApp.instance.bluenet.startScanning()
+//					MainApp.instance.bluenet.startScanning()
 				}
 	}
 
@@ -74,8 +74,9 @@ class MainActivity : AppCompatActivity() {
 //			MainApp.instance.bluenet.addIbeaconFilter(uuid)
 			val keyData = KeyData(keySet, uuid)
 			keys.put(sphere.id, keyData)
+			MainApp.instance.bluenet.iBeaconRanger.track(uuid, sphere.id)
 		}
-		MainApp.instance.bluenet.loadSphereData(keys)
+		MainApp.instance.bluenet.loadKeys(keys)
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -90,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 		super.onActivityResult(requestCode, resultCode, data)
 	}
 
-	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
 		Log.i(TAG, "onRequestPermissionsResult $requestCode")
 		if (MainApp.instance.bluenet.handlePermissionResult(requestCode, permissions, grantResults)) {
 			return

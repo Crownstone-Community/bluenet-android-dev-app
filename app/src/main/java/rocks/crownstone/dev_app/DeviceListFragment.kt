@@ -9,10 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import nl.komponents.kovenant.then
+import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.BluenetEvent
 import rocks.crownstone.bluenet.structs.DeviceAddress
 import rocks.crownstone.bluenet.structs.OperationMode
+import rocks.crownstone.bluenet.structs.ScanMode
+import rocks.crownstone.dev_app.util.Conversion
 import java.util.*
 
 
@@ -54,6 +58,10 @@ class DeviceListFragment : Fragment() {
 
 		buttonRefresh = view.findViewById(R.id.buttonRefresh)
 		buttonRefresh.setOnClickListener {
+			MainApp.instance.bluenet.filterForCrownstones(true)
+			MainApp.instance.bluenet.filterForIbeacons(true)
+			MainApp.instance.bluenet.setScanInterval(ScanMode.BALANCED)
+			MainApp.instance.bluenet.startScanning()
 			deviceList.clear()
 			adapter.notifyDataSetChanged()
 		}
@@ -107,6 +115,14 @@ class DeviceListFragment : Fragment() {
 		if (device.operationMode == OperationMode.NORMAL) {
 			if (longClick) {
 				MainApp.instance.factoryReset(device, activity)
+			}
+			else {
+				MainApp.instance.bluenet.connect(device.address)
+						.then { MainApp.instance.bluenet.state.getSwitchCraftBuffers() }.unwrap()
+//						.success { Log.i(TAG, "buf: ${Conversion.bytesToString(it)}") }
+						.success { Log.i(TAG, "buf: $it") }
+						.fail {	Log.e(TAG, "failed to get switchcraft buffers: ${it.message}") }
+						.always { MainApp.instance.bluenet.disconnect() }
 			}
 		}
 	}

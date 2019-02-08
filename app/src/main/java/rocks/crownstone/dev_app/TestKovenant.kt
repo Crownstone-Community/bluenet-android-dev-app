@@ -159,6 +159,25 @@ class TestKovenant {
 				}
 	}
 
+	fun testConversion() {
+		Log.i(TAG, "testConversion")
+		fun1(3)
+				.then {
+					Log.i(TAG, "then")
+//					it.reversed()[100]
+					it.reversed()
+//					task { it.reversed() }
+//					task { 4 }
+//				}.unwrap()
+				}
+				.success {
+					Log.i(TAG, "$it")
+				}
+				.fail {
+					Log.i(TAG, "fail: ${it.message}")
+				}
+	}
+
 	private abstract class AsyncDummy : AsyncTask<Int, Void, String>() {
 		override fun doInBackground(vararg p0: Int?): String {
 			Thread.sleep(1000)
@@ -178,7 +197,7 @@ class TestKovenant {
 		}
 		else {
 			Log.i(TAG, "fun1 success with $nr")
-			deferred.resolve(nr.toString())
+			deferred.resolve("Done $nr")
 		}
 		return deferred.promise
 	}
@@ -195,7 +214,7 @@ class TestKovenant {
 					return
 				}
 				Log.i(TAG, "fun2 success: $result")
-				deferred.resolve("Done")
+				deferred.resolve("Done $result")
 			}
 		}
 		val task = DummyTask()

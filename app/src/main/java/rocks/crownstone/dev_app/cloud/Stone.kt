@@ -13,7 +13,7 @@ import nl.komponents.kovenant.deferred
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
 import org.json.JSONObject
-import rocks.crownstone.bluenet.DeviceAddress
+import rocks.crownstone.bluenet.structs.DeviceAddress
 import java.net.URLEncoder
 
 class Stone(context: Context, volleyQueue: RequestQueue) {

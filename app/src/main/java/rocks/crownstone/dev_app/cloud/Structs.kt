@@ -1,6 +1,6 @@
 package rocks.crownstone.dev_app.cloud
 
-import rocks.crownstone.bluenet.DeviceAddress
+import rocks.crownstone.bluenet.structs.DeviceAddress
 
 data class UserData(val id: String, var accessToken: String, var ttl: Long, var creationDate: String)
 //data class Key(val key: String?)

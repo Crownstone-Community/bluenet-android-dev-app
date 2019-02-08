@@ -1,8 +1,6 @@
 package rocks.crownstone.dev_app
 
-import android.graphics.Color
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +10,8 @@ import android.widget.TextView
 
 
 import kotlinx.android.synthetic.main.device_list_item.view.*
-import rocks.crownstone.bluenet.DeviceType
-import rocks.crownstone.bluenet.OperationMode
+import rocks.crownstone.bluenet.structs.DeviceType
+import rocks.crownstone.bluenet.structs.OperationMode
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 
 /**

@@ -6,7 +6,6 @@ import android.arch.lifecycle.*
 import android.os.Handler
 import android.support.v7.app.AlertDialog
 //import android.arch.lifecycle.ProcessLifecycleOwner
-import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.android.volley.RequestQueue
@@ -26,6 +25,7 @@ import rocks.crownstone.bluenet.structs.DeviceAddress
 import rocks.crownstone.bluenet.structs.IbeaconData
 import rocks.crownstone.bluenet.structs.Uint32
 import rocks.crownstone.bluenet.util.Conversion
+import rocks.crownstone.bluenet.util.Log
 import rocks.crownstone.bluenet.util.Util
 import rocks.crownstone.dev_app.cloud.*
 import java.util.*
@@ -75,7 +75,9 @@ class MainApp : Application(), LifecycleObserver {
 //		handler.postDelayed(testBluenetRunnable, 1000)
 
 		val testKovenant = TestKovenant()
-		testKovenant.testRecover()
+		testKovenant.test()
+//		testKovenant.testRecover()
+//		testKovenant.testConversion()
 
 		val testTemplate = TestTemplate()
 		testTemplate.test()
