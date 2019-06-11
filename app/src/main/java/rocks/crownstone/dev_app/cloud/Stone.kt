@@ -123,7 +123,8 @@ class Stone(context: Context, volleyQueue: RequestQueue) {
 		val address = json.getString("address")
 		val major = json.getInt("major")
 		val minor = json.getInt("minor")
-		return StoneData(id, sphereId, stoneId, name, address, iBeaconUuid, major, minor)
+		val meshDevKey = json.getString("meshDeviceKey")
+		return StoneData(id, sphereId, stoneId, name, address, iBeaconUuid, major, minor, meshDevKey)
 	}
 
 }
