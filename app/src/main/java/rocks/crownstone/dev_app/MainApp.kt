@@ -30,6 +30,7 @@ import rocks.crownstone.bluenet.util.Conversion
 import rocks.crownstone.bluenet.util.Log
 import rocks.crownstone.bluenet.util.Util
 import rocks.crownstone.dev_app.cloud.*
+import java.nio.charset.Charset
 import java.util.*
 
 
@@ -241,7 +242,7 @@ class MainApp : Application(), LifecycleObserver {
 					val meshAccessAddress = Conversion.byteArrayTo<Uint32>(Conversion.hexStringToBytes(sphere!!.meshAccessAddress))
 					val ibeaconData = IbeaconData(UUID.fromString(stoneData!!.iBeaconUUID), stoneData!!.iBeaconMajor, stoneData!!.iBeaconMinor, 0)
 					val stoneId = stoneData!!.stoneId
-					bluenet.setup.setup(stoneId.toShort(), sphere?.uid!!.toShort(), keySet, meshAccessAddress, byteArrayOf(0), ibeaconData)
+					bluenet.setup.setup(stoneId.toShort(), sphere?.uid!!.toShort(), keySet, meshAccessAddress, Conversion.hexStringToBytes(stoneData?.meshDevKey!!), ibeaconData)
 				}.unwrap()
 				.success {
 					Log.i(TAG, "Setup complete!")
