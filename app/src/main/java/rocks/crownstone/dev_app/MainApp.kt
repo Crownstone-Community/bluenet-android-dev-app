@@ -1,9 +1,12 @@
 package rocks.crownstone.dev_app
 
-import android.app.Activity
-import android.app.Application
+import android.app.*
 import android.arch.lifecycle.*
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Handler
+import android.support.v4.app.NotificationCompat
 import android.support.v7.app.AlertDialog
 //import android.arch.lifecycle.ProcessLifecycleOwner
 import android.widget.ArrayAdapter
@@ -18,12 +21,11 @@ import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.*
 import rocks.crownstone.bluenet.encryption.KeySet
+import rocks.crownstone.bluenet.packets.ControlPacket
+import rocks.crownstone.bluenet.packets.meshCommand.MeshControlPacket
 import rocks.crownstone.bluenet.scanhandling.NearestDeviceListEntry
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
-import rocks.crownstone.bluenet.structs.BluenetEvent
-import rocks.crownstone.bluenet.structs.DeviceAddress
-import rocks.crownstone.bluenet.structs.IbeaconData
-import rocks.crownstone.bluenet.structs.Uint32
+import rocks.crownstone.bluenet.structs.*
 import rocks.crownstone.bluenet.util.Conversion
 import rocks.crownstone.bluenet.util.Log
 import rocks.crownstone.bluenet.util.Util
@@ -47,12 +49,15 @@ import java.util.*
 //class MainApp : Application(), DefaultLifecycleObserver { // Requires min api 24
 class MainApp : Application(), LifecycleObserver {
 	private val TAG = this.javaClass.simpleName
+	lateinit var context: Context
 //	val volleyQueue = Volley.newRequestQueue(this)
 	lateinit var volleyQueue: RequestQueue
 	lateinit var user: User
 	lateinit var sphere: Sphere
 	lateinit var stone: Stone
 	val bluenet = Bluenet()
+
+	val NOTIFICATION_ID = 1
 
 	var nearestDeviceAddress: DeviceAddress? = null
 	var handler = Handler()
@@ -61,6 +66,7 @@ class MainApp : Application(), LifecycleObserver {
 		super<Application>.onCreate()
 		Log.i(TAG, "onCreate")
 		instance = this
+		context = this.applicationContext
 		startKovenant() // Start thread(s)
 		volleyQueue = Volley.newRequestQueue(this)
 		user = User(this, volleyQueue)
@@ -179,6 +185,36 @@ class MainApp : Application(), LifecycleObserver {
 //				}
 	}
 
+	fun getNotification(): Notification {
+		val notificationChannelId = "Crownstone" // The id of the notification channel. Must be unique per package. The value may be truncated if it is too long.
+		val notificationIntent = Intent(context, MainActivity::class.java)
+		notificationIntent.action = Intent.ACTION_MAIN
+		notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+		notificationIntent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+		if (Build.VERSION.SDK_INT >= 26) {
+			// Create the notification channel, must be done before posting any notification.
+			// It's safe to call this repeatedly because creating an existing notification channel performs no operation.
+			val name = "Dev stone" // The user visible name of the channel. The recommended maximum length is 40 characters; the value may be truncated if it is too long.
+			val importance = android.app.NotificationManager.IMPORTANCE_MIN
+			val channel = NotificationChannel(notificationChannelId, name, importance)
+
+			// Register the channel with the system; you can't change the importance or other notification behaviors after this
+			val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+			notificationManager.createNotificationChannel(channel)
+		}
+		val pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+		val notification = NotificationCompat.Builder(context, notificationChannelId)
+				.setSmallIcon(R.drawable.icon_notification)
+				.setContentTitle("Dev stone is running")
+				.setContentText("test")
+				.setContentIntent(pendingIntent)
+				.setOngoing(true)
+				.setPriority(NotificationCompat.PRIORITY_LOW)
+				.setVisibility(Notification.VISIBILITY_PUBLIC)
+				.build()
+		return notification
+	}
+
 	fun setup(device: ScannedDevice, activity: Activity) {
 		bluenet.stopScanning()
 		var sphere: SphereData? = null
@@ -201,11 +237,11 @@ class MainApp : Application(), LifecycleObserver {
 					bluenet.connect(device.address)
 				}.unwrap()
 				.then {
-					val keySet = KeySet(sphere?.keySet?.adminKey, sphere?.keySet?.memberKey, sphere?.keySet?.guestKey)
+					val keySet = KeySet(sphere?.keySet?.adminKey, sphere?.keySet?.memberKey, sphere?.keySet?.guestKey, sphere?.keySet?.serviceDataKey, sphere?.keySet?.meshAppKey, sphere?.keySet?.meshNetKey)
 					val meshAccessAddress = Conversion.byteArrayTo<Uint32>(Conversion.hexStringToBytes(sphere!!.meshAccessAddress))
 					val ibeaconData = IbeaconData(UUID.fromString(stoneData!!.iBeaconUUID), stoneData!!.iBeaconMajor, stoneData!!.iBeaconMinor, 0)
 					val stoneId = stoneData!!.stoneId
-					bluenet.setup.setup(stoneId.toShort(), keySet, meshAccessAddress, ibeaconData)
+					bluenet.setup.setup(stoneId.toShort(), sphere?.uid!!.toShort(), keySet, meshAccessAddress, byteArrayOf(0), ibeaconData)
 				}.unwrap()
 				.success {
 					Log.i(TAG, "Setup complete!")

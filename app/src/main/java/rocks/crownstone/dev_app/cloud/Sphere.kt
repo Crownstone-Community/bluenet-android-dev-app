@@ -154,7 +154,7 @@ class Sphere(context: Context, volleyQueue: RequestQueue) {
 				val sphereJson = response.getJSONObject(i)
 				val id = sphereJson.getString("sphereId")
 				val sphereKeysJson = sphereJson.getJSONArray("sphereKeys")
-				val stoneKeysJson = sphereJson.getJSONArray("stoneKeys")
+				val stoneKeysJson = sphereJson.getJSONObject("stoneKeys")
 				spheres[id]?.keySet = parseSphereKeysV2Json(sphereKeysJson)
 			}
 		}
@@ -169,7 +169,7 @@ class Sphere(context: Context, volleyQueue: RequestQueue) {
 			val key = keyJson.getString("key")
 			when (type) {
 				"ADMIN_KEY" -> keySet.adminKey = key
-				"MEMBER_KEY" -> keySet.adminKey = key
+				"MEMBER_KEY" -> keySet.memberKey = key
 				"BASIC_KEY" -> keySet.guestKey = key
 				"SERVICE_DATA_KEY" -> keySet.serviceDataKey = key
 				"MESH_APPLICATION_KEY" -> keySet.meshAppKey = key

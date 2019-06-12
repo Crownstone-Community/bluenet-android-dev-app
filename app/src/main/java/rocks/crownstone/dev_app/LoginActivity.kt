@@ -33,6 +33,7 @@ class LoginActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		Log.i(TAG, "onCreate")
 		setContentView(R.layout.activity_login)
 		// Set up the login form.
 		passwordText.setOnEditorActionListener(object: TextView.OnEditorActionListener {

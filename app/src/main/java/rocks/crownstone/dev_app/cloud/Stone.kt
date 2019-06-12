@@ -15,6 +15,8 @@ import nl.komponents.kovenant.unwrap
 import org.json.JSONObject
 import rocks.crownstone.bluenet.structs.DeviceAddress
 import java.net.URLEncoder
+import java.util.*
+import kotlin.collections.ArrayList
 
 class Stone(context: Context, volleyQueue: RequestQueue) {
 	private val TAG = this.javaClass.simpleName
@@ -123,7 +125,10 @@ class Stone(context: Context, volleyQueue: RequestQueue) {
 		val address = json.getString("address")
 		val major = json.getInt("major")
 		val minor = json.getInt("minor")
-		val meshDevKey = json.getString("meshDeviceKey")
+		Log.e(TAG, "Missing meshDeviceKey")
+		Log.e(TAG, "Device key should be retrieved via https://my.crownstone.rocks/api/users/<id>/keysV2")
+		// Create a semi random string for now..
+		val meshDevKey = UUID.randomUUID().toString()
 		return StoneData(id, sphereId, stoneId, name, address, iBeaconUuid, major, minor, meshDevKey)
 	}
 
