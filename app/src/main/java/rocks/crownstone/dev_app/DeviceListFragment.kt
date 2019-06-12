@@ -11,12 +11,18 @@ import android.view.ViewGroup
 import android.widget.Button
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
+import rocks.crownstone.bluenet.packets.ControlPacket
+import rocks.crownstone.bluenet.packets.keepAlive.KeepAliveSameTimeout
+import rocks.crownstone.bluenet.packets.keepAlive.KeepAliveSameTimeoutItem
+import rocks.crownstone.bluenet.packets.keepAlive.MultiKeepAlivePacket
+import rocks.crownstone.bluenet.packets.meshCommand.MeshControlPacket
+import rocks.crownstone.bluenet.packets.multiSwitch.MultiSwitchListItemPacket
+import rocks.crownstone.bluenet.packets.multiSwitch.MultiSwitchListPacket
+import rocks.crownstone.bluenet.packets.multiSwitch.MultiSwitchPacket
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
-import rocks.crownstone.bluenet.structs.BluenetEvent
-import rocks.crownstone.bluenet.structs.DeviceAddress
-import rocks.crownstone.bluenet.structs.OperationMode
-import rocks.crownstone.bluenet.structs.ScanMode
-import rocks.crownstone.dev_app.util.Conversion
+import rocks.crownstone.bluenet.structs.*
+import rocks.crownstone.bluenet.util.Conversion
+import rocks.crownstone.bluenet.util.Util
 import java.util.*
 
 
@@ -68,7 +74,7 @@ class DeviceListFragment : Fragment() {
 
 
 		MainApp.instance.bluenet.subscribe(BluenetEvent.SCAN_RESULT, { data -> onScannedDevice(data as ScannedDevice)})
-		MainApp.instance.bluenet.startScanning()
+//		MainApp.instance.bluenet.startScanning()
 		return view
 	}
 
@@ -117,11 +123,46 @@ class DeviceListFragment : Fragment() {
 				MainApp.instance.factoryReset(device, activity)
 			}
 			else {
+				val timestamp = 0x123456.toLong()
+				val keepAlivePacket = KeepAliveSameTimeout(10)
+				val ids = arrayOf(1,2,3,17,24)
+//				for (i in 0 until 5) {
+				for (i in ids) {
+					keepAlivePacket.add(KeepAliveSameTimeoutItem(Conversion.toUint8(i), KeepAliveActionSwitch(100)))
+				}
+				val multiSwitchPacket = MultiSwitchListPacket()
+
+				if (MainApp.instance.switchCmd > 0) {
+					MainApp.instance.switchCmd = 0
+				}
+				else {
+					MainApp.instance.switchCmd = 100
+				}
+				for (i in ids) {
+					multiSwitchPacket.add(MultiSwitchListItemPacket(Conversion.toUint8(i), Conversion.toUint8(MainApp.instance.switchCmd), 0, MultiSwitchIntent.MANUAL))
+				}
 				MainApp.instance.bluenet.connect(device.address)
-						.then { MainApp.instance.bluenet.state.getSwitchCraftBuffers() }.unwrap()
+//						.then { MainApp.instance.bluenet.control.meshCommand(MeshControlPacket(ControlPacket(ControlType.NOOP))) }.unwrap()
+//						.then { Util.waitPromise(100, MainApp.instance.handler) }.unwrap()
+						.then { MainApp.instance.bluenet.control.keepAliveMeshAction(MultiKeepAlivePacket(keepAlivePacket)) }.unwrap()
+//						.then { Util.waitPromise(100, MainApp.instance.handler) }.unwrap()
+						.then { MainApp.instance.bluenet.control.meshCommand(MeshControlPacket(ControlPacket(ControlType.SET_TIME, Conversion.toByteArray(timestamp)))) }.unwrap()
+//						.then { Util.waitPromise(100, MainApp.instance.handler) }.unwrap()
+//						.then { MainApp.instance.bluenet.control.multiSwtich(MultiSwitchPacket(multiSwitchPacket)) }.unwrap()
+//						.then { Util.waitPromise(100, MainApp.instance.handler) }.unwrap()
+						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
+//						.then { Util.waitPromise(100, MainApp.instance.handler) }.unwrap()
+						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
+						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
+						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
+						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
+						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
+						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
+//						.then { MainApp.instance.bluenet.state.getSwitchCraftBuffers() }.unwrap()
 //						.success { Log.i(TAG, "buf: ${Conversion.bytesToString(it)}") }
-						.success { Log.i(TAG, "buf: $it") }
-						.fail {	Log.e(TAG, "failed to get switchcraft buffers: ${it.message}") }
+//						.success { Log.i(TAG, "buf: $it") }
+//						.fail {	Log.e(TAG, "failed to get switchcraft buffers: ${it.message}") }
+						.fail { Log.e(TAG, "failed: ${it.message}") }
 						.always { MainApp.instance.bluenet.disconnect() }
 			}
 		}

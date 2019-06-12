@@ -1,20 +1,28 @@
 package rocks.crownstone.dev_app
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.app.NotificationCompat
 import android.util.Log
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.structs.KeyData
 import rocks.crownstone.bluenet.structs.Keys
 import rocks.crownstone.bluenet.encryption.KeySet
+import rocks.crownstone.bluenet.structs.ScanMode
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 	private val TAG = this.javaClass.simpleName
 
 	private val REQUEST_CODE_LOGIN = 1
+
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -34,15 +42,21 @@ class MainActivity : AppCompatActivity() {
 //		MainApp.instance.bluenet.init(this)
 		MainApp.instance.bluenet.init(applicationContext)
 				.then {
+					MainApp.instance.bluenet.runInForeground(MainApp.instance.NOTIFICATION_ID, MainApp.instance.getNotification())
+				}
+				.then {
 					Log.i(TAG, "make scanner ready")
 					MainApp.instance.bluenet.makeScannerReady(this)
 				}.unwrap()
-				.then {
+//				.then {
 //					MainApp.instance.bluenet.filterForIbeacons(true)
-					MainApp.instance.bluenet.filterForCrownstones(true)
-					Log.i(TAG, "start scanning")
+//					MainApp.instance.bluenet.filterForCrownstones(true)
+//					Log.i(TAG, "start scanning")
 //					MainApp.instance.bluenet.startScanning()
-				}
+//				}
+//				.then {
+//					MainApp.instance.bluenet.setScanInterval(ScanMode.LOW_LATENCY)
+//				}
 	}
 
 	fun onBluenetInitialized(data: Any) {

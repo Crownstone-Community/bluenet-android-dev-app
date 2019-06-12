@@ -63,6 +63,8 @@ class MainApp : Application(), LifecycleObserver {
 	var nearestDeviceAddress: DeviceAddress? = null
 	var handler = Handler()
 
+	var switchCmd = 100
+
 	override fun onCreate() {
 		super<Application>.onCreate()
 		Log.i(TAG, "onCreate")
@@ -97,23 +99,26 @@ class MainApp : Application(), LifecycleObserver {
 //			BluenetProtocol.SERVICE_DATA_UUID_GUIDESTONE -> Log.i(TAG, "guide")
 //			else -> Log.i(TAG, "unknown")
 //		}
-
 	}
 
 	@OnLifecycleEvent(Lifecycle.Event.ON_START)
 	fun onAppForegrounded() {
 		Log.i(TAG, "onAppForegrounded")
-//		if (bluenet.isScannerReady()) {
+		if (bluenet.isScannerReady()) {
+			bluenet.filterForCrownstones(true)
+//			bluenet.filterForIbeacons(false)
 //			bluenet.startScanning()
-//		}
+		}
 	}
 
 	@OnLifecycleEvent(Lifecycle.Event.ON_STOP)
 	fun onAppBackgrounded() {
 		Log.i(TAG, "onAppBackgrounded")
-//		if (bluenet.isScannerReady()) {
+		if (bluenet.isScannerReady()) {
+//			bluenet.filterForIbeacons(true)
+			bluenet.filterForCrownstones(false)
 //			bluenet.stopScanning()
-//		}
+		}
 	}
 
 //	override fun onStart(owner: LifecycleOwner) {
@@ -255,7 +260,7 @@ class MainApp : Application(), LifecycleObserver {
 					bluenet.disconnect()
 				}
 				.always {
-					bluenet.startScanning()
+//					bluenet.startScanning()
 				}
 	}
 
