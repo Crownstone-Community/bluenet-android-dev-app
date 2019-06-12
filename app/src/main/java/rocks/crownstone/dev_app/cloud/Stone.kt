@@ -128,7 +128,7 @@ class Stone(context: Context, volleyQueue: RequestQueue) {
 		Log.e(TAG, "Missing meshDeviceKey")
 		Log.e(TAG, "Device key should be retrieved via https://my.crownstone.rocks/api/users/<id>/keysV2")
 		// Create a semi random string for now..
-		val meshDevKey = UUID.randomUUID().toString()
+		val meshDevKey = UUID.randomUUID().toString().replace("-", "")
 		return StoneData(id, sphereId, stoneId, name, address, iBeaconUuid, major, minor, meshDevKey)
 	}
 
