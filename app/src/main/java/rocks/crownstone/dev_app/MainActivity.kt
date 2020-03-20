@@ -44,12 +44,12 @@ class MainActivity : AppCompatActivity() {
 					Log.i(TAG, "make scanner ready")
 					MainApp.instance.bluenet.makeScannerReady(this)
 				}.unwrap()
-//				.then {
-//					MainApp.instance.bluenet.filterForIbeacons(true)
-//					MainApp.instance.bluenet.filterForCrownstones(true)
-//					Log.i(TAG, "start scanning")
-//					MainApp.instance.bluenet.startScanning()
-//				}
+				.then {
+					MainApp.instance.bluenet.filterForIbeacons(true)
+					MainApp.instance.bluenet.filterForCrownstones(true)
+					Log.i(TAG, "start scanning")
+					MainApp.instance.bluenet.startScanning()
+				}
 //				.then {
 //					MainApp.instance.bluenet.setScanInterval(ScanMode.LOW_LATENCY)
 //				}
