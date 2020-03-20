@@ -1,14 +1,16 @@
 package rocks.crownstone.dev_app
 
 import android.app.*
-import android.arch.lifecycle.*
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.OnLifecycleEvent
+import android.arch.lifecycle.ProcessLifecycleOwner
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.support.v4.app.NotificationCompat
 import android.support.v7.app.AlertDialog
-//import android.arch.lifecycle.ProcessLifecycleOwner
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.android.volley.RequestQueue
@@ -19,18 +21,14 @@ import nl.komponents.kovenant.android.stopKovenant
 import nl.komponents.kovenant.deferred
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
-import rocks.crownstone.bluenet.*
+import rocks.crownstone.bluenet.Bluenet
 import rocks.crownstone.bluenet.encryption.KeySet
-import rocks.crownstone.bluenet.packets.ControlPacket
-import rocks.crownstone.bluenet.packets.meshCommand.MeshControlPacket
+import rocks.crownstone.bluenet.encryption.MeshKeySet
 import rocks.crownstone.bluenet.scanhandling.NearestDeviceListEntry
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
-import rocks.crownstone.bluenet.util.Conversion
-import rocks.crownstone.bluenet.util.Log
-import rocks.crownstone.bluenet.util.Util
+import rocks.crownstone.bluenet.util.*
 import rocks.crownstone.dev_app.cloud.*
-import java.nio.charset.Charset
 import java.util.*
 
 
@@ -58,12 +56,24 @@ class MainApp : Application(), LifecycleObserver {
 	lateinit var stone: Stone
 	val bluenet = Bluenet()
 
+	val USE_DEV_SPHERE = true
+
 	val NOTIFICATION_ID = 1
 
 	var nearestDeviceAddress: DeviceAddress? = null
 	var handler = Handler()
 
 	var switchCmd = 100
+
+	// Dev sphere.
+	val devSphereId = "devSphere"
+	val devKeySet = KeySet("adminKeyForCrown", "memberKeyForHome", "guestKeyForOther", "basicKeyForOther", "LocalizationKeyX")
+	val devMeshKeySet = MeshKeySet("aStoneKeyForMesh", "meshAppForStones", "meshKeyForStones")
+	val devMeshAccessAddress = 0.toUint32()
+	val devIbeaconUuid = UUID.fromString("1843423e-e175-4af0-a2e4-31e32f729a8a")
+	val devSphereShortId = 123.toUint8()
+	val devDeviceToken = 12.toUint8()
+	val devSphereSetting = SphereSettings(devKeySet, devMeshKeySet, devIbeaconUuid, devSphereShortId, devDeviceToken)
 
 	override fun onCreate() {
 		super<Application>.onCreate()
@@ -142,7 +152,10 @@ class MainApp : Application(), LifecycleObserver {
 		Log.v(TAG, "onScan: $device")
 	}
 
-	private fun onNearest(data: Any) {
+	private fun onNearest(data: Any?) {
+		if (data == null) {
+			return
+		}
 		val nearest = data as NearestDeviceListEntry
 		Log.d(TAG, "nearest=${nearest.deviceAddress}")
 		nearestDeviceAddress = nearest.deviceAddress
@@ -223,45 +236,71 @@ class MainApp : Application(), LifecycleObserver {
 
 	fun setup(device: ScannedDevice, activity: Activity) {
 		bluenet.stopScanning()
-		var sphere: SphereData? = null
-		var stoneData: StoneData? = null
-		var userData: UserData? = null
-		selectSphereAlert(activity)
-				.then {
-					sphere = it
-					user.getUserData()
-				}.unwrap()
-				.then {
-					userData = it
-					val name = device.name ?: ""
-					Util.recoverablePromise(stone.createStone(userData!!, sphere!!, name, device.address), { error ->
-						return@recoverablePromise stone.getStoneData(userData!!, sphere!!, device.address)
-					})
-				}.unwrap()
-				.then {
-					stoneData = it
-					bluenet.connect(device.address)
-				}.unwrap()
-				.then {
-					val keySet = KeySet(sphere?.keySet?.adminKey, sphere?.keySet?.memberKey, sphere?.keySet?.guestKey, sphere?.keySet?.serviceDataKey, sphere?.keySet?.meshAppKey, sphere?.keySet?.meshNetKey)
-					val meshAccessAddress = Conversion.byteArrayTo<Uint32>(Conversion.hexStringToBytes(sphere!!.meshAccessAddress))
-					val ibeaconData = IbeaconData(UUID.fromString(stoneData!!.iBeaconUUID), stoneData!!.iBeaconMajor, stoneData!!.iBeaconMinor, 0)
-					val stoneId = stoneData!!.stoneId
-					bluenet.setup.setup(stoneId.toShort(), sphere?.uid!!.toShort(), keySet, meshAccessAddress, Conversion.hexStringToBytes(stoneData?.meshDevKey!!), ibeaconData)
-				}.unwrap()
-				.success {
-					Log.i(TAG, "Setup complete!")
-					showResult("setup success", activity)
-				}
-				.fail {
-					Log.e(TAG, "Setup failed: ${it.message}")
-					it.printStackTrace()
-					showResult("setup failed: ${it.message}", activity)
-					bluenet.disconnect()
-				}
-				.always {
-//					bluenet.startScanning()
-				}
+		if (USE_DEV_SPHERE) {
+			val stoneId = (1..255).random().toUint8()
+			val major = (1..60000).random().toUint16()
+			val minor = (1..60000).random().toUint16()
+			val ibeaconData = IbeaconData(devIbeaconUuid, major, minor, -60)
+			bluenet.connect(device.address)
+					.then {
+						bluenet.setup.setup(stoneId, devSphereShortId, devKeySet, devMeshKeySet, devMeshAccessAddress, ibeaconData)
+								.success {
+									Log.i(TAG, "Setup complete!")
+									showResult("setup success", activity)
+								}
+								.fail {
+									Log.e(TAG, "Setup failed: ${it.message}")
+									it.printStackTrace()
+									showResult("setup failed: ${it.message}", activity)
+									bluenet.disconnect()
+								}
+								.always {
+//									bluenet.startScanning()
+								}
+					}
+		}
+		else {
+			var sphere: SphereData? = null
+			var stoneData: StoneData? = null
+			var userData: UserData? = null
+			selectSphereAlert(activity)
+					.then {
+						sphere = it
+						user.getUserData()
+					}.unwrap()
+					.then {
+						userData = it
+						val name = device.name ?: ""
+						Util.recoverablePromise(stone.createStone(userData!!, sphere!!, name, device.address), { error ->
+							return@recoverablePromise stone.getStoneData(userData!!, sphere!!, device.address)
+						})
+					}.unwrap()
+					.then {
+						stoneData = it
+						bluenet.connect(device.address)
+					}.unwrap()
+					.then {
+						val keySet = KeySet(sphere?.keySet?.adminKey, sphere?.keySet?.memberKey, sphere?.keySet?.guestKey, sphere?.keySet?.serviceDataKey, sphere?.keySet?.localizationKey)
+						val meshKeySet = MeshKeySet(stoneData?.meshDevKey, sphere?.keySet?.meshAppKey, sphere?.keySet?.meshNetKey)
+						val meshAccessAddress = Conversion.byteArrayTo<Uint32>(Conversion.hexStringToBytes(sphere!!.meshAccessAddress))
+						val ibeaconData = IbeaconData(UUID.fromString(stoneData!!.iBeaconUUID), stoneData!!.iBeaconMajor.toUint16(), stoneData!!.iBeaconMinor.toUint16(), 0)
+						val stoneId = stoneData!!.stoneId
+						bluenet.setup.setup(stoneId.toUint8(), sphere?.uid!!.toUint8(), keySet, meshKeySet, meshAccessAddress, ibeaconData)
+					}.unwrap()
+					.success {
+						Log.i(TAG, "Setup complete!")
+						showResult("setup success", activity)
+					}
+					.fail {
+						Log.e(TAG, "Setup failed: ${it.message}")
+						it.printStackTrace()
+						showResult("setup failed: ${it.message}", activity)
+						bluenet.disconnect()
+					}
+					.always {
+//						bluenet.startScanning()
+					}
+		}
 	}
 
 	fun factoryReset(device: ScannedDevice, activity: Activity) {
@@ -299,17 +338,22 @@ class MainApp : Application(), LifecycleObserver {
 	}
 
 	fun removeStoneFromCloud(device: ScannedDevice): Promise<Unit, Exception> {
-		val spheres = sphere.spheres
-		for (sphere in spheres.values) {
-			val uuid = UUID.fromString(sphere.iBeaconUUID)
-			if (uuid == device.ibeaconData?.uuid) {
-				return user.getUserData()
-						.then {
-							stone.removeStone(it, sphere, device.address)
-						}.unwrap()
-			}
+		if (USE_DEV_SPHERE) {
+			return Promise.ofSuccess(Unit)
 		}
-		return Promise.ofFail(Exception("Unknown sphere"))
+		else {
+			val spheres = sphere.spheres
+			for (sphere in spheres.values) {
+				val uuid = UUID.fromString(sphere.iBeaconUUID)
+				if (uuid == device.ibeaconData?.uuid) {
+					return user.getUserData()
+							.then {
+								stone.removeStone(it, sphere, device.address)
+							}.unwrap()
+				}
+			}
+			return Promise.ofFail(Exception("Unknown sphere"))
+		}
 	}
 
 	fun showResult(msg: String, activity: Activity) {
@@ -380,14 +424,6 @@ class MainApp : Application(), LifecycleObserver {
 		return deferred.promise
 	}
 
-	//	companion object {
-//		private val _instance: MainApp = MainApp()
-//
-//		@Synchronized
-//		fun getInstance(): MainApp {
-//			return _instance
-//		}
-//	}
 	companion object {
 		lateinit var instance: MainApp
 	}

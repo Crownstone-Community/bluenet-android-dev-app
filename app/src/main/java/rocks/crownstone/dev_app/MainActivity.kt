@@ -1,21 +1,16 @@
 package rocks.crownstone.dev_app
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.app.NotificationCompat
 import android.util.Log
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
-import rocks.crownstone.bluenet.structs.KeyData
-import rocks.crownstone.bluenet.structs.Keys
 import rocks.crownstone.bluenet.encryption.KeySet
-import rocks.crownstone.bluenet.structs.ScanMode
+import rocks.crownstone.bluenet.encryption.MeshKeySet
+import rocks.crownstone.bluenet.structs.*
+import rocks.crownstone.bluenet.util.Conversion
+import rocks.crownstone.bluenet.util.toUint8
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -30,10 +25,11 @@ class MainActivity : AppCompatActivity() {
 		setContentView(R.layout.activity_main)
 
 //		val intent = Intent(this, TabbedActivity::class.java)
-		val intent = Intent(this, LoginActivity::class.java)
-//		this.startActivity(intent)
-		this.startActivityForResult(intent, REQUEST_CODE_LOGIN)
-
+		if (!MainApp.instance.USE_DEV_SPHERE) {
+			val intent = Intent(this, LoginActivity::class.java)
+//			this.startActivity(intent)
+			this.startActivityForResult(intent, REQUEST_CODE_LOGIN)
+		}
 
 //		MainApp.instance.bluenet.subscribe(BluenetEvent.INITIALIZED, ::onBluenetInitialized)
 //		MainApp.instance.bluenet.subscribe(BluenetEvent.SCANNER_READY, ::onScannerReady)
@@ -57,6 +53,9 @@ class MainActivity : AppCompatActivity() {
 //				.then {
 //					MainApp.instance.bluenet.setScanInterval(ScanMode.LOW_LATENCY)
 //				}
+		if (MainApp.instance.USE_DEV_SPHERE) {
+			onLogin(0)
+		}
 	}
 
 	fun onBluenetInitialized(data: Any) {
@@ -79,18 +78,23 @@ class MainActivity : AppCompatActivity() {
 
 	fun onLogin(resultCode: Int) {
 		Log.i(TAG, "onLogin result=$resultCode")
+		setSphereSettings()
+	}
 
+	fun setSphereSettings() {
 		val spheres = MainApp.instance.sphere.spheres
-		val keys = Keys()
+		val sphereSettings = SphereSettingsMap()
 		for (sphere in spheres.values) {
-			val keySet = KeySet(sphere.keySet?.adminKey, sphere.keySet?.memberKey, sphere.keySet?.guestKey, sphere.keySet?.serviceDataKey, sphere.keySet?.meshAppKey, sphere.keySet?.meshNetKey)
-			val uuid = UUID.fromString(sphere.iBeaconUUID)
-//			MainApp.instance.bluenet.addIbeaconFilter(uuid)
-			val keyData = KeyData(keySet, uuid)
-			keys.put(sphere.id, keyData)
-			MainApp.instance.bluenet.iBeaconRanger.track(uuid, sphere.id)
+			val keySet = KeySet(sphere.keySet?.adminKey, sphere.keySet?.memberKey, sphere.keySet?.guestKey, sphere.keySet?.serviceDataKey, sphere.keySet?.localizationKey)
+			val meshKeySet = MeshKeySet(null, sphere.keySet?.meshAppKey, sphere.keySet?.meshNetKey)
+			val iBeaconUuid = UUID.fromString(sphere.iBeaconUUID)
+			val deviceToken = 0.toUint8()
+			val sphereSetting = SphereSettings(keySet, meshKeySet, iBeaconUuid, Conversion.toUint8(sphere.uid), deviceToken)
+			sphereSettings.put(sphere.id, sphereSetting)
+			MainApp.instance.bluenet.iBeaconRanger.track(iBeaconUuid, sphere.id)
 		}
-		MainApp.instance.bluenet.loadKeys(keys)
+		sphereSettings.put(MainApp.instance.devSphereId, MainApp.instance.devSphereSetting)
+		MainApp.instance.bluenet.setSphereSettings(sphereSettings)
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -117,7 +117,7 @@ class Sphere(context: Context, volleyQueue: RequestQueue) {
 	}
 
 	private fun parseSphereKeysJson(json: JSONObject): KeySet {
-		val keySet = KeySet(null, null, null, null, null, null)
+		val keySet = KeySet(null, null, null, null, null, null, null)
 		keySet.adminKey = json.optString("admin", null)
 		keySet.memberKey = json.optString("member", null)
 		keySet.guestKey = json.optString("guest", null)
@@ -161,7 +161,7 @@ class Sphere(context: Context, volleyQueue: RequestQueue) {
 	}
 
 	private fun parseSphereKeysV2Json(json: JSONArray): KeySet {
-		val keySet = KeySet(null, null, null, null, null, null)
+		val keySet = KeySet(null, null, null, null, null, null, null)
 		for (i in 0 until json.length()) {
 			val keyJson = json.getJSONObject(i)
 			val type = keyJson.getString("keyType")
@@ -172,6 +172,7 @@ class Sphere(context: Context, volleyQueue: RequestQueue) {
 				"MEMBER_KEY" -> keySet.memberKey = key
 				"BASIC_KEY" -> keySet.guestKey = key
 				"SERVICE_DATA_KEY" -> keySet.serviceDataKey = key
+				"LOCALIZATION_KEY" -> keySet.localizationKey = key
 				"MESH_APPLICATION_KEY" -> keySet.meshAppKey = key
 				"MESH_NETWORK_KEY" -> keySet.meshNetKey = key
 			}
