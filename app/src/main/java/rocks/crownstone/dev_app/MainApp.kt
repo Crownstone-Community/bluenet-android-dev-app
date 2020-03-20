@@ -20,6 +20,7 @@ import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
 import nl.komponents.kovenant.deferred
 import nl.komponents.kovenant.then
+import nl.komponents.kovenant.ui.promiseOnUi
 import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.Bluenet
 import rocks.crownstone.bluenet.encryption.KeySet
@@ -234,36 +235,36 @@ class MainApp : Application(), LifecycleObserver {
 		return notification
 	}
 
-	fun setup(device: ScannedDevice, activity: Activity) {
+	fun setup(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {
 		bluenet.stopScanning()
 		if (USE_DEV_SPHERE) {
 			val stoneId = (1..255).random().toUint8()
 			val major = (1..60000).random().toUint16()
 			val minor = (1..60000).random().toUint16()
 			val ibeaconData = IbeaconData(devIbeaconUuid, major, minor, -60)
-			bluenet.connect(device.address)
+			return bluenet.connect(device.address)
 					.then {
 						bluenet.setup.setup(stoneId, devSphereShortId, devKeySet, devMeshKeySet, devMeshAccessAddress, ibeaconData)
-								.success {
-									Log.i(TAG, "Setup complete!")
-									showResult("setup success", activity)
-								}
-								.fail {
-									Log.e(TAG, "Setup failed: ${it.message}")
-									it.printStackTrace()
-									showResult("setup failed: ${it.message}", activity)
-									bluenet.disconnect()
-								}
-								.always {
-//									bluenet.startScanning()
-								}
+					}.unwrap()
+					.success {
+						Log.i(TAG, "Setup complete!")
+						showResult("setup success", activity)
+					}
+					.fail {
+						Log.e(TAG, "Setup failed: ${it.message}")
+						it.printStackTrace()
+						showResult("setup failed: ${it.message}", activity)
+						bluenet.disconnect()
+					}
+					.always {
+						//									bluenet.startScanning()
 					}
 		}
 		else {
 			var sphere: SphereData? = null
 			var stoneData: StoneData? = null
 			var userData: UserData? = null
-			selectSphereAlert(activity)
+			return selectSphereAlert(activity)
 					.then {
 						sphere = it
 						user.getUserData()
@@ -303,11 +304,11 @@ class MainApp : Application(), LifecycleObserver {
 		}
 	}
 
-	fun factoryReset(device: ScannedDevice, activity: Activity) {
-		confirmAlert(activity, "factory reset", "Do you want to factory reset this device?")
-				.success { confirmed ->
+	fun factoryReset(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {
+			return confirmAlert(activity, "factory reset", "Do you want to factory reset this device?")
+				.then { confirmed ->
 					if (!confirmed) {
-						return@success
+						return@then Promise.ofSuccess<Unit, Exception>(Unit)
 					}
 					bluenet.connect(device.address)
 							.then {
@@ -334,7 +335,7 @@ class MainApp : Application(), LifecycleObserver {
 								showResult("factory reset failed: ${it.message}", activity)
 								bluenet.disconnect(true)
 							}
-				}
+				}.unwrap()
 	}
 
 	fun removeStoneFromCloud(device: ScannedDevice): Promise<Unit, Exception> {
@@ -364,27 +365,61 @@ class MainApp : Application(), LifecycleObserver {
 
 
 	fun confirmAlert(activity: Activity, title: String, question: String): Promise<Boolean, Exception> {
-		val deferred = deferred<Boolean, Exception>()
-		val builder = AlertDialog.Builder(activity)
-		builder.setTitle(title)
-		builder.setMessage(question)
-		builder.setPositiveButton(android.R.string.yes) { dialog, which ->
-			Log.d(TAG, "yes")
-			deferred.resolve(true)
-			dialog.dismiss()
-		}
-		builder.setNegativeButton(android.R.string.no) { dialog, which ->
-			Log.d(TAG, "no")
-			deferred.resolve(false)
-			dialog.dismiss()
-		}
-		builder.setOnCancelListener {
-			Log.d(TAG, "canceled")
-			// triggers when clicked next to dialog, or back button
-			deferred.resolve(false)
-		}
-		builder.show()
-		return deferred.promise
+		return promiseOnUi {
+			val deferred = deferred<Boolean, Exception>()
+			val builder = AlertDialog.Builder(activity)
+			builder.setTitle(title)
+			builder.setMessage(question)
+			builder.setPositiveButton(android.R.string.yes) { dialog, which ->
+				Log.d(TAG, "yes")
+				deferred.resolve(true)
+				dialog.dismiss()
+			}
+			builder.setNegativeButton(android.R.string.no) { dialog, which ->
+				Log.d(TAG, "no")
+				deferred.resolve(false)
+				dialog.dismiss()
+			}
+			builder.setOnCancelListener {
+				Log.d(TAG, "canceled")
+				// triggers when clicked next to dialog, or back button
+				deferred.resolve(false)
+			}
+			builder.show()
+			return@promiseOnUi deferred.promise
+		}.unwrap()
+	}
+
+	fun selectOptionAlert(activity: Activity, title: String, options: List<String>): Promise<Int, Exception> {
+		return promiseOnUi {
+			val deferred = deferred<Int, Exception>()
+			val adapter = ArrayAdapter<String>(activity, android.R.layout.select_dialog_item)
+			for (opt in options) {
+				adapter.add(opt)
+			}
+			val builder = AlertDialog.Builder(activity)
+			builder.setTitle(title)
+			builder.setAdapter(adapter) { dialog, which ->
+				Log.i(TAG, "clicked $which == ${adapter.getItem(which)}")
+				deferred.resolve(which)
+			}
+			builder.setNegativeButton(android.R.string.cancel) { dialog, which ->
+				Log.d(TAG, "negative button")
+				deferred.reject(Exception("Canceled"))
+				dialog.dismiss()
+			}
+			builder.setOnCancelListener {
+				Log.d(TAG, "canceled")
+				// triggers when clicked next to dialog, or back button
+				deferred.reject(Exception("Canceled"))
+			}
+			builder.setOnDismissListener {
+				Log.d(TAG, "dismissed")
+				// tiggers when dialog goes away (either via button, or cancel)
+			}
+			builder.show()
+			return@promiseOnUi deferred.promise
+		}.unwrap()
 	}
 
 	/**
@@ -394,34 +429,15 @@ class MainApp : Application(), LifecycleObserver {
 	 * @param return Promise with the selected sphere when resolved.
 	 */
 	fun selectSphereAlert(activity: Activity): Promise<SphereData, Exception> {
-		val deferred = deferred<SphereData, Exception>()
-		val adapter = ArrayAdapter<String>(activity, android.R.layout.select_dialog_item)
 		val sphereArray = ArrayList(sphere.spheres.values)
+		val namesArray = ArrayList<String>()
 		for (sphereData in sphereArray) {
-			adapter.add(sphereData.name)
+			namesArray.add(sphereData.name)
 		}
-		val builder = AlertDialog.Builder(activity)
-		builder.setTitle("Select a sphere")
-		builder.setAdapter(adapter) { dialog, which ->
-			Log.i(TAG, "clicked $which ${sphereArray[which].name} == ${adapter.getItem(which)}")
-			deferred.resolve(sphereArray[which])
-		}
-		builder.setNegativeButton(android.R.string.cancel) { dialog, which ->
-			Log.d(TAG, "negative button")
-			deferred.reject(Exception("Canceled"))
-			dialog.dismiss()
-		}
-		builder.setOnCancelListener {
-			Log.d(TAG, "canceled")
-			// triggers when clicked next to dialog, or back button
-			deferred.reject(Exception("Canceled"))
-		}
-		builder.setOnDismissListener {
-			Log.d(TAG, "dismissed")
-			// tiggers when dialog goes away (either via button, or cancel)
-		}
-		builder.show()
-		return deferred.promise
+		return selectOptionAlert(activity, "Select a sphere", namesArray)
+				.then {
+					return@then sphereArray[it]
+				}
 	}
 
 	companion object {

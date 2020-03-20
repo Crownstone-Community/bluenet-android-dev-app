@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +12,7 @@ import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
+import rocks.crownstone.bluenet.util.*
 import java.util.*
 
 
@@ -62,12 +62,10 @@ class DeviceListFragment : Fragment() {
 			adapter.notifyDataSetChanged()
 		}
 
-
 		MainApp.instance.bluenet.subscribe(BluenetEvent.SCAN_RESULT, { data -> onScannedDevice(data as ScannedDevice)})
 //		MainApp.instance.bluenet.startScanning()
 		return view
 	}
-
 
 	fun onScannedDevice(device: ScannedDevice) {
 		if (!device.validated) {
@@ -100,96 +98,80 @@ class DeviceListFragment : Fragment() {
 //		deviceList = ArrayList(deviceMap.values)
 //	}
 
+	enum class DeviceOption {
+		Setup,
+		FactoryReset,
+		PutInDfu,
+		HardwareVersion,
+		FirmwareVersion,
+		BootloaderVersion,
+		ResetCount,
+		Switch,
+		Toggle,
+	}
+
 	private fun onDeviceClick(device: ScannedDevice, longClick: Boolean) {
 		Log.i(TAG, "onDeviceClick ${device.address}")
 		val activity = activity ?: return
 
-//		if (device.operationMode == OperationMode.SETUP) {
-//			MainApp.instance.setup(device, activity)
-//		}
-//
-//		if (device.operationMode == OperationMode.NORMAL) {
-//			if (longClick) {
-//				MainApp.instance.factoryReset(device, activity)
-//			}
-//			else {
-//				val timestamp = 0x123456.toLong()
-//				val keepAlivePacket = KeepAliveSameTimeout(10)
-//				val ids = arrayOf(1,2,3,17,24)
-////				for (i in 0 until 5) {
-//				for (i in ids) {
-//					keepAlivePacket.add(KeepAliveSameTimeoutItem(Conversion.toUint8(i), KeepAliveActionSwitch(100)))
-//				}
-//				val multiSwitchPacket = MultiSwitchListPacket()
-//
-//				if (MainApp.instance.switchCmd > 0) {
-//					MainApp.instance.switchCmd = 0
-//				}
-//				else {
-//					MainApp.instance.switchCmd = 100
-//				}
-//				for (i in ids) {
-//					multiSwitchPacket.add(MultiSwitchListItemPacket(Conversion.toUint8(i), Conversion.toUint8(MainApp.instance.switchCmd), 0, MultiSwitchIntent.MANUAL))
-//				}
-				MainApp.instance.bluenet.connect(device.address)
-//						.then {
-//							if (device.operationMode == OperationMode.DFU) {
-//								MainApp.instance.bluenet.dfu.reset()
-//							}
-//							else {
-//								MainApp.instance.bluenet.control.goToDfu()
-//							}
-//						}.unwrap()
-//						.then { MainApp.instance.bluenet.deviceInfo.getBootloaderVersion() }.unwrap()
-//						.then {
-//							MainApp.instance.bluenet.state.getResetCount()
-//									.success { Log.i(TAG, "reset count = $it") }
-//						}.unwrap()
-						.then {
-							val uuid = UUID.randomUUID()
-							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, PersistenceMode.RAM)
-									.success {
-										Log.i(TAG, "set uuid $uuid")
-										MainApp.instance.showResult("set $uuid", activity)
-									}
-						}.unwrap()
-						.then {
-							MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceMode.FLASH)
-									.success {
-										Log.i(TAG, "flash uuid $it")
-										MainApp.instance.showResult("flash $it", activity)
-									}
-						}.unwrap()
-						.then {
-							MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceMode.RAM)
-									.success {
-										Log.i(TAG, "ram uuid $it")
-										MainApp.instance.showResult("ram $it", activity)
-									}
-						}.unwrap()
-//						.then { MainApp.instance.bluenet.control.meshCommand(MeshControlPacket(ControlPacket(ControlType.NOOP))) }.unwrap()
-//						.then { Util.waitPromise(100, MainApp.instance.handler) }.unwrap()
-//						.then { MainApp.instance.bluenet.control.keepAliveMeshAction(MultiKeepAlivePacket(keepAlivePacket)) }.unwrap()
-//						.then { Util.waitPromise(100, MainApp.instance.handler) }.unwrap()
-//						.then { MainApp.instance.bluenet.control.meshCommand(MeshControlPacket(ControlPacket(ControlType.SET_TIME, Conversion.toByteArray(timestamp)))) }.unwrap()
-//						.then { Util.waitPromise(100, MainApp.instance.handler) }.unwrap()
-//						.then { MainApp.instance.bluenet.control.multiSwtich(MultiSwitchPacket(multiSwitchPacket)) }.unwrap()
-//						.then { Util.waitPromise(100, MainApp.instance.handler) }.unwrap()
-//						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
-//						.then { Util.waitPromise(100, MainApp.instance.handler) }.unwrap()
-//						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
-//						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
-//						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
-//						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
-//						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
-//						.then { MainApp.instance.bluenet.control.keepAliveMeshRepeat() }.unwrap()
-//						.then { MainApp.instance.bluenet.state.getSwitchCraftBuffers() }.unwrap()
-//						.success { Log.i(TAG, "buf: ${Conversion.bytesToString(it)}") }
-//						.success { Log.i(TAG, "buf: $it") }
-//						.fail {	Log.e(TAG, "failed to get switchcraft buffers: ${it.message}") }
-						.fail { Log.e(TAG, "failed: ${it.message}") }
-						.always { MainApp.instance.bluenet.disconnect() }
-//			}
-//		}
+		val optionList = DeviceOption.values()
+		val optionNames = ArrayList<String>()
+		for (opt in optionList) {
+			optionNames.add(opt.name)
+		}
+		var optionInd = 0
+		MainApp.instance.selectOptionAlert(activity, "Select an option", optionNames)
+				.then {
+					optionInd = it
+					MainApp.instance.bluenet.connect(device.address)
+				}.unwrap()
+				.then {
+					when (optionList[optionInd]) {
+						DeviceOption.Setup -> {
+							MainApp.instance.setup(device, activity)
+						}
+						DeviceOption.FactoryReset -> {
+							MainApp.instance.factoryReset(device, activity)
+						}
+						DeviceOption.PutInDfu -> {
+							MainApp.instance.bluenet.control.goToDfu()
+						}
+						DeviceOption.HardwareVersion -> {
+							MainApp.instance.bluenet.deviceInfo.getHardwareVersion()
+									.success { MainApp.instance.showResult("hw: $it", activity) }
+						}
+						DeviceOption.FirmwareVersion -> {
+							MainApp.instance.bluenet.deviceInfo.getFirmwareVersion()
+									.success { MainApp.instance.showResult("fw: $it", activity) }
+						}
+						DeviceOption.BootloaderVersion -> {
+							MainApp.instance.bluenet.deviceInfo.getBootloaderVersion()
+									.success { MainApp.instance.showResult("bl: $it", activity) }
+						}
+						DeviceOption.ResetCount -> {
+							MainApp.instance.bluenet.state.getResetCount()
+									.success { MainApp.instance.showResult("resetCount: $it", activity) }
+						}
+						DeviceOption.Switch -> {
+							if (MainApp.instance.switchCmd != 0) {
+								MainApp.instance.switchCmd = 0
+							}
+							else {
+								MainApp.instance.switchCmd = 255
+							}
+							val sphereId: SphereId = device.sphereId ?: "unknown"
+							val stoneId: Uint8 = device.serviceData?.crownstoneId ?: 255.toUint8()
+							MainApp.instance.bluenet.broadCast.switch(sphereId, stoneId, MainApp.instance.switchCmd.toUint8())
+						}
+						DeviceOption.Toggle -> {
+							MainApp.instance.bluenet.control.toggleSwitch(255.toUint8())
+						}
+					}
+				}.unwrap()
+				.fail {
+					Log.e(TAG, "failed: ${it.message}")
+					MainApp.instance.showResult("Failed: ${it.message}", activity)
+				}
+				.always { MainApp.instance.bluenet.disconnect() }
 	}
 }
