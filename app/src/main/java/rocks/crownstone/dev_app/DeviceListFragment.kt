@@ -108,6 +108,7 @@ class DeviceListFragment : Fragment() {
 		ResetCount,
 		Switch,
 		Toggle,
+		SetIbeaconUUID,
 	}
 
 	private fun onDeviceClick(device: ScannedDevice, longClick: Boolean) {
@@ -165,6 +166,30 @@ class DeviceListFragment : Fragment() {
 						}
 						DeviceOption.Toggle -> {
 							MainApp.instance.bluenet.control.toggleSwitch(255.toUint8())
+						}
+						DeviceOption.SetIbeaconUUID -> {
+							val uuid = UUID.randomUUID()
+							Log.i(TAG, "Set ibeaconUuid: $uuid")
+							MainApp.instance.showResult("Set uuid: $uuid", activity)
+							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, PersistenceModeSet.TEMPORARY)
+									.then {
+										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.CURRENT)
+									}.unwrap()
+									.then {
+										Log.i(TAG, "Current ibeaconUuid: $it")
+										MainApp.instance.showResult("Current uuid: $it", activity)
+										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.STORED)
+									}.unwrap()
+									.then {
+										Log.i(TAG, "Stored ibeaconUuid: $it")
+										MainApp.instance.showResult("Stored uuid: $it", activity)
+										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.FIRMWARE_DEFAULT)
+									}.unwrap()
+									.then {
+										Log.i(TAG, "Default ibeaconUuid: $it")
+										MainApp.instance.showResult("Default uuid: $it", activity)
+									}
+
 						}
 					}
 				}.unwrap()
