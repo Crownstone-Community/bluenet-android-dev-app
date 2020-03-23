@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
+import rocks.crownstone.bluenet.packets.UuidPacket
+import rocks.crownstone.bluenet.packets.wrappers.v5.StatePacketV5
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
 import rocks.crownstone.bluenet.util.*
@@ -170,31 +172,34 @@ class DeviceListFragment : Fragment() {
 						DeviceOption.SetIbeaconUUID -> {
 							val uuid = UUID.randomUUID()
 							Log.i(TAG, "Set ibeaconUuid: $uuid")
-							MainApp.instance.showResult("Set uuid: $uuid", activity)
-							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, PersistenceModeSet.TEMPORARY)
-									.then {
-										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.CURRENT)
-									}.unwrap()
-									.then {
-										Log.i(TAG, "Current ibeaconUuid: $it")
-										MainApp.instance.showResult("Current uuid: $it", activity)
-										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.STORED)
-									}.unwrap()
-									.then {
-										Log.i(TAG, "Stored ibeaconUuid: $it")
-										MainApp.instance.showResult("Stored uuid: $it", activity)
-										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.FIRMWARE_DEFAULT)
-									}.unwrap()
-									.then {
-										Log.i(TAG, "Default ibeaconUuid: $it")
-										MainApp.instance.showResult("Default uuid: $it", activity)
-									}
+//							MainApp.instance.showResult("Set uuid: $uuid", activity)
+//							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, PersistenceModeSet.TEMPORARY)
+//									.then {
+//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.CURRENT)
+//									}.unwrap()
+//									.then {
+//										Log.i(TAG, "Current ibeaconUuid: $it")
+//										MainApp.instance.showResult("Current uuid: $it", activity)
+//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.STORED)
+//									}.unwrap()
+//									.then {
+//										Log.i(TAG, "Stored ibeaconUuid: $it")
+//										MainApp.instance.showResult("Stored uuid: $it", activity)
+//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.FIRMWARE_DEFAULT)
+//									}.unwrap()
+//									.then {
+//										Log.i(TAG, "Default ibeaconUuid: $it")
+//										MainApp.instance.showResult("Default uuid: $it", activity)
+//									}
+							val statePacket = StatePacketV5(StateTypeV4.IBEACON_PROXIMITY_UUID, 0U, PersistenceModeSet.TEMPORARY.num, UuidPacket(uuid))
+							MainApp.instance.bluenet.mesh.setState(statePacket, 217U)
 
 						}
 					}
 				}.unwrap()
 				.fail {
 					Log.e(TAG, "failed: ${it.message}")
+					it.printStackTrace()
 					MainApp.instance.showResult("Failed: ${it.message}", activity)
 				}
 				.always { MainApp.instance.bluenet.disconnect() }
