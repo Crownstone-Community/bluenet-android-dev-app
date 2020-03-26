@@ -11,11 +11,13 @@ import android.widget.Button
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.packets.UuidPacket
+import rocks.crownstone.bluenet.packets.behaviour.*
 import rocks.crownstone.bluenet.packets.wrappers.v5.StatePacketV5
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
 import rocks.crownstone.bluenet.util.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -108,9 +110,11 @@ class DeviceListFragment : Fragment() {
 		FirmwareVersion,
 		BootloaderVersion,
 		ResetCount,
+		UicrData,
 		Switch,
 		Toggle,
 		SetIbeaconUUID,
+		SetBehaviour,
 	}
 
 	private fun onDeviceClick(device: ScannedDevice, longClick: Boolean) {
@@ -155,6 +159,10 @@ class DeviceListFragment : Fragment() {
 							MainApp.instance.bluenet.state.getResetCount()
 									.success { MainApp.instance.showResult("resetCount: $it", activity) }
 						}
+						DeviceOption.UicrData -> {
+							MainApp.instance.bluenet.deviceInfo.getUicrData()
+									.success { MainApp.instance.showResult("uicr: $it", activity) }
+						}
 						DeviceOption.Switch -> {
 							if (MainApp.instance.switchCmd != 0) {
 								MainApp.instance.switchCmd = 0
@@ -171,32 +179,43 @@ class DeviceListFragment : Fragment() {
 						}
 						DeviceOption.SetIbeaconUUID -> {
 							val uuid = UUID.randomUUID()
-							Log.i(TAG, "Set ibeaconUuid: $uuid")
-//							MainApp.instance.showResult("Set uuid: $uuid", activity)
-//							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, PersistenceModeSet.TEMPORARY)
-//									.then {
-//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.CURRENT)
-//									}.unwrap()
-//									.then {
-//										Log.i(TAG, "Current ibeaconUuid: $it")
-//										MainApp.instance.showResult("Current uuid: $it", activity)
-//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.STORED)
-//									}.unwrap()
-//									.then {
-//										Log.i(TAG, "Stored ibeaconUuid: $it")
-//										MainApp.instance.showResult("Stored uuid: $it", activity)
-//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.FIRMWARE_DEFAULT)
-//									}.unwrap()
-//									.then {
-//										Log.i(TAG, "Default ibeaconUuid: $it")
-//										MainApp.instance.showResult("Default uuid: $it", activity)
-//									}
-							val statePacket = StatePacketV5(StateTypeV4.IBEACON_PROXIMITY_UUID, 0U, PersistenceModeSet.TEMPORARY.num, UuidPacket(uuid))
-							MainApp.instance.bluenet.mesh.setState(statePacket, 217U)
+							MainApp.instance.showResult("Set ibeaconUuid: $uuid", activity)
+							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, PersistenceModeSet.TEMPORARY)
+									.then {
+										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.CURRENT)
+									}.unwrap()
+									.then {
+										MainApp.instance.showResult("Current ibeaconUuid: $it", activity)
+										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.STORED)
+									}.unwrap()
+									.then {
+										MainApp.instance.showResult("Stored ibeaconUuid: $it", activity)
+										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.FIRMWARE_DEFAULT)
+									}.unwrap()
+									.then {
+										MainApp.instance.showResult("Default ibeaconUuid: $it", activity)
+									}
+//							val statePacket = StatePacketV5(StateTypeV4.IBEACON_PROXIMITY_UUID, 0U, PersistenceModeSet.TEMPORARY.num, UuidPacket(uuid))
+//							MainApp.instance.bluenet.mesh.setState(statePacket, 217U)
+//							MainApp.instance.bluenet.mesh.setState(statePacket, 83U)
 
+						}
+						DeviceOption.SetBehaviour -> {
+							val daysOfWeek = DaysOfWeekPacket(true, true, true, true, true, true, true)
+							val startTime = TimeOfDayPacket(BaseTimeType.MIDNIGHT, 6*3600)
+							val endTime = TimeOfDayPacket(BaseTimeType.MIDNIGHT, 23*3600)
+							val presence = PresencePacket(PresenceType.ALWAYS_TRUE, ArrayList(), 5U * 60U)
+							val behaviourPacket = SwitchBehaviourPacket(0U, 0U, daysOfWeek, startTime, endTime, presence)
+							MainApp.instance.bluenet.control.addBehaviour(behaviourPacket)
+									.success {
+										MainApp.instance.showResult("Added behaviour at index=${it.index} hash=${it.hash}", activity)
+									}
 						}
 					}
 				}.unwrap()
+				.success {
+					MainApp.instance.showResult("Success", activity)
+				}
 				.fail {
 					Log.e(TAG, "failed: ${it.message}")
 					it.printStackTrace()

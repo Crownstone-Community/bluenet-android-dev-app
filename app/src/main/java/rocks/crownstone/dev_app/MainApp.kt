@@ -94,6 +94,10 @@ class MainApp : Application(), LifecycleObserver {
 
 //		handler.postDelayed(testBluenetRunnable, 1000)
 
+		val arr = ByteArray(0)
+		val str = String(arr, Charsets.US_ASCII)
+		Log.i(TAG, "str=$str len=${str.length} cond=${str == ""}") // str= len=0 cond=true
+
 		val testKovenant = TestKovenant()
 		testKovenant.test()
 //		testKovenant.testRecover()
@@ -358,6 +362,7 @@ class MainApp : Application(), LifecycleObserver {
 	}
 
 	fun showResult(msg: String, activity: Activity) {
+		Log.i(TAG, msg)
 		activity.runOnUiThread {
 			Toast.makeText(activity, msg, Toast.LENGTH_LONG).show()
 		}
