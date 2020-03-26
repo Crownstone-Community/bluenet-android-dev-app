@@ -113,6 +113,7 @@ class DeviceListFragment : Fragment() {
 		UicrData,
 		Switch,
 		Toggle,
+		SetTime,
 		SetIbeaconUUID,
 		SetBehaviour,
 	}
@@ -176,6 +177,19 @@ class DeviceListFragment : Fragment() {
 						}
 						DeviceOption.Toggle -> {
 							MainApp.instance.bluenet.control.toggleSwitch(255.toUint8())
+						}
+						DeviceOption.SetTime -> {
+							val timeZoneGmt = TimeZone.getTimeZone("GMT")
+							val calendarGmt = Calendar.getInstance(timeZoneGmt)
+							val gmtTimestamp = calendarGmt.time.time / 1000
+
+							val calendar = Calendar.getInstance()
+							val timeZone = calendar.timeZone
+							val secondsFromGmt = (timeZone.rawOffset / 1000).toLong()
+							val correctedTimestamp = gmtTimestamp + secondsFromGmt
+
+							MainApp.instance.bluenet.control.setTime(correctedTimestamp.toUint32())
+									.success { MainApp.instance.showResult("Set time to: $correctedTimestamp", activity) }
 						}
 						DeviceOption.SetIbeaconUUID -> {
 							val uuid = UUID.randomUUID()
