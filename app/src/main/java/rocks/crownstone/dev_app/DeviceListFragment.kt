@@ -12,6 +12,8 @@ import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.packets.UuidPacket
 import rocks.crownstone.bluenet.packets.behaviour.*
+import rocks.crownstone.bluenet.packets.multiSwitch.MultiSwitchItemPacket
+import rocks.crownstone.bluenet.packets.multiSwitch.MultiSwitchPacket
 import rocks.crownstone.bluenet.packets.wrappers.v5.StatePacketV5
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
@@ -178,6 +180,9 @@ class DeviceListFragment : androidx.fragment.app.Fragment() {
 							val sphereId: SphereId = device.sphereId ?: "unknown"
 							val stoneId: Uint8 = device.serviceData?.crownstoneId ?: 255.toUint8()
 							MainApp.instance.bluenet.broadCast.switch(sphereId, stoneId, MainApp.instance.switchCmd.toUint8())
+//							val multiSwitchPacket = MultiSwitchPacket()
+//							multiSwitchPacket.add(MultiSwitchItemPacket(217U, MainApp.instance.switchCmd.toUint8()))
+//							MainApp.instance.bluenet.control.multiSwitch(multiSwitchPacket)
 						}
 						DeviceOption.Toggle -> {
 							MainApp.instance.bluenet.control.toggleSwitch(255.toUint8())
