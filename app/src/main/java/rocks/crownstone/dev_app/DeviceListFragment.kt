@@ -105,6 +105,7 @@ class DeviceListFragment : androidx.fragment.app.Fragment() {
 	enum class DeviceOption {
 		Setup,
 		FactoryReset,
+		Reset,
 		PutInDfu,
 		HardwareVersion,
 		FirmwareVersion,
@@ -140,6 +141,9 @@ class DeviceListFragment : androidx.fragment.app.Fragment() {
 						}
 						DeviceOption.FactoryReset -> {
 							MainApp.instance.factoryReset(device, activity)
+						}
+						DeviceOption.Reset -> {
+							MainApp.instance.bluenet.control.reset()
 						}
 						DeviceOption.PutInDfu -> {
 							MainApp.instance.bluenet.control.goToDfu()
