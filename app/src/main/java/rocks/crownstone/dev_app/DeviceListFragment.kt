@@ -14,6 +14,7 @@ import rocks.crownstone.bluenet.packets.UuidPacket
 import rocks.crownstone.bluenet.packets.behaviour.*
 import rocks.crownstone.bluenet.packets.multiSwitch.MultiSwitchItemPacket
 import rocks.crownstone.bluenet.packets.multiSwitch.MultiSwitchPacket
+import rocks.crownstone.bluenet.packets.other.IbeaconConfigIdPacket
 import rocks.crownstone.bluenet.packets.wrappers.v5.StatePacketV5
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
@@ -195,24 +196,39 @@ class DeviceListFragment : androidx.fragment.app.Fragment() {
 						DeviceOption.SetIbeaconUUID -> {
 							val uuid = UUID.randomUUID()
 							MainApp.instance.showResult("Set ibeaconUuid: $uuid", activity)
-							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, PersistenceModeSet.TEMPORARY)
+//							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, PersistenceModeSet.TEMPORARY)
+//									.then {
+//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.CURRENT)
+//									}.unwrap()
+//									.then {
+//										MainApp.instance.showResult("Current ibeaconUuid: $it", activity)
+//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.STORED)
+//									}.unwrap()
+//									.then {
+//										MainApp.instance.showResult("Stored ibeaconUuid: $it", activity)
+//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.FIRMWARE_DEFAULT)
+//									}.unwrap()
+//									.then {
+//										MainApp.instance.showResult("Default ibeaconUuid: $it", activity)
+//									}
+							val statePacket = StatePacketV5(StateTypeV4.IBEACON_PROXIMITY_UUID, 1U, PersistenceModeSet.TEMPORARY.num, UuidPacket(uuid))
+							val ids = listOf<Uint8>(217U, 83U)
+							MainApp.instance.bluenet.mesh.setState(statePacket, ids[0])
 									.then {
-										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.CURRENT)
+										MainApp.instance.bluenet.mesh.setState(statePacket, ids[1])
 									}.unwrap()
 									.then {
-										MainApp.instance.showResult("Current ibeaconUuid: $it", activity)
-										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.STORED)
+										val timestamp: Uint32 = 0U
+										val interval: Uint16 = 4U
+//										MainApp.instance.bluenet.control.setIbeaconConfigId(IbeaconConfigIdPacket(0U, timestamp, interval))
+										MainApp.instance.bluenet.mesh.setIbeaconConfigId(IbeaconConfigIdPacket(0U, timestamp, interval), ids)
 									}.unwrap()
 									.then {
-										MainApp.instance.showResult("Stored ibeaconUuid: $it", activity)
-										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.FIRMWARE_DEFAULT)
+										val timestamp: Uint32 = 2U
+										val interval: Uint16 = 4U
+//										MainApp.instance.bluenet.control.setIbeaconConfigId(IbeaconConfigIdPacket(1U, timestamp, interval))
+										MainApp.instance.bluenet.mesh.setIbeaconConfigId(IbeaconConfigIdPacket(1U, timestamp, interval), ids)
 									}.unwrap()
-									.then {
-										MainApp.instance.showResult("Default ibeaconUuid: $it", activity)
-									}
-//							val statePacket = StatePacketV5(StateTypeV4.IBEACON_PROXIMITY_UUID, 0U, PersistenceModeSet.TEMPORARY.num, UuidPacket(uuid))
-//							MainApp.instance.bluenet.mesh.setState(statePacket, 217U)
-//							MainApp.instance.bluenet.mesh.setState(statePacket, 83U)
 
 						}
 						DeviceOption.SetBehaviour -> {
