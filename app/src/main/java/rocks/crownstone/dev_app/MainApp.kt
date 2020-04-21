@@ -1,16 +1,16 @@
 package rocks.crownstone.dev_app
 
 import android.app.*
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.OnLifecycleEvent
-import android.arch.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ProcessLifecycleOwner
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
-import android.support.v4.app.NotificationCompat
-import android.support.v7.app.AlertDialog
+import androidx.core.app.NotificationCompat
+import androidx.appcompat.app.AlertDialog
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.android.volley.RequestQueue

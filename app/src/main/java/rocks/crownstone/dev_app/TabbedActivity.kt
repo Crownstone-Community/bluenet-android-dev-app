@@ -1,13 +1,13 @@
 package rocks.crownstone.dev_app
 
-import android.support.design.widget.TabLayout
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.snackbar.Snackbar
+import androidx.appcompat.app.AppCompatActivity
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.view.ViewPager
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.viewpager.widget.ViewPager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -97,9 +97,9 @@ class TabbedActivity : AppCompatActivity() {
 	 * A [FragmentPagerAdapter] that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.
 	 */
-	inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+	inner class SectionsPagerAdapter(fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
 
-		override fun getItem(position: Int): Fragment {
+		override fun getItem(position: Int): androidx.fragment.app.Fragment {
 			when (position) {
 				1 -> return ControlFragment()
 			}
@@ -117,7 +117,7 @@ class TabbedActivity : AppCompatActivity() {
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
-	class PlaceholderFragment : Fragment() {
+	class PlaceholderFragment : androidx.fragment.app.Fragment() {
 
 		override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
 								  savedInstanceState: Bundle?): View? {

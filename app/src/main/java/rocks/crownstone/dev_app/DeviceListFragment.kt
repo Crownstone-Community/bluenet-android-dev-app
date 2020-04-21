@@ -1,9 +1,9 @@
 package rocks.crownstone.dev_app
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +23,7 @@ import kotlin.collections.ArrayList
 /**
  * A fragment representing a list of Items.
  */
-class DeviceListFragment : Fragment() {
+class DeviceListFragment : androidx.fragment.app.Fragment() {
 	private val TAG = this.javaClass.simpleName
 	private val GUI_UPDATE_INTERVAL_MS = 500
 
@@ -43,9 +43,9 @@ class DeviceListFragment : Fragment() {
 		val view = inflater.inflate(R.layout.device_list_fragment, container, false)
 
 		// Set the adapter
-		val listView = view.findViewById<RecyclerView>(R.id.list)
-		if (listView is RecyclerView) {
-			listView.layoutManager = LinearLayoutManager(context)
+		val listView = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.list)
+		if (listView is androidx.recyclerview.widget.RecyclerView) {
+			listView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
 			adapter = DeviceListAdapter(deviceList, ::onDeviceClick)
 			listView.adapter = adapter
 //			// See: https://stackoverflow.com/questions/45977011/example-of-when-should-we-use-run-let-apply-also-and-with-on-kotlin

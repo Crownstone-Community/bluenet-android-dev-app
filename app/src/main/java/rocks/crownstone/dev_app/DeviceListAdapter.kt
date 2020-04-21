@@ -1,6 +1,6 @@
 package rocks.crownstone.dev_app
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +20,7 @@ import rocks.crownstone.bluenet.scanparsing.ScannedDevice
  * @param deviceList List of devices to display.
  * @param onClick    Callback function when a device is clicked. True for long clicks.
  */
-class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDevice, Boolean) -> Unit): RecyclerView.Adapter<DeviceListAdapter.ViewHolder>() {
+class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDevice, Boolean) -> Unit): androidx.recyclerview.widget.RecyclerView.Adapter<DeviceListAdapter.ViewHolder>() {
 	private val TAG = this.javaClass.simpleName
 //	private var deviceList: List<ScannedDevice> = ArrayList()
 	private val onClickListener: View.OnClickListener
@@ -99,7 +99,7 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 
 	override fun getItemCount(): Int = deviceList.size
 
-	inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+	inner class ViewHolder(val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 		val name:    TextView = view.name
 		val address: TextView = view.address
 		val rssi:    TextView = view.rssi
