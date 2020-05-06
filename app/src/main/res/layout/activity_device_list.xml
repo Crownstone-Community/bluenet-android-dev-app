@@ -45,6 +45,6 @@
 		android:layout_marginLeft="8dp"
 		android:layout_marginRight="8dp"
 		app:layoutManager="LinearLayoutManager"
-		tools:context=".DeviceListFragment"
+		tools:context=".MainActivity"
 		tools:listitem="@layout/device_list_item" />
 </LinearLayout>
