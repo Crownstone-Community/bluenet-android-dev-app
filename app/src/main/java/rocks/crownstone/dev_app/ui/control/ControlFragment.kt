@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import nl.komponents.kovenant.then
+import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.structs.Uint8
 import rocks.crownstone.bluenet.util.toUint8
 import rocks.crownstone.dev_app.MainApp
@@ -70,6 +71,10 @@ class ControlFragment : Fragment() {
 			)
 		}
 
+		root.findViewById<Button>(R.id.buttonFirmwareVersion).setOnClickListener { getFirmwareVersion() }
+		root.findViewById<Button>(R.id.buttonHardwareVersion).setOnClickListener { getHardwareVersion() }
+		root.findViewById<Button>(R.id.buttonBootloaderVersion).setOnClickListener { getBootloaderVersion() }
+		root.findViewById<Button>(R.id.buttonUicrData).setOnClickListener { getUicrData() }
 
 		return root
 	}
@@ -105,7 +110,7 @@ class ControlFragment : Fragment() {
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.bluenet.control.reset()
-				}
+				}.unwrap()
 				.success { showResult("Reset success") }
 				.fail { showResult("Reset failed: $it") }
 	}
@@ -130,7 +135,7 @@ class ControlFragment : Fragment() {
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.bluenet.control.goToDfu()
-				}
+				}.unwrap()
 				.success { showResult("Go to DFU success") }
 				.fail { showResult("Go to DFU failed: $it") }
 	}
@@ -140,8 +145,8 @@ class ControlFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-			MainApp.instance.bluenet.control.setSwitch(value)
-		}
+					MainApp.instance.bluenet.control.setSwitch(value)
+				}.unwrap()
 //				.success { showResult("Set switch success") }
 				.fail { showResult("Set switch failed: $it") }
 	}
@@ -164,6 +169,8 @@ class ControlFragment : Fragment() {
 		val sphereId = device.sphereId ?: return
 		val stoneId = device.serviceData?.crownstoneId ?: return
 		MainApp.instance.bluenet.broadCast.switchOn(sphereId, stoneId)
+//				.success { showResult("Broadcast switch success") }
+//				.fail { showResult("Broadcast switch failed: $it") }
 	}
 
 	private fun broadcastSwitch(value: Uint8) {
@@ -171,6 +178,8 @@ class ControlFragment : Fragment() {
 		val sphereId = device.sphereId ?: return
 		val stoneId = device.serviceData?.crownstoneId ?: return
 		MainApp.instance.bluenet.broadCast.switch(sphereId, stoneId, value)
+//				.success { showResult("Broadcast switch success") }
+//				.fail { showResult("Broadcast switch failed: $it") }
 	}
 
 	private val dimmerBroadcastSliderListener = object : SeekBar.OnSeekBarChangeListener {
@@ -185,6 +194,48 @@ class ControlFragment : Fragment() {
 		override fun onStopTrackingTouch(seekBar: SeekBar?) {
 		}
 	}
+
+	private fun getFirmwareVersion() {
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.deviceInfo.getFirmwareVersion()
+				}.unwrap()
+				.success { showResult("Firmware version: $it") }
+				.fail { showResult("Get firmware version failed: $it") }
+	}
+
+	private fun getHardwareVersion() {
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.deviceInfo.getHardwareVersion()
+				}.unwrap()
+				.success { showResult("Hardware version: $it") }
+				.fail { showResult("Get hardware version failed: $it") }
+	}
+
+	private fun getBootloaderVersion() {
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.deviceInfo.getBootloaderVersion()
+				}.unwrap()
+				.success { showResult("Bootloader version: $it") }
+				.fail { showResult("Get bootloader version failed: $it") }
+	}
+
+	private fun getUicrData() {
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.deviceInfo.getUicrData()
+				}.unwrap()
+				.success { showResult("UICR data: $it") }
+				.fail { showResult("Get UICR data failed: $it") }
+	}
+
+
 
 	private fun showResult(text: String) {
 		val activ = activity ?: return
