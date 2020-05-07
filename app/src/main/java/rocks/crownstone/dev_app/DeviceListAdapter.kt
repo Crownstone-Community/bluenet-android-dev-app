@@ -20,7 +20,7 @@ import rocks.crownstone.bluenet.scanparsing.ScannedDevice
  * @param deviceList List of devices to display.
  * @param onClick    Callback function when a device is clicked. True for long clicks.
  */
-class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDevice, Boolean) -> Unit): androidx.recyclerview.widget.RecyclerView.Adapter<DeviceListAdapter.ViewHolder>() {
+class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDevice, Boolean) -> Unit): RecyclerView.Adapter<DeviceListAdapter.ViewHolder>() {
 	private val TAG = this.javaClass.simpleName
 //	private var deviceList: List<ScannedDevice> = ArrayList()
 	private val onClickListener: View.OnClickListener
@@ -59,6 +59,15 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 		holder.name.text =    device.name
 		holder.address.text = device.address
 		holder.rssi.text =    device.rssi.toString()
+		holder.stoneType.text = when (device.serviceData?.deviceType) {
+			DeviceType.CROWNSTONE_PLUG -> "Plug"
+			DeviceType.CROWNSTONE_BUILTIN -> "Builtin"
+			DeviceType.CROWNSTONE_BUILTIN_ONE -> "Builtin One"
+			DeviceType.CROWNSTONE_DONGLE -> "Dongle"
+			DeviceType.GUIDESTONE -> "Guidestone"
+			DeviceType.UNKNOWN -> ""
+			null -> ""
+		}
 		val ibeaconData = device.ibeaconData
 		if (ibeaconData != null) {
 			holder.iBeacon.visibility = View.VISIBLE
@@ -73,18 +82,25 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 		val serviceData = device.serviceData
 
 		when (device.operationMode) {
-			OperationMode.DFU ->    holder.view.setBackgroundColor(0xFF8000A0.toInt()) // Purple
-			OperationMode.SETUP ->  holder.view.setBackgroundColor(0xFF0080D0.toInt()) // Blue
+			OperationMode.DFU ->       holder.view.setBackgroundColor(0xFF8000A0.toInt()) // Purple
+			OperationMode.SETUP ->     holder.view.setBackgroundColor(0xFF0080D0.toInt()) // Blue
 			OperationMode.NORMAL -> {
-				when (serviceData?.deviceType) {
-					DeviceType.CROWNSTONE_PLUG ->    holder.view.setBackgroundColor(0xFF60A000.toInt()) // Light green
-					DeviceType.CROWNSTONE_BUILTIN -> holder.view.setBackgroundColor(0xFF008000.toInt()) // Green
-					DeviceType.GUIDESTONE ->         holder.view.setBackgroundColor(0xFFA0E000.toInt()) // Yellow green
-					DeviceType.CROWNSTONE_DONGLE ->  holder.view.setBackgroundColor(0xFF00A0A0.toInt()) // Cyan
-					else ->                          holder.view.setBackgroundColor(0xFF000000.toInt())
+				when (device.validated) {
+					true ->            holder.view.setBackgroundColor(0xFF008000.toInt()) // Green
+					false ->           holder.view.setBackgroundColor(0xFF808080.toInt()) // Grey
 				}
 			}
-			else ->                 holder.view.setBackgroundColor(0xFF000000.toInt())
+//			OperationMode.NORMAL -> {
+//				when (serviceData?.deviceType) {
+//					DeviceType.CROWNSTONE_PLUG ->          holder.view.setBackgroundColor(0xFF60A000.toInt()) // Light green
+//					DeviceType.CROWNSTONE_BUILTIN ->       holder.view.setBackgroundColor(0xFF008000.toInt()) // Green
+//					DeviceType.CROWNSTONE_BUILTIN_ONE ->   holder.view.setBackgroundColor(0xFF008000.toInt()) // Green
+//					DeviceType.GUIDESTONE ->               holder.view.setBackgroundColor(0xFFA0E000.toInt()) // Yellow green
+//					DeviceType.CROWNSTONE_DONGLE ->        holder.view.setBackgroundColor(0xFF00A0A0.toInt()) // Cyan
+//					else ->                                holder.view.setBackgroundColor(0xFF000000.toInt()) // Black
+//				}
+//			}
+			else ->                 holder.view.setBackgroundColor(0xFF000000.toInt()) // Black
 		}
 
 //		holder.view.tag = device
@@ -100,12 +116,13 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 	override fun getItemCount(): Int = deviceList.size
 
 	inner class ViewHolder(val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
-		val name:    TextView = view.name
-		val address: TextView = view.address
-		val rssi:    TextView = view.rssi
-		val iBeacon: LinearLayout = view.layIBeacon
-		val uuid:    TextView = view.iBeaconUuid
-		val major:   TextView = view.iBeaconMajor
-		val minor:   TextView = view.iBeaconMinor
+		val name:       TextView = view.name
+		val address:    TextView = view.address
+		val rssi:       TextView = view.rssi
+		val stoneType:  TextView = view.stoneType
+		val iBeacon:    LinearLayout = view.layIBeacon
+		val uuid:       TextView = view.iBeaconUuid
+		val major:      TextView = view.iBeaconMajor
+		val minor:      TextView = view.iBeaconMinor
 	}
 }

@@ -62,6 +62,13 @@ class MainActivity : FragmentActivity() {
 			adapter.notifyDataSetChanged()
 		}
 
+		findViewById<Button>(R.id.buttonSort).setOnClickListener {
+			deviceList.sortByDescending { it.rssi }
+			adapter.notifyDataSetChanged()
+		}
+
+
+
 		MainApp.instance.bluenet.subscribe(BluenetEvent.SCAN_RESULT, { data -> onScannedDevice(data as ScannedDevice)})
 
 //		val intent = Intent(this, TabbedActivity::class.java)
@@ -163,7 +170,10 @@ class MainActivity : FragmentActivity() {
 
 
 	fun onScannedDevice(device: ScannedDevice) {
-		if (!device.validated) {
+//		if (!device.validated) {
+//			return
+//		}
+		if (device.serviceData == null) {
 			return
 		}
 
