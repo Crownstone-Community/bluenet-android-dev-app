@@ -66,6 +66,9 @@ class MainApp : Application(), LifecycleObserver {
 
 	var switchCmd = 100
 
+	// Device selected from list.
+	var selectedDevice: ScannedDevice? = null
+
 	// Dev sphere.
 	val devSphereId = "devSphere"
 	val devKeySet = KeySet("adminKeyForCrown", "memberKeyForHome", "guestKeyForOther", "basicKeyForOther", "LocalizationKeyX")

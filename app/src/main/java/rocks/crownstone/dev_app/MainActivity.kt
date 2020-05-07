@@ -212,6 +212,8 @@ class MainActivity : FragmentActivity() {
 
 		if (!longClick) {
 			val intent = Intent(this, ControlActivity::class.java)
+			intent.putExtra("deviceAddress", device.address)
+			MainApp.instance.selectedDevice = device
 			this.startActivity(intent)
 //			this.startActivityForResult(intent, REQUEST_CODE_LOGIN)
 			return
