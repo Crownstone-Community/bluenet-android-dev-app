@@ -2,6 +2,7 @@ package rocks.crownstone.dev_app
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
 import com.google.android.material.tabs.TabLayout
 import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,8 @@ class ControlActivity : AppCompatActivity() {
 
 		val deviceAddress = intent.getStringExtra("deviceAddress")
 		Log.i(TAG, "deviceAddress=$deviceAddress")
+
+		findViewById<TextView>(R.id.titleControl).text = "Control $deviceAddress"
 
 		val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager, intent.extras)
 		val viewPager: ViewPager = findViewById(R.id.view_pager)
