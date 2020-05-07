@@ -45,14 +45,15 @@ class ControlFragment : Fragment() {
 			textView.text = it
 		})
 
-		root.findViewById<Button>(R.id.buttonOn).setOnClickListener {
-			setSwitch(100U)
-		}
+		root.findViewById<Button>(R.id.buttonSetup).setOnClickListener { setup() }
+		root.findViewById<Button>(R.id.buttonFactoryReset).setOnClickListener { factoryReset() }
+		root.findViewById<Button>(R.id.buttonReset).setOnClickListener { reset() }
+		root.findViewById<Button>(R.id.buttonDfu).setOnClickListener { gotoDfu() }
+		root.findViewById<Button>(R.id.buttonRecover).setOnClickListener { recover() }
 
-		root.findViewById<Button>(R.id.buttonOff).setOnClickListener {
-			setSwitch(0U)
-		}
 
+		root.findViewById<Button>(R.id.buttonOn).setOnClickListener { setSwitch(100U) }
+		root.findViewById<Button>(R.id.buttonOff).setOnClickListener { setSwitch(0U) }
 		root.findViewById<SeekBar>(R.id.dimmerSlider).apply {
 			max = 100
 			setOnSeekBarChangeListener(
@@ -60,14 +61,8 @@ class ControlFragment : Fragment() {
 			)
 		}
 
-		root.findViewById<Button>(R.id.buttonBroadcastOn).setOnClickListener {
-			broadcastSwitchOn()
-		}
-
-		root.findViewById<Button>(R.id.buttonBroadcastOff).setOnClickListener {
-			broadcastSwitch(0U)
-		}
-
+		root.findViewById<Button>(R.id.buttonBroadcastOn).setOnClickListener { broadcastSwitchOn() }
+		root.findViewById<Button>(R.id.buttonBroadcastOff).setOnClickListener { broadcastSwitch(0U) }
 		root.findViewById<SeekBar>(R.id.dimmerBroadcastSlider).apply {
 			max = 100
 			setOnSeekBarChangeListener(
@@ -97,11 +92,58 @@ class ControlFragment : Fragment() {
 		}
 	}
 
+	private fun setup() {
+		val device = MainApp.instance.selectedDevice ?: return
+		val activ = activity ?: return
+		MainApp.instance.setup(device, activ)
+				.success { showResult("Setup success") }
+				.fail { showResult("Setup failed: $it") }
+	}
+
+	private fun reset() {
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.control.reset()
+				}
+				.success { showResult("Reset success") }
+				.fail { showResult("Reset failed: $it") }
+	}
+
+	private fun factoryReset() {
+		val device = MainApp.instance.selectedDevice ?: return
+		val activ = activity ?: return
+		MainApp.instance.factoryReset(device, activ)
+				.success { showResult("Factory reset success") }
+				.fail { showResult("Factory reset failed: $it") }
+	}
+
+	private fun recover() {
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.control.recover(device.address)
+				.success { showResult("Recover success") }
+				.fail { showResult("Recover failed: $it") }
+	}
+
+	private fun gotoDfu() {
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.control.goToDfu()
+				}
+				.success { showResult("Go to DFU success") }
+				.fail { showResult("Go to DFU failed: $it") }
+	}
+
+
 	private fun setSwitch(value: Uint8) {
 		val device = MainApp.instance.selectedDevice ?: return
-		MainApp.instance.bluenet.connect(device.address).then {
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
 			MainApp.instance.bluenet.control.setSwitch(value)
 		}
+//				.success { showResult("Set switch success") }
+				.fail { showResult("Set switch failed: $it") }
 	}
 
 	private val dimmerSliderListener = object : SeekBar.OnSeekBarChangeListener {
@@ -142,5 +184,10 @@ class ControlFragment : Fragment() {
 
 		override fun onStopTrackingTouch(seekBar: SeekBar?) {
 		}
+	}
+
+	private fun showResult(text: String) {
+		val activ = activity ?: return
+		MainApp.instance.showResult(text, activ)
 	}
 }
