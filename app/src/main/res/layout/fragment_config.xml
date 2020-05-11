@@ -17,6 +17,13 @@
 		android:orientation="vertical"
 		android:paddingTop="@dimen/activity_vertical_margin">
 
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="@dimen/activity_vertical_margin"
+			android:text="Dimming"
+			android:textAlignment="center" />
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -29,16 +36,23 @@
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
-				android:text="Enable dimming" />
+				android:text="Enable" />
 
 			<Button
 				android:id="@+id/buttonDisableDimming"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
-				android:text="Disable dimming" />
+				android:text="Disable" />
 		</LinearLayout>
 
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="@dimen/activity_vertical_margin"
+			android:text="Switchcraft"
+			android:textAlignment="center" />
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -51,24 +65,22 @@
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
-				android:text="Enable switchcraft" />
+				android:text="Enable" />
 
 			<Button
 				android:id="@+id/buttonDisableSwitchcraft"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
-				android:text="Disable switchcraft" />
+				android:text="Disable" />
 		</LinearLayout>
-
-
-
 
 
 		<TextView
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="Resets"
+			android:layout_marginTop="@dimen/activity_vertical_margin"
+			android:text="Reset count"
 			android:textAlignment="center" />
 		<LinearLayout
 			android:layout_width="match_parent"

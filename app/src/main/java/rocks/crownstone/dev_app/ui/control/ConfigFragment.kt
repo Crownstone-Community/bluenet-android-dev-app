@@ -80,7 +80,6 @@ class ConfigFragment : Fragment() {
 
 	private fun enableDimming(enable: Boolean) {
 		val device = MainApp.instance.selectedDevice ?: return
-		val activ = activity ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.bluenet.control.allowDimming(enable)
@@ -91,7 +90,6 @@ class ConfigFragment : Fragment() {
 
 	private fun enableSwitchcraft(enable: Boolean) {
 		val device = MainApp.instance.selectedDevice ?: return
-		val activ = activity ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.bluenet.config.setSwitchCraftEnabled(enable)
@@ -102,7 +100,6 @@ class ConfigFragment : Fragment() {
 
 	private fun resetCount(set: Boolean, editText: EditText) {
 		val device = MainApp.instance.selectedDevice ?: return
-		val activ = activity ?: return
 		if (!set) {
 			editText.setText("")
 		}
@@ -113,10 +110,7 @@ class ConfigFragment : Fragment() {
 						false -> MainApp.instance.bluenet.state.getResetCount()
 					}
 				}.unwrap()
-				.success {
-//					showResult("Reset count: $it")
-					editText.setText(it.toString())
-				}
+				.success { editText.setText(it.toString()) }
 				.fail { showResult("Reset count failed: ${it.message}") }
 	}
 
