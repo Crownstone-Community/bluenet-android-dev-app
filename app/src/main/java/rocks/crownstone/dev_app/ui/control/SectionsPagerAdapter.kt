@@ -28,7 +28,8 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, va
 
 		when (position) {
 			0 -> return ControlFragment.newInstance(position + 1, deviceAddress)
-			1 -> return PlaceholderFragment.newInstance(position + 1)
+			1 -> return ConfigFragment.newInstance(position + 1, deviceAddress)
+			2 -> return PlaceholderFragment.newInstance(position + 1)
 		}
 		return PlaceholderFragment.newInstance(position + 1)
 	}
@@ -38,13 +39,14 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, va
 //		return context.resources.getString(TAB_TITLES[position])
 		when (position) {
 			0 -> return "Control"
-			1 -> return "todo"
+			1 -> return "Config"
+			2 -> return "todo"
 		}
 		throw Exception("Invalid position")
 	}
 
 	override fun getCount(): Int {
-		// Show 2 total pages.
-		return 2
+		// Number of total pages.
+		return 3
 	}
 }
