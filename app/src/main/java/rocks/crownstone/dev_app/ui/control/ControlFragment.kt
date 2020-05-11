@@ -102,7 +102,7 @@ class ControlFragment : Fragment() {
 		val activ = activity ?: return
 		MainApp.instance.setup(device, activ)
 				.success { showResult("Setup success") }
-				.fail { showResult("Setup failed: $it") }
+				.fail { showResult("Setup failed: ${it.message}") }
 	}
 
 	private fun reset() {
@@ -112,7 +112,7 @@ class ControlFragment : Fragment() {
 					MainApp.instance.bluenet.control.reset()
 				}.unwrap()
 				.success { showResult("Reset success") }
-				.fail { showResult("Reset failed: $it") }
+				.fail { showResult("Reset failed: ${it.message}") }
 	}
 
 	private fun factoryReset() {
@@ -120,14 +120,14 @@ class ControlFragment : Fragment() {
 		val activ = activity ?: return
 		MainApp.instance.factoryReset(device, activ)
 				.success { showResult("Factory reset success") }
-				.fail { showResult("Factory reset failed: $it") }
+				.fail { showResult("Factory reset failed: ${it.message}") }
 	}
 
 	private fun recover() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.control.recover(device.address)
 				.success { showResult("Recover success") }
-				.fail { showResult("Recover failed: $it") }
+				.fail { showResult("Recover failed: ${it.message}") }
 	}
 
 	private fun gotoDfu() {
@@ -137,7 +137,7 @@ class ControlFragment : Fragment() {
 					MainApp.instance.bluenet.control.goToDfu()
 				}.unwrap()
 				.success { showResult("Go to DFU success") }
-				.fail { showResult("Go to DFU failed: $it") }
+				.fail { showResult("Go to DFU failed: ${it.message}") }
 	}
 
 
@@ -148,7 +148,7 @@ class ControlFragment : Fragment() {
 					MainApp.instance.bluenet.control.setSwitch(value)
 				}.unwrap()
 //				.success { showResult("Set switch success") }
-				.fail { showResult("Set switch failed: $it") }
+				.fail { showResult("Set switch failed: ${it.message}") }
 	}
 
 	private val dimmerSliderListener = object : SeekBar.OnSeekBarChangeListener {
@@ -170,7 +170,7 @@ class ControlFragment : Fragment() {
 		val stoneId = device.serviceData?.crownstoneId ?: return
 		MainApp.instance.bluenet.broadCast.switchOn(sphereId, stoneId)
 //				.success { showResult("Broadcast switch success") }
-//				.fail { showResult("Broadcast switch failed: $it") }
+//				.fail { showResult("Broadcast switch failed: ${it.message}") }
 	}
 
 	private fun broadcastSwitch(value: Uint8) {
@@ -179,7 +179,7 @@ class ControlFragment : Fragment() {
 		val stoneId = device.serviceData?.crownstoneId ?: return
 		MainApp.instance.bluenet.broadCast.switch(sphereId, stoneId, value)
 //				.success { showResult("Broadcast switch success") }
-//				.fail { showResult("Broadcast switch failed: $it") }
+//				.fail { showResult("Broadcast switch failed: ${it.message}") }
 	}
 
 	private val dimmerBroadcastSliderListener = object : SeekBar.OnSeekBarChangeListener {
@@ -202,7 +202,7 @@ class ControlFragment : Fragment() {
 					MainApp.instance.bluenet.deviceInfo.getFirmwareVersion()
 				}.unwrap()
 				.success { showResult("Firmware version: $it") }
-				.fail { showResult("Get firmware version failed: $it") }
+				.fail { showResult("Get firmware version failed: ${it.message}") }
 	}
 
 	private fun getHardwareVersion() {
@@ -212,7 +212,7 @@ class ControlFragment : Fragment() {
 					MainApp.instance.bluenet.deviceInfo.getHardwareVersion()
 				}.unwrap()
 				.success { showResult("Hardware version: $it") }
-				.fail { showResult("Get hardware version failed: $it") }
+				.fail { showResult("Get hardware version failed: ${it.message}") }
 	}
 
 	private fun getBootloaderVersion() {
@@ -222,7 +222,7 @@ class ControlFragment : Fragment() {
 					MainApp.instance.bluenet.deviceInfo.getBootloaderVersion()
 				}.unwrap()
 				.success { showResult("Bootloader version: $it") }
-				.fail { showResult("Get bootloader version failed: $it") }
+				.fail { showResult("Get bootloader version failed: ${it.message}") }
 	}
 
 	private fun getUicrData() {
@@ -232,7 +232,7 @@ class ControlFragment : Fragment() {
 					MainApp.instance.bluenet.deviceInfo.getUicrData()
 				}.unwrap()
 				.success { showResult("UICR data: $it") }
-				.fail { showResult("Get UICR data failed: $it") }
+				.fail { showResult("Get UICR data failed: ${it.message}") }
 	}
 
 
