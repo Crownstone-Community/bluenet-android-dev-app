@@ -19,6 +19,7 @@ import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
 import rocks.crownstone.bluenet.util.Conversion
 import rocks.crownstone.bluenet.util.Util
+import rocks.crownstone.bluenet.util.toUint32
 import rocks.crownstone.bluenet.util.toUint8
 import java.util.*
 
@@ -298,6 +299,8 @@ class MainActivity : FragmentActivity() {
 						}
 						DeviceOption.SetIbeaconUUID -> {
 							val uuid = UUID.randomUUID()
+							val major: Uint16 = 1U
+							val minor: Uint16 = 2U
 							MainApp.instance.showResult("Set ibeaconUuid: $uuid", activity)
 //							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, PersistenceModeSet.TEMPORARY)
 //									.then {
@@ -314,8 +317,28 @@ class MainActivity : FragmentActivity() {
 //									.then {
 //										MainApp.instance.showResult("Default ibeaconUuid: $it", activity)
 //									}
-							val statePacket = StatePacketV5(StateTypeV4.IBEACON_PROXIMITY_UUID, 1U, PersistenceModeSet.TEMPORARY.num, UuidPacket(uuid))
-							val ids = listOf<Uint8>(217U, 83U)
+
+//							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, 1U, PersistenceModeSet.STORED)
+//									.then {
+//										MainApp.instance.bluenet.config.setIbeaconMajor(major, 1U, PersistenceModeSet.STORED)
+//									}.unwrap()
+//									.then {
+//										MainApp.instance.bluenet.config.setIbeaconMinor(minor, 1U, PersistenceModeSet.STORED)
+//									}.unwrap()
+//									.then {
+//										val timestamp: Uint32 = 0U
+//										val interval: Uint16 = 4U
+//										MainApp.instance.bluenet.control.setIbeaconConfigId(IbeaconConfigIdPacket(0U, timestamp, interval))
+//									}.unwrap()
+//									.then {
+//										val timestamp: Uint32 = 2U
+//										val interval: Uint16 = 4U
+//										MainApp.instance.bluenet.control.setIbeaconConfigId(IbeaconConfigIdPacket(1U, timestamp, interval))
+//									}
+
+							// Via mesh
+							val statePacket = StatePacketV5(StateTypeV4.IBEACON_PROXIMITY_UUID, 1U, PersistenceModeSet.STORED.num, UuidPacket(uuid))
+							val ids = listOf<Uint8>(79U, 77U)
 							MainApp.instance.bluenet.mesh.setState(statePacket, ids[0])
 									.then {
 										MainApp.instance.bluenet.mesh.setState(statePacket, ids[1])
@@ -323,13 +346,11 @@ class MainActivity : FragmentActivity() {
 									.then {
 										val timestamp: Uint32 = 0U
 										val interval: Uint16 = 4U
-//										MainApp.instance.bluenet.control.setIbeaconConfigId(IbeaconConfigIdPacket(0U, timestamp, interval))
 										MainApp.instance.bluenet.mesh.setIbeaconConfigId(IbeaconConfigIdPacket(0U, timestamp, interval), ids)
 									}.unwrap()
 									.then {
 										val timestamp: Uint32 = 2U
 										val interval: Uint16 = 4U
-//										MainApp.instance.bluenet.control.setIbeaconConfigId(IbeaconConfigIdPacket(1U, timestamp, interval))
 										MainApp.instance.bluenet.mesh.setIbeaconConfigId(IbeaconConfigIdPacket(1U, timestamp, interval), ids)
 									}.unwrap()
 
