@@ -70,12 +70,6 @@ class ControlFragment : Fragment() {
 					dimmerBroadcastSliderListener
 			)
 		}
-
-		root.findViewById<Button>(R.id.buttonFirmwareVersion).setOnClickListener { getFirmwareVersion() }
-		root.findViewById<Button>(R.id.buttonHardwareVersion).setOnClickListener { getHardwareVersion() }
-		root.findViewById<Button>(R.id.buttonBootloaderVersion).setOnClickListener { getBootloaderVersion() }
-		root.findViewById<Button>(R.id.buttonUicrData).setOnClickListener { getUicrData() }
-
 		return root
 	}
 
@@ -195,45 +189,7 @@ class ControlFragment : Fragment() {
 		}
 	}
 
-	private fun getFirmwareVersion() {
-		val device = MainApp.instance.selectedDevice ?: return
-		MainApp.instance.bluenet.connect(device.address)
-				.then {
-					MainApp.instance.bluenet.deviceInfo.getFirmwareVersion()
-				}.unwrap()
-				.success { showResult("Firmware version: $it") }
-				.fail { showResult("Get firmware version failed: ${it.message}") }
-	}
 
-	private fun getHardwareVersion() {
-		val device = MainApp.instance.selectedDevice ?: return
-		MainApp.instance.bluenet.connect(device.address)
-				.then {
-					MainApp.instance.bluenet.deviceInfo.getHardwareVersion()
-				}.unwrap()
-				.success { showResult("Hardware version: $it") }
-				.fail { showResult("Get hardware version failed: ${it.message}") }
-	}
-
-	private fun getBootloaderVersion() {
-		val device = MainApp.instance.selectedDevice ?: return
-		MainApp.instance.bluenet.connect(device.address)
-				.then {
-					MainApp.instance.bluenet.deviceInfo.getBootloaderVersion()
-				}.unwrap()
-				.success { showResult("Bootloader version: $it") }
-				.fail { showResult("Get bootloader version failed: ${it.message}") }
-	}
-
-	private fun getUicrData() {
-		val device = MainApp.instance.selectedDevice ?: return
-		MainApp.instance.bluenet.connect(device.address)
-				.then {
-					MainApp.instance.bluenet.deviceInfo.getUicrData()
-				}.unwrap()
-				.success { showResult("UICR data: $it") }
-				.fail { showResult("Get UICR data failed: ${it.message}") }
-	}
 
 
 

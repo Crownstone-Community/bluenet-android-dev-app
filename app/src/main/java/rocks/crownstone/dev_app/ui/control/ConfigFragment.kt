@@ -7,19 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.SeekBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import nl.komponents.kovenant.Promise
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
-import rocks.crownstone.bluenet.structs.Errors
-import rocks.crownstone.bluenet.structs.Uint8
-import rocks.crownstone.bluenet.util.toUint8
+import rocks.crownstone.bluenet.util.Util
 import rocks.crownstone.dev_app.MainApp
 import rocks.crownstone.dev_app.R
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Fragment with the config commands.
@@ -53,9 +51,8 @@ class ConfigFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonDisableDimming).setOnClickListener { enableDimming(false) }
 		root.findViewById<Button>(R.id.buttonEnableSwitchcraft).setOnClickListener { enableSwitchcraft(true) }
 		root.findViewById<Button>(R.id.buttonDisableSwitchcraft).setOnClickListener { enableSwitchcraft(false) }
-		val editTestResets = root.findViewById<EditText>(R.id.editResets)
-		root.findViewById<Button>(R.id.buttonGetResets).setOnClickListener { resetCount(false, editTestResets) }
-		root.findViewById<Button>(R.id.buttonSetResets).setOnClickListener { resetCount(true, editTestResets) }
+		root.findViewById<Button>(R.id.buttonGetTime).setOnClickListener { getTime(root.findViewById<EditText>(R.id.editGetTime)) }
+		root.findViewById<Button>(R.id.buttonSetTime).setOnClickListener { setTime(root.findViewById<EditText>(R.id.editSetTime)) }
 
 		return root
 	}
@@ -98,22 +95,37 @@ class ConfigFragment : Fragment() {
 				.fail { showResult("Enable switchcraft failed: ${it.message}") }
 	}
 
-	private fun resetCount(set: Boolean, editText: EditText) {
+	private fun getTime(editText: EditText) {
+		editText.setText("")
 		val device = MainApp.instance.selectedDevice ?: return
-		if (!set) {
-			editText.setText("")
-		}
+
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					when (set) {
-						true -> Promise.ofFail(Errors.NotImplemented())
-						false -> MainApp.instance.bluenet.state.getResetCount()
-					}
+					MainApp.instance.bluenet.state.getTime()
 				}.unwrap()
-				.success { editText.setText(it.toString()) }
-				.fail { showResult("Reset count failed: ${it.message}") }
+				.success {
+					val timestampStr = Util.getTimestampString(it)
+					editText.setText("$it $timestampStr")
+					showResult("Time: $it $timestampStr")
+				}
+				.fail { showResult("Get time failed: ${it.message}") }
 	}
-
+	private fun setTime(editText: EditText) {
+		val device = MainApp.instance.selectedDevice ?: return
+		val timestamp = if (editText.text.isBlank()) {
+			Util.getLocalTimestamp()
+		}
+		else {
+			editText.text.toString().toUIntOrNull() ?: Util.getLocalTimestamp()
+		}
+		val timestampStr = Util.getTimestampString(timestamp)
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.control.setTime(timestamp)
+				}.unwrap()
+				.success { showResult("Set time to $timestamp $timestampStr") }
+				.fail { showResult("Set time failed: ${it.message}") }
+	}
 
 
 

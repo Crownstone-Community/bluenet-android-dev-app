@@ -80,7 +80,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="@dimen/activity_vertical_margin"
-			android:text="Reset count"
+			android:text="Time"
 			android:textAlignment="center" />
 		<LinearLayout
 			android:layout_width="match_parent"
@@ -90,26 +90,40 @@
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent">
 			<Button
-				android:id="@+id/buttonGetResets"
+				android:id="@+id/buttonGetTime"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:text="Get" />
-			<Button
-				android:id="@+id/buttonSetResets"
-				android:layout_height="wrap_content"
-				android:layout_width="0dp"
-				android:layout_weight="1"
-				android:text="Set" />
 			<EditText
-				android:id="@+id/editResets"
+				android:id="@+id/editGetTime"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:ems="10"
 				android:inputType="number" />
 		</LinearLayout>
-
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+			<Button
+				android:id="@+id/buttonSetTime"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="Set" />
+			<EditText
+				android:id="@+id/editSetTime"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:ems="10"
+				android:inputType="number" />
+		</LinearLayout>
 
 
 

@@ -24,42 +24,18 @@
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent">
-
 			<Button
-				android:id="@+id/buttonSetup"
+				android:id="@+id/buttonFirmwareVersion"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
-				android:text="Setup" />
-
-			<Button
-				android:id="@+id/buttonFactoryReset"
-				android:layout_height="wrap_content"
+				android:text="Firmware version" />
+			<TextView
+				android:id="@+id/textViewFirmwareVersion"
 				android:layout_width="0dp"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:text="Factory reset" />
-		</LinearLayout>
-
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toTopOf="parent">
-
-			<Button
-				android:id="@+id/buttonReset"
-				android:layout_height="wrap_content"
-				android:layout_width="0dp"
-				android:layout_weight="1"
-				android:text="Reset" />
-
-			<Button
-				android:id="@+id/buttonReserved"
-				android:layout_height="wrap_content"
-				android:layout_width="0dp"
-				android:layout_weight="1"
+				android:textIsSelectable="true"
 				android:text="" />
 		</LinearLayout>
 
@@ -70,29 +46,20 @@
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent">
-
 			<Button
-				android:id="@+id/buttonDfu"
+				android:id="@+id/buttonBootloaderVersion"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
-				android:text="DFU" />
-
-			<Button
-				android:id="@+id/buttonRecover"
-				android:layout_height="wrap_content"
+				android:text="Bootloader version" />
+			<TextView
+				android:id="@+id/textViewBootloaderVersion"
 				android:layout_width="0dp"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:text="Recover" />
+				android:textIsSelectable="true"
+				android:text="" />
 		</LinearLayout>
-
-
-
-		<TextView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Via connection"
-			android:textAlignment="center" />
 
 		<LinearLayout
 			android:layout_width="match_parent"
@@ -101,35 +68,21 @@
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent">
-
 			<Button
-				android:id="@+id/buttonOn"
+				android:id="@+id/buttonHardwareVersion"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
-				android:text="On" />
-
-			<Button
-				android:id="@+id/buttonOff"
-				android:layout_height="wrap_content"
+				android:text="Hardware version" />
+			<TextView
+				android:id="@+id/textViewHardwareVersion"
 				android:layout_width="0dp"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:text="Off" />
+				android:textIsSelectable="true"
+				android:text="" />
 		</LinearLayout>
 
-		<SeekBar
-			android:id="@+id/dimmerSlider"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:paddingVertical="@dimen/activity_vertical_margin"
-			/>
-
-
-		<TextView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Via broadcast"
-			android:textAlignment="center" />
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -137,28 +90,110 @@
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent">
-
 			<Button
-				android:id="@+id/buttonBroadcastOn"
+				android:id="@+id/buttonUicrData"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
-				android:text="On" />
-
-			<Button
-				android:id="@+id/buttonBroadcastOff"
-				android:layout_height="wrap_content"
+				android:text="UICR data" />
+			<TextView
+				android:id="@+id/textViewUicrData"
 				android:layout_width="0dp"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:text="Off" />
+				android:textIsSelectable="true"
+				android:text="" />
 		</LinearLayout>
 
-		<SeekBar
-			android:id="@+id/dimmerBroadcastSlider"
+		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:paddingVertical="@dimen/activity_vertical_margin"
-			/>
+			android:orientation="horizontal"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+			<Button
+				android:id="@+id/buttonUptime"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="Uptime" />
+			<TextView
+				android:id="@+id/textViewUptime"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:textIsSelectable="true"
+				android:text="" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+			<Button
+				android:id="@+id/buttonTime"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="Time" />
+			<TextView
+				android:id="@+id/textViewTime"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:textIsSelectable="true"
+				android:text="" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+			<Button
+				android:id="@+id/buttonAdcRestarts"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="ADC restarts" />
+			<TextView
+				android:id="@+id/textViewAdcRestarts"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:textIsSelectable="true"
+				android:text="" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+			<Button
+				android:id="@+id/buttonPowerSamples"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="Power samples" />
+			<TextView
+				android:id="@+id/textViewPowerSamples"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:textIsSelectable="true"
+				android:text="" />
+		</LinearLayout>
+
+
 
 
 
