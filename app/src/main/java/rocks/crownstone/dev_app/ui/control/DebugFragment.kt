@@ -72,6 +72,9 @@ class DebugFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonAdcRestarts).setOnClickListener {
 			getAdcRestarts(root.findViewById<TextView>(R.id.textViewAdcRestarts))
 		}
+		root.findViewById<Button>(R.id.buttonSwitchHistory).setOnClickListener {
+			getSwitchHistory(root.findViewById<TextView>(R.id.textViewSwitchHistory))
+		}
 		root.findViewById<Button>(R.id.buttonPowerSamples).setOnClickListener {
 			getPowerSamples(root.findViewById<TextView>(R.id.textViewPowerSamples))
 		}
@@ -99,13 +102,13 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getFirmwareVersion(view: TextView) {
-		view.text = ""
+		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.bluenet.deviceInfo.getFirmwareVersion()
 				}.unwrap()
-				.success {
+				.successUi {
 					view.text = it
 					showResult("Firmware version: $it")
 				}
@@ -113,13 +116,13 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getBootloaderVersion(view: TextView) {
-		view.text = ""
+		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.bluenet.deviceInfo.getBootloaderVersion()
 				}.unwrap()
-				.success {
+				.successUi {
 					view.text = it
 					showResult("Bootloader version: $it")
 				}
@@ -127,13 +130,13 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getHardwareVersion(view: TextView) {
-		view.text = ""
+		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.bluenet.deviceInfo.getHardwareVersion()
 				}.unwrap()
-				.success {
+				.successUi {
 					view.text = it
 					showResult("Hardware version: $it")
 				}
@@ -141,13 +144,13 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getUicrData(view: TextView) {
-		view.text = ""
+		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.bluenet.deviceInfo.getUicrData()
 				}.unwrap()
-				.success {
+				.successUi {
 					view.text = it.toString()
 					showResult("UICR data: $it")
 				}
@@ -155,13 +158,13 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getUptime(view: TextView) {
-		view.text = ""
+		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.bluenet.debugData.getUptime()
 				}.unwrap()
-				.success {
+				.successUi {
 					view.text = it.toString()
 					showResult("Uptime: $it")
 				}
@@ -169,35 +172,50 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getTime(view: TextView) {
-		view.text = ""
+		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.bluenet.state.getTime()
 				}.unwrap()
-				.success {
-					view.text = it.toString()
-					showResult("Time: $it")
+				.successUi {
+					val timestampStr = Util.getTimestampString(it)
+					view.text = "$timestampStr $it"
+					showResult("Time: $timestampStr $it")
 				}
 				.fail { showResult("Get time failed: ${it.message}") }
 	}
 
 	private fun getAdcRestarts(view: TextView) {
-		view.text = ""
+		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.bluenet.debugData.getAdcRestarts()
 				}.unwrap()
-				.success {
+				.successUi {
 					view.text = it.toString()
 					showResult("ADC restarts: $it")
 				}
 				.fail { showResult("Get ADC restarts failed: ${it.message}") }
 	}
 
+	private fun getSwitchHistory(view: TextView) {
+		clearText(view)
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.debugData.getSwitchHistory()
+				}.unwrap()
+				.successUi {
+					view.text = it.toString()
+					showResult("Switch history: $it")
+				}
+				.fail { showResult("Get switch history failed: ${it.message}") }
+	}
+
 	private fun getPowerSamples(view: TextView) {
-		view.text = ""
+		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
@@ -213,16 +231,22 @@ class DebugFragment : Fragment() {
 				}.unwrap()
 				.successUi {
 					val timestampStr = Util.getTimestampString(it.timestamp)
-					Log.i(TAG, "Power samples: $it")
-					view.text = "${it.timestamp} $timestampStr"
-					showResult("Power samples timestamp: ${it.timestamp} $timestampStr")
+//					Log.i(TAG, "Power samples: $it")
+//					view.text = "${it.timestamp} $timestampStr"
+					view.text = "$timestampStr $it"
+//					showResult("Power samples timestamp: ${it.timestamp} $timestampStr")
+					showResult("Power samples $timestampStr $it")
 				}
 				.fail { showResult("Get power samples failed: ${it.message}") }
 	}
 
 
 
-
+	private fun clearText(view: TextView) {
+		activity?.runOnUiThread {
+			view.text = ""
+		}
+	}
 
 	private fun showResult(text: String) {
 		val activ = activity ?: return
