@@ -30,9 +30,9 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, va
 			0 -> return ControlFragment.newInstance(position + 1, deviceAddress)
 			1 -> return ConfigFragment.newInstance(position + 1, deviceAddress)
 			2 -> return DebugFragment.newInstance(position + 1, deviceAddress)
-			3 -> return PlaceholderFragment.newInstance(position + 1)
+			3 -> return BehaviourFragment.newInstance(position + 1, deviceAddress)
 		}
-		return PlaceholderFragment.newInstance(position + 1)
+		return ControlFragment.newInstance(position + 1, deviceAddress)
 	}
 
 	override fun getPageTitle(position: Int): CharSequence? {
@@ -42,7 +42,7 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, va
 			0 -> return "Control"
 			1 -> return "Config"
 			2 -> return "Debug"
-			3 -> return "test"
+			3 -> return "Behaviour"
 		}
 		throw Exception("Invalid position")
 	}

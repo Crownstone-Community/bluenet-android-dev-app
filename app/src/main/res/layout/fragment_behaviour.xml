@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/constraintLayout"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".ui.control.ControlFragment">
+
+	<ScrollView
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="vertical"
+			android:paddingTop="@dimen/activity_vertical_margin">
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="parent">
+
+				<LinearLayout
+					android:layout_width="0dp"
+					android:layout_height="match_parent"
+					android:layout_weight="3"
+					android:orientation="vertical"
+					android:paddingTop="@dimen/activity_vertical_margin">
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent">
+						<TextView
+							android:id="@+id/textType"
+							android:layout_width="0dp"
+							android:layout_height="match_parent"
+							android:layout_weight="1"
+							android:textIsSelectable="true"
+							android:text="Type:" />
+						<Spinner
+							android:id="@+id/spinnerBehaviourType"
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_weight="2"
+							app:layout_constraintEnd_toEndOf="parent"
+							app:layout_constraintStart_toStartOf="parent" />
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent">
+						<TextView
+							android:id="@+id/textSwitchVal"
+							android:layout_width="0dp"
+							android:layout_height="match_parent"
+							android:layout_weight="1"
+							android:textIsSelectable="true"
+							android:text="Switch val:" />
+						<EditText
+							android:id="@+id/editSwitchVal"
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_weight="2"
+							android:ems="10"
+							android:inputType="number"
+							android:text="0"
+							app:layout_constraintEnd_toEndOf="parent"
+							app:layout_constraintStart_toStartOf="parent" />
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent">
+						<TextView
+							android:id="@+id/textProfileId"
+							android:layout_width="0dp"
+							android:layout_height="match_parent"
+							android:layout_weight="1"
+							android:textIsSelectable="true"
+							android:text="Profile ID:" />
+						<EditText
+							android:id="@+id/editProfileId"
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_weight="2"
+							android:ems="10"
+							android:inputType="number"
+							android:text="0"
+							app:layout_constraintEnd_toEndOf="parent"
+							app:layout_constraintStart_toStartOf="parent" />
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent">
+						<TextView
+							android:id="@+id/textFromTime"
+							android:layout_width="0dp"
+							android:layout_height="match_parent"
+							android:layout_weight="1"
+							android:textIsSelectable="true"
+							android:text="From:" />
+
+						<EditText
+							android:id="@+id/editFromTime"
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_weight="2"
+							android:ems="10"
+							android:inputType="time"
+							android:text="00:00:00" />
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent">
+						<TextView
+							android:id="@+id/textUntilTime"
+							android:layout_width="0dp"
+							android:layout_height="match_parent"
+							android:layout_weight="1"
+							android:textIsSelectable="true"
+							android:text="Until:" />
+
+						<EditText
+							android:id="@+id/editUntilTime"
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_weight="2"
+							android:ems="10"
+							android:inputType="time"
+							android:text="23:00:00" />
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent">
+						<TextView
+							android:id="@+id/textPresenceType"
+							android:layout_width="0dp"
+							android:layout_height="match_parent"
+							android:layout_weight="1"
+							android:textIsSelectable="true"
+							android:text="Type:" />
+						<Spinner
+							android:id="@+id/spinnerPresenceType"
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_weight="2"
+							app:layout_constraintEnd_toEndOf="parent"
+							app:layout_constraintStart_toStartOf="parent" />
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent">
+						<TextView
+							android:id="@+id/textRoom"
+							android:layout_width="0dp"
+							android:layout_height="match_parent"
+							android:layout_weight="1"
+							android:textIsSelectable="true"
+							android:text="Room ID:" />
+						<EditText
+							android:id="@+id/editRoom"
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_weight="2"
+							android:ems="10"
+							android:inputType="number"
+							android:text="0"
+							app:layout_constraintEnd_toEndOf="parent"
+							app:layout_constraintStart_toStartOf="parent" />
+					</LinearLayout>
+
+				</LinearLayout>
+
+
+
+				<LinearLayout
+					android:layout_width="0dp"
+					android:layout_height="match_parent"
+					android:layout_weight="2"
+					android:orientation="vertical"
+					android:paddingTop="@dimen/activity_vertical_margin">
+
+					<CheckBox
+						android:id="@+id/checkMonday"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:checked="true"
+						android:text="Monday" />
+					<CheckBox
+						android:id="@+id/checkTuesday"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:checked="true"
+						android:text="Tuesday" />
+					<CheckBox
+						android:id="@+id/checkWednesday"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:checked="true"
+						android:text="Wednesday" />
+					<CheckBox
+						android:id="@+id/checkThursday"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:checked="true"
+						android:text="Thursday" />
+					<CheckBox
+						android:id="@+id/checkFriday"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:checked="true"
+						android:text="Friday" />
+					<CheckBox
+						android:id="@+id/checkSaturday"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:checked="true"
+						android:text="Saturday" />
+					<CheckBox
+						android:id="@+id/checkSunday"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:checked="true"
+						android:text="Sunday" />
+
+				</LinearLayout>
+			</LinearLayout>
+
+
+
+			<Button
+				android:id="@+id/buttonAdd"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="Add" />
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="parent">
+
+				<Button
+					android:id="@+id/buttonRem"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:text="Remove" />
+
+				<EditText
+					android:id="@+id/editRem"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:ems="10"
+					android:inputType="number" />
+			</LinearLayout>
+
+			<Button
+				android:id="@+id/buttonGet"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="Get" />
+
+			<TextView
+				android:id="@+id/textBehaviours"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="" />
+
+
+			<TextView
+				android:id="@+id/section_label"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginStart="@dimen/activity_horizontal_margin"
+				android:layout_marginTop="@dimen/activity_vertical_margin"
+				android:layout_marginEnd="@dimen/activity_horizontal_margin"
+				android:layout_marginBottom="@dimen/activity_vertical_margin"
+				app:layout_constraintLeft_toLeftOf="parent"
+				app:layout_constraintTop_toTopOf="@+id/constraintLayout"
+				tools:layout_constraintLeft_creator="1"
+				tools:layout_constraintTop_creator="1" />
+
+		</LinearLayout>
+	</ScrollView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

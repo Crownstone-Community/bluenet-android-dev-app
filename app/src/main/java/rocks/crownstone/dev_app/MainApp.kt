@@ -23,8 +23,10 @@ import nl.komponents.kovenant.then
 import nl.komponents.kovenant.ui.promiseOnUi
 import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.Bluenet
+import rocks.crownstone.bluenet.behaviour.BehaviourSyncerFromCrownstone
 import rocks.crownstone.bluenet.encryption.KeySet
 import rocks.crownstone.bluenet.encryption.MeshKeySet
+import rocks.crownstone.bluenet.packets.behaviour.IndexedBehaviourPacket
 import rocks.crownstone.bluenet.scanhandling.NearestDeviceListEntry
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
@@ -78,6 +80,9 @@ class MainApp : Application(), LifecycleObserver {
 	val devSphereShortId = 123.toUint8()
 	val devDeviceToken = 12.toUint8()
 	val devSphereSetting = SphereSettings(devKeySet, devMeshKeySet, devIbeaconUuid, devSphereShortId, devDeviceToken)
+
+	val behaviours = ArrayList<IndexedBehaviourPacket>()
+	val behaviourSyncer = BehaviourSyncerFromCrownstone(bluenet)
 
 	override fun onCreate() {
 		super<Application>.onCreate()
