@@ -201,13 +201,57 @@
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent">
 			<Button
-				android:id="@+id/buttonPowerSamples"
+				android:id="@+id/buttonSwitchcraftSamples"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
-				android:text="Power samples" />
+				android:text="Switchcraft samples" />
 			<TextView
-				android:id="@+id/textViewPowerSamples"
+				android:id="@+id/textViewSwitchcraftSamples"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:textIsSelectable="true"
+				android:text="" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+			<Button
+				android:id="@+id/buttonFilteredPowerSamples"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="Filtered samples" />
+			<TextView
+				android:id="@+id/textViewFilteredPowerSamples"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:textIsSelectable="true"
+				android:text="" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+			<Button
+				android:id="@+id/buttonUnfilteredPowerSamples"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="Unfiltered samples" />
+			<TextView
+				android:id="@+id/textViewUnfilteredPowerSamples"
 				android:layout_width="0dp"
 				android:layout_height="match_parent"
 				android:layout_weight="1"

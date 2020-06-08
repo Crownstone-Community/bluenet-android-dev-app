@@ -75,8 +75,14 @@ class DebugFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonSwitchHistory).setOnClickListener {
 			getSwitchHistory(root.findViewById<TextView>(R.id.textViewSwitchHistory))
 		}
-		root.findViewById<Button>(R.id.buttonPowerSamples).setOnClickListener {
-			getPowerSamples(root.findViewById<TextView>(R.id.textViewPowerSamples))
+		root.findViewById<Button>(R.id.buttonSwitchcraftSamples).setOnClickListener {
+			getPowerSamples(root.findViewById<TextView>(R.id.textViewSwitchcraftSamples), PowerSamplesType.SWITCHCRAFT)
+		}
+		root.findViewById<Button>(R.id.buttonFilteredPowerSamples).setOnClickListener {
+			getPowerSamples(root.findViewById<TextView>(R.id.textViewFilteredPowerSamples), PowerSamplesType.NOW_FILTERED)
+		}
+		root.findViewById<Button>(R.id.buttonUnfilteredPowerSamples).setOnClickListener {
+			getPowerSamples(root.findViewById<TextView>(R.id.textViewUnfilteredPowerSamples), PowerSamplesType.NOW_UNFILTERED)
 		}
 
 
@@ -214,27 +220,17 @@ class DebugFragment : Fragment() {
 				.fail { showResult("Get switch history failed: ${it.message}") }
 	}
 
-	private fun getPowerSamples(view: TextView) {
+	private fun getPowerSamples(view: TextView, type: PowerSamplesType) {
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.debugData.getPowerSamples(PowerSamplesType.SWITCHCRAFT, 0U)
-				}.unwrap()
-				.then {
-					Log.i(TAG, "Power samples: $it")
-					MainApp.instance.bluenet.debugData.getPowerSamples(PowerSamplesType.SWITCHCRAFT, 1U)
-				}.unwrap()
-				.then {
-					Log.i(TAG, "Power samples: $it")
-					MainApp.instance.bluenet.debugData.getPowerSamples(PowerSamplesType.SWITCHCRAFT, 2U)
+					MainApp.instance.bluenet.debugData.getPowerSamples(type)
 				}.unwrap()
 				.successUi {
-					val timestampStr = Util.getTimestampString(it.timestamp)
-//					Log.i(TAG, "Power samples: $it")
-//					view.text = "${it.timestamp} $timestampStr"
+					val timestampStr = Util.getTimestampString(it[0].timestamp)
+					Log.i(TAG, "Power samples: $it")
 					view.text = "$timestampStr $it"
-//					showResult("Power samples timestamp: ${it.timestamp} $timestampStr")
 					showResult("Power samples $timestampStr $it")
 				}
 				.fail { showResult("Get power samples failed: ${it.message}") }
