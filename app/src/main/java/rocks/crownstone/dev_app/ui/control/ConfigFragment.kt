@@ -13,7 +13,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
+import rocks.crownstone.bluenet.structs.Uint8
 import rocks.crownstone.bluenet.util.Util
+import rocks.crownstone.bluenet.util.toUint8
 import rocks.crownstone.dev_app.MainApp
 import rocks.crownstone.dev_app.R
 import java.text.SimpleDateFormat
@@ -51,8 +53,11 @@ class ConfigFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonDisableDimming).setOnClickListener { enableDimming(false) }
 		root.findViewById<Button>(R.id.buttonEnableSwitchcraft).setOnClickListener { enableSwitchcraft(true) }
 		root.findViewById<Button>(R.id.buttonDisableSwitchcraft).setOnClickListener { enableSwitchcraft(false) }
-		root.findViewById<Button>(R.id.buttonGetTime).setOnClickListener { getTime(root.findViewById<EditText>(R.id.editGetTime)) }
-		root.findViewById<Button>(R.id.buttonSetTime).setOnClickListener { setTime(root.findViewById<EditText>(R.id.editSetTime)) }
+		root.findViewById<Button>(R.id.buttonGetTime).setOnClickListener { getTime(root.findViewById<EditText>(R.id.editTime)) }
+		root.findViewById<Button>(R.id.buttonSetTime).setOnClickListener { setTime(root.findViewById<EditText>(R.id.editTime)) }
+		root.findViewById<Button>(R.id.buttonSetCurrentTime).setOnClickListener { setTime(null) }
+		root.findViewById<Button>(R.id.buttonGetSoftOnSpeed).setOnClickListener { getSoftOnSpeed(root.findViewById<EditText>(R.id.editSoftOnSpeed)) }
+		root.findViewById<Button>(R.id.buttonSetSoftOnSpeed).setOnClickListener { setSoftOnSpeed(root.findViewById<EditText>(R.id.editSoftOnSpeed)) }
 
 		return root
 	}
@@ -110,9 +115,9 @@ class ConfigFragment : Fragment() {
 				}
 				.fail { showResult("Get time failed: ${it.message}") }
 	}
-	private fun setTime(editText: EditText) {
+	private fun setTime(editText: EditText?) {
 		val device = MainApp.instance.selectedDevice ?: return
-		val timestamp = if (editText.text.isBlank()) {
+		val timestamp = if (editText == null || editText.text.isBlank()) {
 			Util.getLocalTimestamp()
 		}
 		else {
@@ -125,6 +130,30 @@ class ConfigFragment : Fragment() {
 				}.unwrap()
 				.success { showResult("Set time to $timestamp $timestampStr") }
 				.fail { showResult("Set time failed: ${it.message}") }
+	}
+
+	private fun getSoftOnSpeed(editText: EditText) {
+		editText.setText("")
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.config.getSoftOnSpeed()
+				}.unwrap()
+				.success {
+					editText.setText("$it")
+					showResult("Soft on speed: $it")
+				}
+				.fail { showResult("Get soft on speed failed: ${it.message}") }
+	}
+	private fun setSoftOnSpeed(editText: EditText) {
+		val device = MainApp.instance.selectedDevice ?: return
+		val speed: Uint8 = editText.text.toString().toUIntOrNull()?.toUint8() ?: 1U
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.config.setSoftOnSpeed(speed)
+				}.unwrap()
+				.success { showResult("Set soft on speed to $speed") }
+				.fail { showResult("Set soft on speed failed: ${it.message}") }
 	}
 
 

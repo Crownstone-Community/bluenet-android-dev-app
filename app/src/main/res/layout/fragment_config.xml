@@ -95,14 +95,33 @@
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:text="Get" />
-			<EditText
-				android:id="@+id/editGetTime"
+			<Button
+				android:id="@+id/buttonSetTime"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
+				android:text="Set" />
+			<EditText
+				android:id="@+id/editTime"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="2"
 				android:ems="10"
 				android:inputType="number" />
 		</LinearLayout>
+		<Button
+			android:id="@+id/buttonSetCurrentTime"
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:text="Set current time" />
+
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="@dimen/activity_vertical_margin"
+			android:text="Sof on speed"
+			android:textAlignment="center" />
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -111,16 +130,22 @@
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent">
 			<Button
-				android:id="@+id/buttonSetTime"
+				android:id="@+id/buttonGetSoftOnSpeed"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="Get" />
+			<Button
+				android:id="@+id/buttonSetSoftOnSpeed"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:text="Set" />
 			<EditText
-				android:id="@+id/editSetTime"
+				android:id="@+id/editSoftOnSpeed"
 				android:layout_height="wrap_content"
 				android:layout_width="0dp"
-				android:layout_weight="1"
+				android:layout_weight="2"
 				android:ems="10"
 				android:inputType="number" />
 		</LinearLayout>
