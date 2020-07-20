@@ -72,6 +72,18 @@ class DebugFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonAdcRestarts).setOnClickListener {
 			getAdcRestarts(root.findViewById<TextView>(R.id.textViewAdcRestarts))
 		}
+		root.findViewById<Button>(R.id.buttonAdcChannelSwaps).setOnClickListener {
+			getAdcChannelSwaps(root.findViewById<TextView>(R.id.textViewAdcChannelSwaps))
+		}
+		root.findViewById<Button>(R.id.buttonSchedulerMinFree).setOnClickListener {
+			getSchedulerMinFree(root.findViewById<TextView>(R.id.textViewSchedulerMinFree))
+		}
+		root.findViewById<Button>(R.id.buttonResetReason).setOnClickListener {
+			getResetReason(root.findViewById<TextView>(R.id.textViewResetReason))
+		}
+		root.findViewById<Button>(R.id.buttonGpregret).setOnClickListener {
+			getGpregret(root.findViewById<TextView>(R.id.textViewGpregret))
+		}
 		root.findViewById<Button>(R.id.buttonSwitchHistory).setOnClickListener {
 			getSwitchHistory(root.findViewById<TextView>(R.id.textViewSwitchHistory))
 		}
@@ -209,6 +221,62 @@ class DebugFragment : Fragment() {
 				.fail { showResult("Get ADC restarts failed: ${it.message}") }
 	}
 
+	private fun getAdcChannelSwaps(view: TextView) {
+		clearText(view)
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.debugData.getAdcChannelSwaps()
+				}.unwrap()
+				.successUi {
+					view.text = it.toString()
+					showResult("ADC channel swaps: $it")
+				}
+				.fail { showResult("Get ADC channel swaps failed: ${it.message}") }
+	}
+
+	private fun getSchedulerMinFree(view: TextView) {
+		clearText(view)
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.debugData.getSchedulerMinFree()
+				}.unwrap()
+				.successUi {
+					view.text = it.toString()
+					showResult("Scheduler min free: $it")
+				}
+				.fail { showResult("Get scheduler min free failed: ${it.message}") }
+	}
+
+	private fun getResetReason(view: TextView) {
+		clearText(view)
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.debugData.getResetReason()
+				}.unwrap()
+				.successUi {
+					view.text = it.toString()
+					showResult("Reset reason: $it")
+				}
+				.fail { showResult("Get reset reason failed: ${it.message}") }
+	}
+
+	private fun getGpregret(view: TextView) {
+		clearText(view)
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.debugData.getGpregret()
+				}.unwrap()
+				.successUi {
+					view.text = it.toString()
+					showResult("GPREGRET: $it")
+				}
+				.fail { showResult("Get GPREGRET failed: ${it.message}") }
+	}
+
 	private fun getSwitchHistory(view: TextView) {
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
@@ -238,6 +306,8 @@ class DebugFragment : Fragment() {
 				}
 				.fail { showResult("Get power samples failed: ${it.message}") }
 	}
+
+
 
 
 
