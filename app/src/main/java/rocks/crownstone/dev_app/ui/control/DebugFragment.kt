@@ -84,6 +84,9 @@ class DebugFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonUnfilteredPowerSamples).setOnClickListener {
 			getPowerSamples(root.findViewById<TextView>(R.id.textViewUnfilteredPowerSamples), PowerSamplesType.NOW_UNFILTERED)
 		}
+		root.findViewById<Button>(R.id.buttonSoftFusePowerSamples).setOnClickListener {
+			getPowerSamples(root.findViewById<TextView>(R.id.textViewSoftFusePowerSamples), PowerSamplesType.SOFT_FUSE)
+		}
 
 
 		return root
