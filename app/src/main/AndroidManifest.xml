@@ -21,10 +21,11 @@
 		<activity
 			android:name=".ControlActivity"
 			android:label="@string/title_activity_control"
-			android:theme="@style/AppTheme.NoActionBar"></activity>
+			android:theme="@style/AppTheme.NoActionBar" />
 		<activity
 			android:name=".MainActivity"
-			android:label="Crownstone dev">
+			android:label="Crownstone dev"
+			android:theme="@style/AppTheme.NoActionBar">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
@@ -32,18 +33,8 @@
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".TabbedActivity"
-			android:label="@string/title_activity_tabbed"
-			android:theme="@style/AppTheme.NoActionBar" />
-		<activity
 			android:name=".LoginActivity"
 			android:label="@string/title_activity_login" />
-		<!--
-        <activity
-                android:name=".LoginActivity2"
-                android:label="@string/title_activity_login2">
-        </activity>
-        -->
 		<service
 			android:name="rocks.crownstone.bluenet.BackgroundService"
 			android:enabled="true"

@@ -59,7 +59,7 @@ class MainApp : Application(), LifecycleObserver {
 	lateinit var stone: Stone
 	val bluenet = Bluenet()
 
-	val USE_DEV_SPHERE = true
+	val usingDevSphere = true
 
 	val NOTIFICATION_ID = 1
 
@@ -249,7 +249,7 @@ class MainApp : Application(), LifecycleObserver {
 
 	fun setup(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {
 		bluenet.stopScanning()
-		if (USE_DEV_SPHERE) {
+		if (usingDevSphere) {
 			val stoneId = (1..255).random().toUint8()
 			val major = (1..60000).random().toUint16()
 			val minor = (1..60000).random().toUint16()
@@ -269,10 +269,12 @@ class MainApp : Application(), LifecycleObserver {
 						bluenet.disconnect()
 					}
 					.always {
-						//									bluenet.startScanning()
+//						bluenet.startScanning()
 					}
 		}
 		else {
+			return Promise.ofFail(Exception("Don't setup when logged in"))
+
 			var sphere: SphereData? = null
 			var stoneData: StoneData? = null
 			var userData: UserData? = null
@@ -317,7 +319,12 @@ class MainApp : Application(), LifecycleObserver {
 	}
 
 	fun factoryReset(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {
-			return confirmAlert(activity, "factory reset", "Do you want to factory reset this device?")
+		if (device.sphereId != devSphereId) {
+			Log.i(TAG, "Refuse factory reset. SphereId=${device.sphereId}")
+			showResult("Don't factory reset stones that are not in the dev sphere. SphereId=${device.sphereId}", activity)
+			return Promise.ofFail(Exception("Don't factory reset stones that are not in the dev sphere. SphereId=${device.sphereId}"))
+		}
+		return confirmAlert(activity, "factory reset", "Do you want to factory reset this device?")
 				.then { confirmed ->
 					if (!confirmed) {
 						return@then Promise.ofSuccess<Unit, Exception>(Unit)
@@ -351,7 +358,7 @@ class MainApp : Application(), LifecycleObserver {
 	}
 
 	fun removeStoneFromCloud(device: ScannedDevice): Promise<Unit, Exception> {
-		if (USE_DEV_SPHERE) {
+		if (usingDevSphere) {
 			return Promise.ofSuccess(Unit)
 		}
 		else {

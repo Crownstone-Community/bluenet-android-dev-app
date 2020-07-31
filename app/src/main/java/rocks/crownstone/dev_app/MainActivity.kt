@@ -1,9 +1,14 @@
 package rocks.crownstone.dev_app
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,11 +24,11 @@ import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
 import rocks.crownstone.bluenet.util.Conversion
 import rocks.crownstone.bluenet.util.Util
-import rocks.crownstone.bluenet.util.toUint32
 import rocks.crownstone.bluenet.util.toUint8
 import java.util.*
 
-class MainActivity : FragmentActivity() {
+
+class MainActivity : AppCompatActivity() {
 	private val TAG = this.javaClass.simpleName
 
 	private val REQUEST_CODE_LOGIN = 1
@@ -37,7 +42,9 @@ class MainActivity : FragmentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		Log.i(TAG, "onCreate")
-		setContentView(R.layout.activity_device_list)
+		setContentView(R.layout.activity_main)
+		setSupportActionBar(findViewById(R.id.my_toolbar))
+
 
 		// Set the adapter
 		val listView = findViewById<RecyclerView>(R.id.list)
@@ -68,21 +75,7 @@ class MainActivity : FragmentActivity() {
 			adapter.notifyDataSetChanged()
 		}
 
-
-
 		MainApp.instance.bluenet.subscribe(BluenetEvent.SCAN_RESULT, { data -> onScannedDevice(data as ScannedDevice)})
-
-//		val intent = Intent(this, TabbedActivity::class.java)
-		if (!MainApp.instance.USE_DEV_SPHERE) {
-			val intent = Intent(this, LoginActivity::class.java)
-//			this.startActivity(intent)
-			this.startActivityForResult(intent, REQUEST_CODE_LOGIN)
-		}
-
-//		val deviceListFragment = DeviceListFragment()
-//		deviceListFragment.arguments = intent.extras
-//		supportFragmentManager.beginTransaction().add(R.id.fragment_container, deviceListFragment).commit()
-
 //		MainApp.instance.bluenet.subscribe(BluenetEvent.INITIALIZED, ::onBluenetInitialized)
 //		MainApp.instance.bluenet.subscribe(BluenetEvent.SCANNER_READY, ::onScannerReady)
 
@@ -105,9 +98,33 @@ class MainActivity : FragmentActivity() {
 //				.then {
 //					MainApp.instance.bluenet.setScanInterval(ScanMode.LOW_LATENCY)
 //				}
-		if (MainApp.instance.USE_DEV_SPHERE) {
-			onLogin(0)
+
+		// Fake the login: use dev sphere
+		onLogin(0)
+	}
+
+	override fun onCreateOptionsMenu(menu: Menu): Boolean {
+		Log.i(TAG, "onCreateOptionsMenu")
+		val inflater: MenuInflater = menuInflater
+		inflater.inflate(R.menu.menu_main, menu)
+		return true
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		Log.i(TAG, "onOptionsItemSelected")
+		if (item == null) { return false }
+		when (item.itemId) {
+			R.id.action_login -> {
+				val intent = Intent(this, LoginActivity::class.java)
+				this.startActivityForResult(intent, REQUEST_CODE_LOGIN)
+				return true
+			}
+			R.id.action_localization -> {
+				MainApp.instance.showResult("localization!", this)
+				return true
+			}
 		}
+		return super.onOptionsItemSelected(item)
 	}
 
 	fun onBluenetInitialized(data: Any) {
