@@ -84,6 +84,10 @@ class DebugFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonGpregret).setOnClickListener {
 			getGpregret(root.findViewById<TextView>(R.id.textViewGpregret))
 		}
+		root.findViewById<Button>(R.id.buttonRamStats).setOnClickListener {
+			getRamStats(root.findViewById<TextView>(R.id.textViewRamStats))
+		}
+
 		root.findViewById<Button>(R.id.buttonSwitchHistory).setOnClickListener {
 			getSwitchHistory(root.findViewById<TextView>(R.id.textViewSwitchHistory))
 		}
@@ -275,6 +279,20 @@ class DebugFragment : Fragment() {
 					showResult("GPREGRET: $it")
 				}
 				.fail { showResult("Get GPREGRET failed: ${it.message}") }
+	}
+
+	private fun getRamStats(view: TextView) {
+		clearText(view)
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.debugData.getRamStats()
+				}.unwrap()
+				.successUi {
+					view.text = it.toString()
+					showResult("RAM stats: $it")
+				}
+				.fail { showResult("Get RAM stats failed: ${it.message}") }
 	}
 
 	private fun getSwitchHistory(view: TextView) {
