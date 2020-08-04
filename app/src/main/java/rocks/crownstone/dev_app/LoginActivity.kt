@@ -157,6 +157,7 @@ class LoginActivity : AppCompatActivity() {
 			Log.i(TAG, "execute")
 			MainApp.instance.user.login(_email, _password)
 					.then {
+						MainApp.instance.user.saveLogin(this@LoginActivity)
 						MainApp.instance.sphere.getSpheres(MainApp.instance.user)
 					}.unwrap()
 					.successUi {

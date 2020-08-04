@@ -1,6 +1,7 @@
 package rocks.crownstone.dev_app
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -99,7 +100,18 @@ class MainActivity : AppCompatActivity() {
 //					MainApp.instance.bluenet.setScanInterval(ScanMode.LOW_LATENCY)
 //				}
 
-		// Fake the login: use dev sphere
+		if (MainApp.instance.user.loadLogin(this)) {
+			MainApp.instance.sphere.getSpheres(MainApp.instance.user)
+					.success {
+						MainApp.instance.showResult("Logged in", this)
+						onLogin(0)
+					}
+					.fail {
+						MainApp.instance.showResult("Failed to log in", this)
+					}
+		}
+
+		// Always call onLogin, so the dev sphere settings are loaded.
 		onLogin(0)
 	}
 

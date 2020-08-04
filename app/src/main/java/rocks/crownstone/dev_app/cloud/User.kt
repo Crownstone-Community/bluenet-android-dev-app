@@ -1,6 +1,7 @@
 package rocks.crownstone.dev_app.cloud
 
 import android.content.Context
+import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.util.Log
 import com.android.volley.Request
 import com.android.volley.RequestQueue
@@ -99,4 +100,28 @@ class User(context: Context, volleyQueue: RequestQueue) {
 		return deferred.promise
 	}
 
+	fun saveLogin(context: Context) {
+		val prefs = getDefaultSharedPreferences(context)
+		val prefsEditor = prefs.edit()
+		val userData = this.userData ?: return
+		prefsEditor.putString("user.id", userData.id)
+		prefsEditor.putString("user.accessToken", userData.accessToken)
+		prefsEditor.putLong("user.ttl", userData.ttl)
+		prefsEditor.putString("user.creationDate", userData.creationDate)
+		prefsEditor.apply()
+	}
+
+	fun loadLogin(context: Context): Boolean {
+		val prefs = getDefaultSharedPreferences(context)
+
+		val userId = prefs.getString("user.id", null) ?: return false
+		val accessToken = prefs.getString("user.accessToken", null) ?: return false
+		val creationDate = prefs.getString("user.creationDate", null) ?: return false
+		val ttl = prefs.getLong("user.ttl", 0)
+		if (ttl == 0L) {
+			return false
+		}
+		userData = UserData(userId, accessToken, ttl, creationDate)
+		return true
+	}
 }
