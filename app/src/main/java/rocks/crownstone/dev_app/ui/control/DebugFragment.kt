@@ -87,6 +87,9 @@ class DebugFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonRamStats).setOnClickListener {
 			getRamStats(root.findViewById<TextView>(R.id.textViewRamStats))
 		}
+		root.findViewById<Button>(R.id.buttonCleanFlash).setOnClickListener {
+			cleanFlash(root.findViewById<TextView>(R.id.textViewCleanFlash))
+		}
 
 		root.findViewById<Button>(R.id.buttonSwitchHistory).setOnClickListener {
 			getSwitchHistory(root.findViewById<TextView>(R.id.textViewSwitchHistory))
@@ -293,6 +296,20 @@ class DebugFragment : Fragment() {
 					showResult("RAM stats: $it")
 				}
 				.fail { showResult("Get RAM stats failed: ${it.message}") }
+	}
+
+	private fun cleanFlash(view: TextView) {
+		clearText(view)
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.debugData.cleanFlash()
+				}.unwrap()
+				.successUi {
+					view.text = "started"
+					showResult("Clean flash started")
+				}
+				.fail { showResult("Clean flash failed: ${it.message}") }
 	}
 
 	private fun getSwitchHistory(view: TextView) {
