@@ -26,6 +26,7 @@ import rocks.crownstone.bluenet.Bluenet
 import rocks.crownstone.bluenet.behaviour.BehaviourSyncerFromCrownstone
 import rocks.crownstone.bluenet.encryption.KeySet
 import rocks.crownstone.bluenet.encryption.MeshKeySet
+import rocks.crownstone.bluenet.encryption.RC5
 import rocks.crownstone.bluenet.packets.behaviour.IndexedBehaviourPacket
 import rocks.crownstone.bluenet.scanhandling.NearestDeviceListEntry
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
@@ -319,7 +320,7 @@ class MainApp : Application(), LifecycleObserver {
 	}
 
 	fun factoryReset(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {
-		if (device.sphereId != devSphereId) {
+		if ((device.sphereId != devSphereId) && (device.sphereId != null)) {
 			Log.i(TAG, "Refuse factory reset. SphereId=${device.sphereId}")
 			showResult("Don't factory reset stones that are not in the dev sphere. SphereId=${device.sphereId}", activity)
 			return Promise.ofFail(Exception("Don't factory reset stones that are not in the dev sphere. SphereId=${device.sphereId}"))
