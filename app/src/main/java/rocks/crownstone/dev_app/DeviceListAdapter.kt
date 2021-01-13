@@ -81,6 +81,16 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 
 		val serviceData = device.serviceData
 
+		if (device.operationMode == OperationMode.NORMAL && device.validated) {
+			// When we received the external id, don't set the stoneId text, so it keeps the previous value.
+			if (serviceData != null && !serviceData.flagExternalData) {
+				holder.stoneId.text = "id=${serviceData.crownstoneId}"
+			}
+		}
+		else {
+			holder.stoneId.text = ""
+		}
+
 		when (device.operationMode) {
 			OperationMode.DFU ->       holder.view.setBackgroundColor(0xFF8000A0.toInt()) // Purple
 			OperationMode.SETUP ->     holder.view.setBackgroundColor(0xFF0080D0.toInt()) // Blue
@@ -118,6 +128,7 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 	inner class ViewHolder(val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 		val name:       TextView = view.name
 		val address:    TextView = view.address
+		val stoneId:    TextView = view.stondId
 		val rssi:       TextView = view.rssi
 		val stoneType:  TextView = view.stoneType
 		val iBeacon:    LinearLayout = view.layIBeacon
