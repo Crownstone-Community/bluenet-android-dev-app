@@ -207,6 +207,11 @@ class MainActivity : AppCompatActivity() {
 			return
 		}
 
+		if (device.serviceData?.unique == false) {
+			return
+		}
+		Log.v(TAG, "Add or update $device")
+
 //		deviceMap[device.address] = device
 		var found = false
 		for (i in deviceList.indices) {
