@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
+import rocks.crownstone.bluenet.structs.UartMode
 import rocks.crownstone.bluenet.structs.Uint8
 import rocks.crownstone.bluenet.util.Util
 import rocks.crownstone.bluenet.util.toUint8
@@ -58,6 +59,8 @@ class ConfigFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonSetCurrentTime).setOnClickListener { setTime(null) }
 		root.findViewById<Button>(R.id.buttonGetSoftOnSpeed).setOnClickListener { getSoftOnSpeed(root.findViewById<EditText>(R.id.editSoftOnSpeed)) }
 		root.findViewById<Button>(R.id.buttonSetSoftOnSpeed).setOnClickListener { setSoftOnSpeed(root.findViewById<EditText>(R.id.editSoftOnSpeed)) }
+		root.findViewById<Button>(R.id.buttonEnableUart).setOnClickListener { enableUart(true) }
+		root.findViewById<Button>(R.id.buttonDisableUart).setOnClickListener { enableUart(false) }
 
 		return root
 	}
@@ -115,6 +118,7 @@ class ConfigFragment : Fragment() {
 				}
 				.fail { showResult("Get time failed: ${it.message}") }
 	}
+
 	private fun setTime(editText: EditText?) {
 		val device = MainApp.instance.selectedDevice ?: return
 		val timestamp = if (editText == null || editText.text.isBlank()) {
@@ -145,6 +149,7 @@ class ConfigFragment : Fragment() {
 				}
 				.fail { showResult("Get soft on speed failed: ${it.message}") }
 	}
+
 	private fun setSoftOnSpeed(editText: EditText) {
 		val device = MainApp.instance.selectedDevice ?: return
 		val speed: Uint8 = editText.text.toString().toUIntOrNull()?.toUint8() ?: 1U
@@ -154,6 +159,16 @@ class ConfigFragment : Fragment() {
 				}.unwrap()
 				.success { showResult("Set soft on speed to $speed") }
 				.fail { showResult("Set soft on speed failed: ${it.message}") }
+	}
+
+	private fun enableUart(enable: Boolean) {
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.config.setUartEnabled(if (enable) UartMode.RX_AND_TX else UartMode.NONE)
+				}.unwrap()
+				.success { showResult("Enable UART success") }
+				.fail { showResult("Enable UART failed: ${it.message}") }
 	}
 
 
