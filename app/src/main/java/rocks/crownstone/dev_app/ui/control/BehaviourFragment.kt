@@ -56,7 +56,9 @@ class BehaviourFragment : Fragment() {
 		for (type in behaviourTypes) {
 			behaviourTypeStrings.add(type.name)
 		}
-		val behaviourTypeAdapter = ArrayAdapter(this.context, android.R.layout.simple_spinner_item, behaviourTypeStrings)
+
+		val contextNonNull = context!!
+		val behaviourTypeAdapter = ArrayAdapter(contextNonNull, android.R.layout.simple_spinner_item, behaviourTypeStrings)
 		behaviourTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 		root.findViewById<Spinner>(R.id.spinnerBehaviourType).adapter = behaviourTypeAdapter
 
@@ -65,7 +67,7 @@ class BehaviourFragment : Fragment() {
 		for (type in presenceTypes) {
 			presenceTypeStrings.add(type.name)
 		}
-		val presenceTypeAdapter = ArrayAdapter(this.context, android.R.layout.simple_spinner_item, presenceTypeStrings)
+		val presenceTypeAdapter = ArrayAdapter(contextNonNull, android.R.layout.simple_spinner_item, presenceTypeStrings)
 		presenceTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 		root.findViewById<Spinner>(R.id.spinnerPresenceType).adapter = presenceTypeAdapter
 
