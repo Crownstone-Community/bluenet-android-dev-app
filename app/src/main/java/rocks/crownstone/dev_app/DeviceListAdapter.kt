@@ -65,6 +65,8 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 			DeviceType.CROWNSTONE_BUILTIN_ONE -> "Builtin One"
 			DeviceType.CROWNSTONE_DONGLE -> "Dongle"
 			DeviceType.GUIDESTONE -> "Guidestone"
+			DeviceType.CROWNSTONE_PLUG_ONE -> "Plug One"
+			DeviceType.CROWNSTONE_HUB -> "Hub"
 			DeviceType.UNKNOWN -> ""
 			null -> ""
 		}
