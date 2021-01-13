@@ -96,9 +96,6 @@ class MainActivity : AppCompatActivity() {
 					Log.i(TAG, "start scanning")
 					MainApp.instance.bluenet.startScanning()
 				}
-//				.then {
-//					MainApp.instance.bluenet.setScanInterval(ScanMode.LOW_LATENCY)
-//				}
 
 		if (MainApp.instance.user.loadLogin(this)) {
 			MainApp.instance.sphere.getSpheres(MainApp.instance.user)
@@ -244,11 +241,7 @@ class MainActivity : AppCompatActivity() {
 		BootloaderVersion,
 		ResetCount,
 		UicrData,
-		Switch,
 		Toggle,
-		SetTime,
-		SetIbeaconUUID,
-		SetBehaviour,
 	}
 
 	private fun onDeviceClick(device: ScannedDevice, longClick: Boolean) {
@@ -309,96 +302,8 @@ class MainActivity : AppCompatActivity() {
 							MainApp.instance.bluenet.deviceInfo.getUicrData()
 									.success { MainApp.instance.showResult("uicr: $it", activity) }
 						}
-						DeviceOption.Switch -> {
-							if (MainApp.instance.switchCmd != 0) {
-								MainApp.instance.switchCmd = 0
-							}
-							else {
-								MainApp.instance.switchCmd = 255
-							}
-							val sphereId: SphereId = device.sphereId ?: "unknown"
-							val stoneId: Uint8 = device.serviceData?.crownstoneId ?: 255.toUint8()
-							MainApp.instance.bluenet.broadCast.switch(sphereId, stoneId, MainApp.instance.switchCmd.toUint8())
-//							val multiSwitchPacket = MultiSwitchPacket()
-//							multiSwitchPacket.add(MultiSwitchItemPacket(217U, MainApp.instance.switchCmd.toUint8()))
-//							MainApp.instance.bluenet.control.multiSwitch(multiSwitchPacket)
-						}
 						DeviceOption.Toggle -> {
 							MainApp.instance.bluenet.control.toggleSwitch(255.toUint8())
-						}
-						DeviceOption.SetTime -> {
-							val timestamp = Util.getLocalTimestamp()
-							MainApp.instance.bluenet.control.setTime(timestamp)
-									.success { MainApp.instance.showResult("Set time to: $timestamp", activity) }
-						}
-						DeviceOption.SetIbeaconUUID -> {
-							val uuid = UUID.randomUUID()
-							val major: Uint16 = 1U
-							val minor: Uint16 = 2U
-							MainApp.instance.showResult("Set ibeaconUuid: $uuid", activity)
-//							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, PersistenceModeSet.TEMPORARY)
-//									.then {
-//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.CURRENT)
-//									}.unwrap()
-//									.then {
-//										MainApp.instance.showResult("Current ibeaconUuid: $it", activity)
-//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.STORED)
-//									}.unwrap()
-//									.then {
-//										MainApp.instance.showResult("Stored ibeaconUuid: $it", activity)
-//										MainApp.instance.bluenet.config.getIbeaconUuid(PersistenceModeGet.FIRMWARE_DEFAULT)
-//									}.unwrap()
-//									.then {
-//										MainApp.instance.showResult("Default ibeaconUuid: $it", activity)
-//									}
-
-//							MainApp.instance.bluenet.config.setIbeaconUuid(uuid, 1U, PersistenceModeSet.STORED)
-//									.then {
-//										MainApp.instance.bluenet.config.setIbeaconMajor(major, 1U, PersistenceModeSet.STORED)
-//									}.unwrap()
-//									.then {
-//										MainApp.instance.bluenet.config.setIbeaconMinor(minor, 1U, PersistenceModeSet.STORED)
-//									}.unwrap()
-//									.then {
-//										val timestamp: Uint32 = 0U
-//										val interval: Uint16 = 4U
-//										MainApp.instance.bluenet.control.setIbeaconConfigId(IbeaconConfigIdPacket(0U, timestamp, interval))
-//									}.unwrap()
-//									.then {
-//										val timestamp: Uint32 = 2U
-//										val interval: Uint16 = 4U
-//										MainApp.instance.bluenet.control.setIbeaconConfigId(IbeaconConfigIdPacket(1U, timestamp, interval))
-//									}
-
-							// Via mesh
-							val statePacket = StatePacketV5(StateTypeV4.IBEACON_PROXIMITY_UUID, 1U, PersistenceModeSet.STORED.num, UuidPacket(uuid))
-							val ids = listOf<Uint8>(79U, 77U)
-							MainApp.instance.bluenet.mesh.setState(statePacket, ids[0])
-									.then {
-										MainApp.instance.bluenet.mesh.setState(statePacket, ids[1])
-									}.unwrap()
-									.then {
-										val timestamp: Uint32 = 0U
-										val interval: Uint16 = 4U
-										MainApp.instance.bluenet.mesh.setIbeaconConfigId(IbeaconConfigIdPacket(0U, timestamp, interval), ids)
-									}.unwrap()
-									.then {
-										val timestamp: Uint32 = 2U
-										val interval: Uint16 = 4U
-										MainApp.instance.bluenet.mesh.setIbeaconConfigId(IbeaconConfigIdPacket(1U, timestamp, interval), ids)
-									}.unwrap()
-
-						}
-						DeviceOption.SetBehaviour -> {
-							val daysOfWeek = DaysOfWeekPacket(true, true, true, true, true, true, true)
-							val startTime = TimeOfDayPacket(BaseTimeType.MIDNIGHT, 6*3600)
-							val endTime = TimeOfDayPacket(BaseTimeType.MIDNIGHT, 23*3600)
-							val presence = PresencePacket(PresenceType.ALWAYS_TRUE, ArrayList(), 5U * 60U)
-							val behaviourPacket = SwitchBehaviourPacket(0U, 0U, daysOfWeek, startTime, endTime, presence)
-							MainApp.instance.bluenet.control.addBehaviour(behaviourPacket)
-									.success {
-										MainApp.instance.showResult("Added behaviour at index=${it.index} hash=${it.hash}", activity)
-									}
 						}
 					}
 				}.unwrap()
