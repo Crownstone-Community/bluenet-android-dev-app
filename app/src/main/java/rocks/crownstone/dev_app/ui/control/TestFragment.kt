@@ -63,6 +63,14 @@ class TestFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonBroadcastNoop).setOnClickListener {
 			broadcastNoop()
 		}
+
+		root.findViewById<Button>(R.id.buttonEnable).setOnClickListener {
+			enableBehaviour(true)
+		}
+
+		root.findViewById<Button>(R.id.buttonDisable).setOnClickListener {
+			enableBehaviour(false)
+		}
 		return root
 	}
 
@@ -82,6 +90,23 @@ class TestFragment : Fragment() {
 				}
 			}
 		}
+	}
+
+	private fun enableBehaviour(enable: Boolean) {
+		val setting =
+				if (enable) { BehaviourSettings.SMART }
+				else { BehaviourSettings.DUMB }
+		val enableString =
+				if (enable) { "Enable" }
+				else { "Disable" }
+
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.config.setBehaviourSettings(setting)
+				}.unwrap()
+				.success { showResult("$enableString behaviour success") }
+				.fail { showResult("$enableString behaviour failed: ${it.message}") }
 	}
 
 	private fun broadcastNoop() {

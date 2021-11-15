@@ -39,6 +39,35 @@
 				android:text="" />
 		</LinearLayout>
 
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Behaviour"
+			android:textAlignment="center" />
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+
+			<Button
+				android:id="@+id/buttonEnable"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="Enable" />
+
+			<Button
+				android:id="@+id/buttonDisable"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="Disable" />
+		</LinearLayout>
+
 
 
 
