@@ -251,7 +251,9 @@ class MainApp : Application(), LifecycleObserver {
 	fun setup(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {
 		bluenet.stopScanning()
 		if (usingDevSphere) {
-			val stoneId = (1..255).random().toUint8()
+			val addressBytes = device.address.toByteArray()
+			val stoneId = Conversion.hexStringToBytes(device.address.slice(0 until 2))[0].toUint8()
+//			val stoneId = (1..255).random().toUint8()
 			val major = (1..60000).random().toUint16()
 			val minor = (1..60000).random().toUint16()
 			val ibeaconData = IbeaconData(devIbeaconUuid, major, minor, -60)
