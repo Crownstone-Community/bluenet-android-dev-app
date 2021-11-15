@@ -9,12 +9,11 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.TextView
 
 import android.view.KeyEvent
-import android.widget.Toast
+import android.widget.*
+import androidx.recyclerview.widget.RecyclerView
 
-import kotlinx.android.synthetic.main.activity_login.*
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.ui.alwaysUi
 import nl.komponents.kovenant.ui.failUi
@@ -31,10 +30,22 @@ class LoginActivity : AppCompatActivity() {
 	private var _authTask: UserLoginTask? = null
 	private val TAG = this.javaClass.simpleName
 
+	private lateinit var emailText: AutoCompleteTextView
+	private lateinit var passwordText: EditText
+	private lateinit var loginForm: ScrollView
+	private lateinit var loginProgress: ProgressBar
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		Log.i(TAG, "onCreate")
 		setContentView(R.layout.activity_login)
+
+		emailText = findViewById(R.id.emailText)
+		passwordText = findViewById(R.id.passwordText)
+		loginForm = findViewById(R.id.login_form)
+		loginProgress = findViewById(R.id.login_progress)
+		val emailSignInButton = findViewById<Button>(R.id.email_sign_in_button)
+
 		// Set up the login form.
 		passwordText.setOnEditorActionListener(object: TextView.OnEditorActionListener {
 			override fun onEditorAction(textView: TextView, id: Int, keyEvent: KeyEvent?): Boolean {
@@ -46,7 +57,7 @@ class LoginActivity : AppCompatActivity() {
 			}
 		})
 
-		email_sign_in_button.setOnClickListener { attemptLogin() }
+		emailSignInButton.setOnClickListener { attemptLogin() }
 
 	}
 
@@ -121,23 +132,23 @@ class LoginActivity : AppCompatActivity() {
 			// Fade-in the progress spinner.
 			val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-			login_form.visibility = if (show) View.GONE else View.VISIBLE
-			login_form.animate()
+			loginForm.visibility = if (show) View.GONE else View.VISIBLE
+			loginForm.animate()
 					.setDuration(shortAnimTime)
 					.alpha((if (show) 0 else 1).toFloat())
 					.setListener(object : AnimatorListenerAdapter() {
 						override fun onAnimationEnd(animation: Animator) {
-							login_form.visibility = if (show) View.GONE else View.VISIBLE
+							loginForm.visibility = if (show) View.GONE else View.VISIBLE
 						}
 					})
 
-			login_progress.visibility = if (show) View.VISIBLE else View.GONE
-			login_progress.animate()
+			loginProgress.visibility = if (show) View.VISIBLE else View.GONE
+			loginProgress.animate()
 					.setDuration(shortAnimTime)
 					.alpha((if (show) 1 else 0).toFloat())
 					.setListener(object : AnimatorListenerAdapter() {
 						override fun onAnimationEnd(animation: Animator) {
-							login_progress.visibility = if (show) View.VISIBLE else View.GONE
+							loginProgress.visibility = if (show) View.VISIBLE else View.GONE
 						}
 					})
 //		}

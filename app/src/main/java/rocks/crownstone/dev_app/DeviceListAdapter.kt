@@ -7,9 +7,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 
-
-
-import kotlinx.android.synthetic.main.device_list_item.view.*
 import rocks.crownstone.bluenet.structs.DeviceType
 import rocks.crownstone.bluenet.structs.OperationMode
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
@@ -128,14 +125,14 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 	override fun getItemCount(): Int = deviceList.size
 
 	inner class ViewHolder(val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
-		val name:       TextView = view.name
-		val address:    TextView = view.address
-		val stoneId:    TextView = view.stondId
-		val rssi:       TextView = view.rssi
-		val stoneType:  TextView = view.stoneType
-		val iBeacon:    LinearLayout = view.layIBeacon
-		val uuid:       TextView = view.iBeaconUuid
-		val major:      TextView = view.iBeaconMajor
-		val minor:      TextView = view.iBeaconMinor
+		val name:       TextView = view.findViewById(R.id.name)
+		val address:    TextView = view.findViewById(R.id.address)
+		val stoneId:    TextView = view.findViewById(R.id.stondId)
+		val rssi:       TextView = view.findViewById(R.id.rssi)
+		val stoneType:  TextView = view.findViewById(R.id.stoneType)
+		val iBeacon:    LinearLayout = view.findViewById(R.id.layIBeacon)
+		val uuid:       TextView = view.findViewById(R.id.iBeaconUuid)
+		val major:      TextView = view.findViewById(R.id.iBeaconMajor)
+		val minor:      TextView = view.findViewById(R.id.iBeaconMinor)
 	}
 }
