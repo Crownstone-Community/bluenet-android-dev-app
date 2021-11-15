@@ -74,8 +74,8 @@ class MainApp : Application(), LifecycleObserver {
 
 	// Dev sphere.
 	val devSphereId = "devSphere"
-	val devKeySet = KeySet("adminKeyForCrown", "memberKeyForHome", "guestKeyForOther", "basicKeyForOther", "LocalizationKeyX")
-	val devMeshKeySet = MeshKeySet("aStoneKeyForMesh", "meshAppForStones", "meshKeyForStones")
+	val devKeySet = KeySet("adminKeyForCrown", "memberKeyForHome", "basicKeyForOther", "MyServiceDataKey", "aLocalizationKey")
+	val devMeshKeySet = MeshKeySet("aStoneKeyForMesh", "MyGoodMeshAppKey", "MyGoodMeshNetKey")
 	val devMeshAccessAddress = 0.toUint32()
 	val devIbeaconUuid = UUID.fromString("1843423e-e175-4af0-a2e4-31e32f729a8a")
 	val devSphereShortId = 123.toUint8()
