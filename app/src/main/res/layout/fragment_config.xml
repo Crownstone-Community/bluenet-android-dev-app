@@ -120,7 +120,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="@dimen/activity_vertical_margin"
-			android:text="Sof on speed"
+			android:text="Soft on speed"
 			android:textAlignment="center" />
 		<LinearLayout
 			android:layout_width="match_parent"
@@ -176,6 +176,41 @@
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:text="Disable" />
+		</LinearLayout>
+
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="@dimen/activity_vertical_margin"
+			android:text="TX power"
+			android:textAlignment="center" />
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+			<Button
+				android:id="@+id/buttonGetTxPower"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="Get" />
+			<Button
+				android:id="@+id/buttonSetTxPower"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:text="Set" />
+			<EditText
+				android:id="@+id/editTxPower"
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="2"
+				android:ems="10"
+				android:inputType="number" />
 		</LinearLayout>
 
 

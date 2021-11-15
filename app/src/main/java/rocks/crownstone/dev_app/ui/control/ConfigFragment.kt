@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
+import rocks.crownstone.bluenet.structs.Int8
 import rocks.crownstone.bluenet.structs.UartMode
 import rocks.crownstone.bluenet.structs.Uint8
 import rocks.crownstone.bluenet.util.Util
@@ -61,6 +62,8 @@ class ConfigFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonSetSoftOnSpeed).setOnClickListener { setSoftOnSpeed(root.findViewById<EditText>(R.id.editSoftOnSpeed)) }
 		root.findViewById<Button>(R.id.buttonEnableUart).setOnClickListener { enableUart(true) }
 		root.findViewById<Button>(R.id.buttonDisableUart).setOnClickListener { enableUart(false) }
+		root.findViewById<Button>(R.id.buttonGetTxPower).setOnClickListener { getTxPower(root.findViewById<EditText>(R.id.editTxPower)) }
+		root.findViewById<Button>(R.id.buttonSetTxPower).setOnClickListener { setTxPower(root.findViewById<EditText>(R.id.editTxPower)) }
 
 		return root
 	}
@@ -171,7 +174,30 @@ class ConfigFragment : Fragment() {
 				.fail { showResult("Enable UART failed: ${it.message}") }
 	}
 
+	private fun getTxPower(editText: EditText) {
+		editText.setText("")
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.config.getTxPower()
+				}.unwrap()
+				.success {
+					editText.setText("$it")
+					showResult("TX power: $it")
+				}
+				.fail { showResult("Get TX power failed: ${it.message}") }
+	}
 
+	private fun setTxPower(editText: EditText) {
+		val device = MainApp.instance.selectedDevice ?: return
+		val txPower: Int8 = editText.text.toString().toIntOrNull()?.toByte() ?: 4
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.config.setTxPower(txPower)
+				}.unwrap()
+				.success { showResult("Set TX power to $txPower") }
+				.fail { showResult("Set TX power failed: ${it.message}") }
+	}
 
 
 	private fun showResult(text: String) {
