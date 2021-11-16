@@ -130,11 +130,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getFirmwareVersion(view: TextView) {
+		Log.i(TAG, "getFirmwareVersion")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.deviceInfo.getFirmwareVersion()
+					MainApp.instance.bluenet.deviceInfo(device.address).getFirmwareVersion()
 				}.unwrap()
 				.successUi {
 					view.text = it
@@ -144,11 +145,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getBootloaderVersion(view: TextView) {
+		Log.i(TAG, "getBootloaderVersion")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.deviceInfo.getBootloaderVersion()
+					MainApp.instance.bluenet.deviceInfo(device.address).getBootloaderVersion()
 				}.unwrap()
 				.successUi {
 					view.text = it
@@ -158,11 +160,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getHardwareVersion(view: TextView) {
+		Log.i(TAG, "getHardwareVersion")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.deviceInfo.getHardwareVersion()
+					MainApp.instance.bluenet.deviceInfo(device.address).getHardwareVersion()
 				}.unwrap()
 				.successUi {
 					view.text = it
@@ -172,11 +175,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getUicrData(view: TextView) {
+		Log.i(TAG, "getUicrData")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.deviceInfo.getUicrData()
+					MainApp.instance.bluenet.deviceInfo(device.address).getUicrData()
 				}.unwrap()
 				.successUi {
 					view.text = it.toString()
@@ -186,11 +190,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getUptime(view: TextView) {
+		Log.i(TAG, "getUptime")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.debugData.getUptime()
+					MainApp.instance.bluenet.debugData(device.address).getUptime()
 				}.unwrap()
 				.successUi {
 					view.text = it.toString()
@@ -200,11 +205,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getTime(view: TextView) {
+		Log.i(TAG, "getTime")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.state.getTime()
+					MainApp.instance.bluenet.state(device.address).getTime()
 				}.unwrap()
 				.successUi {
 					val timestampStr = Util.getTimestampString(it)
@@ -215,11 +221,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getAdcRestarts(view: TextView) {
+		Log.i(TAG, "getAdcRestarts")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.debugData.getAdcRestarts()
+					MainApp.instance.bluenet.debugData(device.address).getAdcRestarts()
 				}.unwrap()
 				.successUi {
 					view.text = it.toString()
@@ -229,11 +236,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getAdcChannelSwaps(view: TextView) {
+		Log.i(TAG, "getAdcChannelSwaps")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.debugData.getAdcChannelSwaps()
+					MainApp.instance.bluenet.debugData(device.address).getAdcChannelSwaps()
 				}.unwrap()
 				.successUi {
 					view.text = it.toString()
@@ -243,11 +251,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getSchedulerMinFree(view: TextView) {
+		Log.i(TAG, "getSchedulerMinFree")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.debugData.getSchedulerMinFree()
+					MainApp.instance.bluenet.debugData(device.address).getSchedulerMinFree()
 				}.unwrap()
 				.successUi {
 					view.text = it.toString()
@@ -257,11 +266,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getResetReason(view: TextView) {
+		Log.i(TAG, "getResetReason")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.debugData.getResetReason()
+					MainApp.instance.bluenet.debugData(device.address).getResetReason()
 				}.unwrap()
 				.successUi {
 					view.text = it.toString()
@@ -271,11 +281,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getGpregret(view: TextView) {
+		Log.i(TAG, "getGpregret")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.debugData.getGpregret()
+					MainApp.instance.bluenet.debugData(device.address).getGpregret()
 				}.unwrap()
 				.successUi {
 					view.text = it.toString()
@@ -285,11 +296,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getRamStats(view: TextView) {
+		Log.i(TAG, "getRamStats")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.debugData.getRamStats()
+					MainApp.instance.bluenet.debugData(device.address).getRamStats()
 				}.unwrap()
 				.successUi {
 					view.text = it.toString()
@@ -299,11 +311,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun cleanFlash(view: TextView) {
+		Log.i(TAG, "cleanFlash")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.debugData.cleanFlash()
+					MainApp.instance.bluenet.debugData(device.address).cleanFlash()
 				}.unwrap()
 				.successUi {
 					view.text = "started"
@@ -313,11 +326,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getSwitchHistory(view: TextView) {
+		Log.i(TAG, "getSwitchHistory")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.debugData.getSwitchHistory()
+					MainApp.instance.bluenet.debugData(device.address).getSwitchHistory()
 				}.unwrap()
 				.successUi {
 					view.text = it.toString()
@@ -327,11 +341,12 @@ class DebugFragment : Fragment() {
 	}
 
 	private fun getPowerSamples(view: TextView, type: PowerSamplesType) {
+		Log.i(TAG, "getPowerSamples")
 		clearText(view)
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.debugData.getPowerSamples(type)
+					MainApp.instance.bluenet.debugData(device.address).getPowerSamples(type)
 				}.unwrap()
 				.successUi {
 					val timestampStr = Util.getTimestampString(it[0].timestamp)

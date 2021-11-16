@@ -170,7 +170,7 @@ class BehaviourFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.control.addBehaviour(behaviour)
+					MainApp.instance.bluenet.control(device.address).addBehaviour(behaviour)
 				}.unwrap()
 				.successUi {
 					showResult("Add behaviour success: $it")
@@ -183,7 +183,7 @@ class BehaviourFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.control.removeBehaviour(index)
+					MainApp.instance.bluenet.control(device.address).removeBehaviour(index)
 				}.unwrap()
 				.successUi {
 					showResult("Rem behaviour success: $it")
@@ -197,7 +197,7 @@ class BehaviourFragment : Fragment() {
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
 					MainApp.instance.behaviourSyncer.setBehaviours(MainApp.instance.behaviours)
-					MainApp.instance.behaviourSyncer.sync()
+					MainApp.instance.behaviourSyncer.sync(device.address)
 				}.unwrap()
 				.successUi {
 					view.text = it.toString()

@@ -277,33 +277,33 @@ class MainActivity : AppCompatActivity() {
 							MainApp.instance.factoryReset(device, activity)
 						}
 						DeviceOption.Reset -> {
-							MainApp.instance.bluenet.control.reset()
+							MainApp.instance.bluenet.control(device.address).reset()
 						}
 						DeviceOption.PutInDfu -> {
-							MainApp.instance.bluenet.control.goToDfu()
+							MainApp.instance.bluenet.control(device.address).goToDfu()
 						}
 						DeviceOption.HardwareVersion -> {
-							MainApp.instance.bluenet.deviceInfo.getHardwareVersion()
+							MainApp.instance.bluenet.deviceInfo(device.address).getHardwareVersion()
 									.success { MainApp.instance.showResult("hw: $it", activity) }
 						}
 						DeviceOption.FirmwareVersion -> {
-							MainApp.instance.bluenet.deviceInfo.getFirmwareVersion()
+							MainApp.instance.bluenet.deviceInfo(device.address).getFirmwareVersion()
 									.success { MainApp.instance.showResult("fw: $it", activity) }
 						}
 						DeviceOption.BootloaderVersion -> {
-							MainApp.instance.bluenet.deviceInfo.getBootloaderVersion()
+							MainApp.instance.bluenet.deviceInfo(device.address).getBootloaderVersion()
 									.success { MainApp.instance.showResult("bl: $it", activity) }
 						}
 						DeviceOption.ResetCount -> {
-							MainApp.instance.bluenet.state.getResetCount()
+							MainApp.instance.bluenet.state(device.address).getResetCount()
 									.success { MainApp.instance.showResult("resetCount: $it", activity) }
 						}
 						DeviceOption.UicrData -> {
-							MainApp.instance.bluenet.deviceInfo.getUicrData()
+							MainApp.instance.bluenet.deviceInfo(device.address).getUicrData()
 									.success { MainApp.instance.showResult("uicr: $it", activity) }
 						}
 						DeviceOption.Toggle -> {
-							MainApp.instance.bluenet.control.toggleSwitch(255.toUint8())
+							MainApp.instance.bluenet.control(device.address).toggleSwitch(255.toUint8())
 						}
 					}
 				}.unwrap()
@@ -315,6 +315,6 @@ class MainActivity : AppCompatActivity() {
 					it.printStackTrace()
 					MainApp.instance.showResult("Failed: ${it.message}", activity)
 				}
-				.always { MainApp.instance.bluenet.disconnect() }
+				.always { MainApp.instance.bluenet.disconnect(device.address) }
 	}
 }

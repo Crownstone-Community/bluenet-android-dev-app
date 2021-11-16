@@ -171,7 +171,7 @@ class MainApp : Application(), LifecycleObserver {
 			return
 		}
 		val nearest = data as NearestDeviceListEntry
-		Log.d(TAG, "nearest=${nearest.deviceAddress}")
+		Log.v(TAG, "nearest=${nearest.deviceAddress}")
 		nearestDeviceAddress = nearest.deviceAddress
 	}
 
@@ -259,7 +259,7 @@ class MainApp : Application(), LifecycleObserver {
 			val ibeaconData = IbeaconData(devIbeaconUuid, major, minor, -60)
 			return bluenet.connect(device.address)
 					.then {
-						bluenet.setup.setup(stoneId, devSphereShortId, devKeySet, devMeshKeySet, devMeshAccessAddress, ibeaconData)
+						bluenet.setup(device.address).setup(stoneId, devSphereShortId, devKeySet, devMeshKeySet, devMeshAccessAddress, ibeaconData)
 					}.unwrap()
 					.success {
 						Log.i(TAG, "Setup complete!")
@@ -269,7 +269,7 @@ class MainApp : Application(), LifecycleObserver {
 						Log.e(TAG, "Setup failed: ${it.message}")
 						it.printStackTrace()
 						showResult("setup failed: ${it.message}", activity)
-						bluenet.disconnect()
+						bluenet.disconnect(device.address)
 					}
 					.always {
 //						bluenet.startScanning()
@@ -303,7 +303,7 @@ class MainApp : Application(), LifecycleObserver {
 						val meshAccessAddress = Conversion.byteArrayTo<Uint32>(Conversion.hexStringToBytes(sphere!!.meshAccessAddress))
 						val ibeaconData = IbeaconData(UUID.fromString(stoneData!!.iBeaconUUID), stoneData!!.iBeaconMajor.toUint16(), stoneData!!.iBeaconMinor.toUint16(), 0)
 						val stoneId = stoneData!!.stoneId
-						bluenet.setup.setup(stoneId.toUint8(), sphere?.uid!!.toUint8(), keySet, meshKeySet, meshAccessAddress, ibeaconData)
+						bluenet.setup(device.address).setup(stoneId.toUint8(), sphere?.uid!!.toUint8(), keySet, meshKeySet, meshAccessAddress, ibeaconData)
 					}.unwrap()
 					.success {
 						Log.i(TAG, "Setup complete!")
@@ -313,7 +313,7 @@ class MainApp : Application(), LifecycleObserver {
 						Log.e(TAG, "Setup failed: ${it.message}")
 						it.printStackTrace()
 						showResult("setup failed: ${it.message}", activity)
-						bluenet.disconnect()
+						bluenet.disconnect(device.address)
 					}
 					.always {
 //						bluenet.startScanning()
@@ -334,12 +334,12 @@ class MainApp : Application(), LifecycleObserver {
 					}
 					bluenet.connect(device.address)
 							.then {
-								bluenet.control.factoryReset()
+								bluenet.control(device.address).factoryReset()
 							}.unwrap()
 							.success {
 								Log.i(TAG, "factory reset success")
 								showResult("factory reset success", activity)
-								bluenet.disconnect(true)
+								bluenet.disconnect(device.address, true)
 										.then {
 											removeStoneFromCloud(device)
 										}.unwrap()
@@ -355,7 +355,7 @@ class MainApp : Application(), LifecycleObserver {
 							.fail {
 								Log.e(TAG, "factory reset failed: ${it.message}")
 								showResult("factory reset failed: ${it.message}", activity)
-								bluenet.disconnect(true)
+								bluenet.disconnect(device.address, true)
 							}
 				}.unwrap()
 	}

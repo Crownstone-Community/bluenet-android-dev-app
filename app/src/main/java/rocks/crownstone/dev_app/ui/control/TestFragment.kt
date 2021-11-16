@@ -103,7 +103,7 @@ class TestFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.config.setBehaviourSettings(setting)
+					MainApp.instance.bluenet.config(device.address).setBehaviourSettings(setting)
 				}.unwrap()
 				.success { showResult("$enableString behaviour success") }
 				.fail { showResult("$enableString behaviour failed: ${it.message}") }
@@ -125,7 +125,7 @@ class TestFragment : Fragment() {
 		val stoneId = device.serviceData?.crownstoneId ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.control.hubData(HubDataPacket(HubDataPacket.EncryptType.NOT_ENCRYPTED, StringPacket("test")) )
+					MainApp.instance.bluenet.control(device.address).hubData(HubDataPacket(HubDataPacket.EncryptType.NOT_ENCRYPTED, StringPacket("test")) )
 				}.unwrap()
 				.success { showResult("Hub data reply: $it") }
 				.fail { showResult("Failed to send hub data: ${it.message}") }
@@ -142,7 +142,7 @@ class TestFragment : Fragment() {
 					val endTime = TimeOfDayPacket(BaseTimeType.MIDNIGHT, 23*3600)
 					val presence = PresencePacket(PresenceType.ALWAYS_TRUE, ArrayList(), 5U * 60U)
 					val behaviourPacket = SwitchBehaviourPacket(0U, 0U, daysOfWeek, startTime, endTime, presence)
-					MainApp.instance.bluenet.control.addBehaviour(behaviourPacket)
+					MainApp.instance.bluenet.control(device.address).addBehaviour(behaviourPacket)
 				}.unwrap()
 				.success { showResult("Added behaviour at index=${it.index} hash=${it.hash}") }
 				.fail { showResult("Failed to set behaviour: ${it.message}") }
@@ -203,20 +203,20 @@ class TestFragment : Fragment() {
 
 				// Via mesh
 				.then {
-					MainApp.instance.bluenet.mesh.setState(statePacket, ids[0])
+					MainApp.instance.bluenet.mesh(device.address).setState(statePacket, ids[0])
 				}.unwrap()
 				.then {
-					MainApp.instance.bluenet.mesh.setState(statePacket, ids[1])
+					MainApp.instance.bluenet.mesh(device.address).setState(statePacket, ids[1])
 				}.unwrap()
 				.then {
 					val timestamp: Uint32 = 0U
 					val interval: Uint16 = 4U
-					MainApp.instance.bluenet.mesh.setIbeaconConfigId(IbeaconConfigIdPacket(0U, timestamp, interval), ids)
+					MainApp.instance.bluenet.mesh(device.address).setIbeaconConfigId(IbeaconConfigIdPacket(0U, timestamp, interval), ids)
 				}.unwrap()
 				.then {
 					val timestamp: Uint32 = 2U
 					val interval: Uint16 = 4U
-					MainApp.instance.bluenet.mesh.setIbeaconConfigId(IbeaconConfigIdPacket(1U, timestamp, interval), ids)
+					MainApp.instance.bluenet.mesh(device.address).setIbeaconConfigId(IbeaconConfigIdPacket(1U, timestamp, interval), ids)
 				}.unwrap()
 	}
 

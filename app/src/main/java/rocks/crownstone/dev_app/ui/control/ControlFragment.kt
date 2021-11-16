@@ -103,7 +103,7 @@ class ControlFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.control.reset()
+					MainApp.instance.bluenet.control(device.address).reset()
 				}.unwrap()
 				.success { showResult("Reset success") }
 				.fail { showResult("Reset failed: ${it.message}") }
@@ -119,7 +119,7 @@ class ControlFragment : Fragment() {
 
 	private fun recover() {
 		val device = MainApp.instance.selectedDevice ?: return
-		MainApp.instance.bluenet.control.recover(device.address)
+		MainApp.instance.bluenet.control(device.address).recover(device.address)
 				.success { showResult("Recover success") }
 				.fail { showResult("Recover failed: ${it.message}") }
 	}
@@ -128,7 +128,7 @@ class ControlFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.control.goToDfu()
+					MainApp.instance.bluenet.control(device.address).goToDfu()
 				}.unwrap()
 				.success { showResult("Go to DFU success") }
 				.fail { showResult("Go to DFU failed: ${it.message}") }
@@ -139,7 +139,7 @@ class ControlFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.control.setSwitch(value)
+					MainApp.instance.bluenet.control(device.address).setSwitch(value)
 				}.unwrap()
 //				.success { showResult("Set switch success") }
 				.fail { showResult("Set switch failed: ${it.message}") }

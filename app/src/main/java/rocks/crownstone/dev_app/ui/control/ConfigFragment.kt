@@ -90,7 +90,7 @@ class ConfigFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.control.allowDimming(enable)
+					MainApp.instance.bluenet.control(device.address).allowDimming(enable)
 				}.unwrap()
 				.success { showResult("Enable dimming success") }
 				.fail { showResult("Enable dimming failed: ${it.message}") }
@@ -100,7 +100,7 @@ class ConfigFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.config.setSwitchCraftEnabled(enable)
+					MainApp.instance.bluenet.config(device.address).setSwitchCraftEnabled(enable)
 				}.unwrap()
 				.success { showResult("Enable switchcraft success") }
 				.fail { showResult("Enable switchcraft failed: ${it.message}") }
@@ -112,7 +112,7 @@ class ConfigFragment : Fragment() {
 
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.state.getTime()
+					MainApp.instance.bluenet.state(device.address).getTime()
 				}.unwrap()
 				.success {
 					val timestampStr = Util.getTimestampString(it)
@@ -133,7 +133,7 @@ class ConfigFragment : Fragment() {
 		val timestampStr = Util.getTimestampString(timestamp)
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.control.setTime(timestamp)
+					MainApp.instance.bluenet.control(device.address).setTime(timestamp)
 				}.unwrap()
 				.success { showResult("Set time to $timestamp $timestampStr") }
 				.fail { showResult("Set time failed: ${it.message}") }
@@ -144,7 +144,7 @@ class ConfigFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.config.getSoftOnSpeed()
+					MainApp.instance.bluenet.config(device.address).getSoftOnSpeed()
 				}.unwrap()
 				.success {
 					editText.setText("$it")
@@ -158,7 +158,7 @@ class ConfigFragment : Fragment() {
 		val speed: Uint8 = editText.text.toString().toUIntOrNull()?.toUint8() ?: 1U
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.config.setSoftOnSpeed(speed)
+					MainApp.instance.bluenet.config(device.address).setSoftOnSpeed(speed)
 				}.unwrap()
 				.success { showResult("Set soft on speed to $speed") }
 				.fail { showResult("Set soft on speed failed: ${it.message}") }
@@ -168,7 +168,7 @@ class ConfigFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.config.setUartEnabled(if (enable) UartMode.RX_AND_TX else UartMode.NONE)
+					MainApp.instance.bluenet.config(device.address).setUartEnabled(if (enable) UartMode.RX_AND_TX else UartMode.NONE)
 				}.unwrap()
 				.success { showResult("Enable UART success") }
 				.fail { showResult("Enable UART failed: ${it.message}") }
@@ -179,7 +179,7 @@ class ConfigFragment : Fragment() {
 		val device = MainApp.instance.selectedDevice ?: return
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.config.getTxPower()
+					MainApp.instance.bluenet.config(device.address).getTxPower()
 				}.unwrap()
 				.success {
 					editText.setText("$it")
@@ -193,7 +193,7 @@ class ConfigFragment : Fragment() {
 		val txPower: Int8 = editText.text.toString().toIntOrNull()?.toByte() ?: 4
 		MainApp.instance.bluenet.connect(device.address)
 				.then {
-					MainApp.instance.bluenet.config.setTxPower(txPower)
+					MainApp.instance.bluenet.config(device.address).setTxPower(txPower)
 				}.unwrap()
 				.success { showResult("Set TX power to $txPower") }
 				.fail { showResult("Set TX power failed: ${it.message}") }
