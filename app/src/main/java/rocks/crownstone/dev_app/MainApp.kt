@@ -463,6 +463,48 @@ class MainApp : Application(), LifecycleObserver {
 				}
 	}
 
+	fun test(devices: List<ScannedDevice>, activity: Activity) {
+		devices.sortedByDescending { it.rssi }
+		val count = 5
+		connectNext(devices, activity, 0, count-1)
+	}
+
+	private fun connectNext(devices: List<ScannedDevice>, activity: Activity, index: Int, maxIndex: Int) {
+		if (index > maxIndex) {
+			getUptimeNext(devices, activity, 0, maxIndex)
+			return
+		}
+		bluenet.connect(devices[index].address)
+				.success {
+					showResult("Connected to ${devices[index].address}", activity)
+				}
+				.fail {
+					showResult("Failed to connect to ${devices[index].address}: ${it.message}", activity)
+				}
+				.always {
+					connectNext(devices, activity, index + 1, maxIndex)
+				}
+	}
+
+	private fun getUptimeNext(devices: List<ScannedDevice>, activity: Activity, index: Int, maxIndex: Int) {
+		if (index > maxIndex) {
+			return
+		}
+		bluenet.debugData(devices[index].address).getUptime()
+				.success {
+					showResult("Uptime of ${devices[index].address} = $it", activity)
+				}
+				.fail {
+					showResult("Failed to get uptime of ${devices[index].address}: ${it.message}", activity)
+				}
+				.always {
+//					getUptimeNext(devices, activity, index + 1, maxIndex)
+				}
+
+		// Each connection has their own "thread".
+		getUptimeNext(devices, activity, index + 1, maxIndex)
+	}
+
 	companion object {
 		lateinit var instance: MainApp
 	}

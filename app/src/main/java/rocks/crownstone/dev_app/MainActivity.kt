@@ -129,7 +129,13 @@ class MainActivity : AppCompatActivity() {
 				return true
 			}
 			R.id.action_localization -> {
-				MainApp.instance.showResult("localization!", this)
+				MainApp.instance.showResult("This does nothing!", this)
+				return true
+			}
+			R.id.action_test -> {
+				val deviceListCopy = ArrayList<ScannedDevice>()
+				deviceListCopy.addAll(deviceList)
+				MainApp.instance.test(deviceListCopy, this)
 				return true
 			}
 		}
