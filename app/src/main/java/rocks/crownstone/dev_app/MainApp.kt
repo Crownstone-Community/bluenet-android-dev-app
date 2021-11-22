@@ -468,10 +468,10 @@ class MainApp : Application(), LifecycleObserver {
 		devices.sortedByDescending { it.rssi }
 		val count = 5
 
-		// All non-auto connects
+//		// All non-auto connects, connect 1 by 1.
 //		connectNext(devices, activity, 0, count-1)
 
-		// 1 Non-auto, the others auto connect
+		// 1 Non-auto, the others auto connect, do all in parallel.
 		for (index in 0 until count) {
 			val auto = index != 0
 			bluenet.connect(devices[index].address, auto, 60*1000)
@@ -487,6 +487,7 @@ class MainApp : Application(), LifecycleObserver {
 
 	private fun connectNext(devices: List<ScannedDevice>, activity: Activity, index: Int, maxIndex: Int) {
 		if (index > maxIndex) {
+			// Read after all connections were made.
 			readNext(devices, activity, 0, maxIndex)
 			return
 		}
@@ -507,11 +508,12 @@ class MainApp : Application(), LifecycleObserver {
 			return
 		}
 		readData(devices[index], activity)
-				.always {
-//					getUptimeNext(devices, activity, index + 1, maxIndex)
-				}
+//				.always {
+//					// Read 1 by 1.
+//					readNext(devices, activity, index + 1, maxIndex)
+//				}
 
-		// Each connection has their own "thread".
+		// Read all in parallel.
 		readNext(devices, activity, index + 1, maxIndex)
 	}
 
