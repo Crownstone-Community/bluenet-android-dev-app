@@ -28,6 +28,7 @@ import rocks.crownstone.bluenet.encryption.KeySet
 import rocks.crownstone.bluenet.encryption.MeshKeySet
 import rocks.crownstone.bluenet.encryption.RC5
 import rocks.crownstone.bluenet.packets.behaviour.IndexedBehaviourPacket
+import rocks.crownstone.bluenet.packets.powerSamples.PowerSamplesType
 import rocks.crownstone.bluenet.scanhandling.NearestDeviceListEntry
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
@@ -466,12 +467,27 @@ class MainApp : Application(), LifecycleObserver {
 	fun test(devices: List<ScannedDevice>, activity: Activity) {
 		devices.sortedByDescending { it.rssi }
 		val count = 5
-		connectNext(devices, activity, 0, count-1)
+
+		// All non-auto connects
+//		connectNext(devices, activity, 0, count-1)
+
+		// 1 Non-auto, the others auto connect
+		for (index in 0 until count) {
+			val auto = index != 0
+			bluenet.connect(devices[index].address, auto, 60*1000)
+					.success {
+						showResult("Connected to ${devices[index].address}", activity)
+						readData(devices[index], activity)
+					}
+					.fail {
+						showResult("Failed to connect to ${devices[index].address}: ${it.message}", activity)
+					}
+		}
 	}
 
 	private fun connectNext(devices: List<ScannedDevice>, activity: Activity, index: Int, maxIndex: Int) {
 		if (index > maxIndex) {
-			getUptimeNext(devices, activity, 0, maxIndex)
+			readNext(devices, activity, 0, maxIndex)
 			return
 		}
 		bluenet.connect(devices[index].address)
@@ -486,23 +502,31 @@ class MainApp : Application(), LifecycleObserver {
 				}
 	}
 
-	private fun getUptimeNext(devices: List<ScannedDevice>, activity: Activity, index: Int, maxIndex: Int) {
+	private fun readNext(devices: List<ScannedDevice>, activity: Activity, index: Int, maxIndex: Int) {
 		if (index > maxIndex) {
 			return
 		}
-		bluenet.debugData(devices[index].address).getUptime()
-				.success {
-					showResult("Uptime of ${devices[index].address} = $it", activity)
-				}
-				.fail {
-					showResult("Failed to get uptime of ${devices[index].address}: ${it.message}", activity)
-				}
+		readData(devices[index], activity)
 				.always {
 //					getUptimeNext(devices, activity, index + 1, maxIndex)
 				}
 
 		// Each connection has their own "thread".
-		getUptimeNext(devices, activity, index + 1, maxIndex)
+		readNext(devices, activity, index + 1, maxIndex)
+	}
+
+	private fun readData(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {
+		val deferred = deferred<Unit, Exception>()
+		bluenet.debugData(device.address).getPowerSamples(PowerSamplesType.NOW_UNFILTERED)
+				.success {
+					showResult("Read from ${device.address} $it", activity)
+					deferred.resolve(Unit)
+				}
+				.fail {
+					showResult("Failed to read ${device.address}: ${it.message}", activity)
+					deferred.reject(it)
+				}
+		return deferred.promise
 	}
 
 	companion object {
