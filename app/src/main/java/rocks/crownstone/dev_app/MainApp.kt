@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
+import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import androidx.appcompat.app.AlertDialog
 import android.widget.ArrayAdapter
@@ -35,6 +36,7 @@ import rocks.crownstone.bluenet.structs.*
 import rocks.crownstone.bluenet.util.*
 import rocks.crownstone.dev_app.cloud.*
 import java.util.*
+import kotlin.math.min
 
 
 // Singleton class that is accessible in all activities
@@ -65,6 +67,7 @@ class MainApp : Application(), LifecycleObserver {
 
 	val NOTIFICATION_ID = 1
 
+	val deviceMap = HashMap<DeviceAddress, ScannedDevice>()
 	var nearestDeviceAddress: DeviceAddress? = null
 	var handler = Handler()
 
@@ -99,9 +102,11 @@ class MainApp : Application(), LifecycleObserver {
 
 		ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-		bluenet.subscribe(BluenetEvent.SCAN_RESULT, ::onScan)
+		bluenet.subscribe(BluenetEvent.SCAN_RESULT, { data -> onScannedDevice(data as ScannedDevice)})
 		bluenet.subscribe(BluenetEvent.NEAREST_VALIDATED_NORMAL, ::onNearest)
 
+		bluenet.subscribe(BluenetEvent.CORE_CONNECTED, { data: Any? -> Log.i(TAG, "connected to ${data as DeviceAddress}") })
+		bluenet.subscribe(BluenetEvent.CORE_DISCONNECTED, { data: Any? -> Log.i(TAG, "disconnected from ${data as DeviceAddress}") })
 //		handler.postDelayed(testBluenetRunnable, 1000)
 
 		val arr = ByteArray(0)
@@ -159,13 +164,21 @@ class MainApp : Application(), LifecycleObserver {
 		stopKovenant() // Stop thread(s)
 	}
 
-	private fun onScan(data: Any?) {
-		if (data == null) {
+	private fun onScannedDevice(device: ScannedDevice) {
+//		if (!device.validated) {
+//			return
+//		}
+		if (device.serviceData == null) {
 			return
 		}
-		val device = data as ScannedDevice
-		Log.v(TAG, "onScan: $device")
+
+		if (device.serviceData?.unique == false) {
+			return
+		}
+		Log.v(TAG, "onScannedDevice $device")
+		deviceMap.put(device.address, device)
 	}
+
 
 	private fun onNearest(data: Any?) {
 		if (data == null) {
@@ -178,45 +191,8 @@ class MainApp : Application(), LifecycleObserver {
 
 	private val testBluenetRunnable = Runnable {
 		val address = nearestDeviceAddress
-		testBluenet(address)
-	}
 
-	private fun testBluenet(address: DeviceAddress?) {
-//		if (address == null) {
-//			handler.postDelayed(testBluenetRunnable, 1000)
-//			return
-//		}
-//		Log.i(TAG, "---- connect ----")
-//		bluenet.connect(address)
-//				.then {
-//					Log.i(TAG, "---- discover services ----")
-//					bluenet.discoverServices()
-//				}.unwrap()
-//				.then {
-//					Log.i(TAG, "---- read ----")
-//					bluenet.read(BluenetProtocol.DEVICE_INFO_SERVICE_UUID, BluenetProtocol.CHAR_FIRMWARE_REVISION_UUID)
-//				}.unwrap()
-//				.then {
-//					Log.i(TAG, "---- write ----")
-//					val writeData = ByteArray(1)
-//					writeData[0] = 5
-//					bluenet.write(BluenetProtocol.CROWNSTONE_SERVICE_UUID, BluenetProtocol.CHAR_CONTROL_UUID, writeData)
-//				}.unwrap()
-//				.then {
-//					Log.i(TAG, "---- disconnect ----")
-//					bluenet.disconnect(true)
-//				}.unwrap()
-//				.success {
-//					Log.i(TAG, "---- success ----")
-//					handler.post(connectRunnable)
-//				}
-//				.fail {
-//					Log.e(TAG, "---- error: ${it.message} ----")
-//					handler.postDelayed(connectRunnable, 100)
-//				}
-//				.always {
-//
-//				}
+		test(ArrayList(deviceMap.values), null)
 	}
 
 	fun getNotification(): Notification {
@@ -250,7 +226,7 @@ class MainApp : Application(), LifecycleObserver {
 	}
 
 	fun setup(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {
-		bluenet.stopScanning()
+//		bluenet.stopScanning()
 		if (usingDevSphere) {
 			val addressBytes = device.address.toByteArray()
 			val stoneId = Conversion.hexStringToBytes(device.address.slice(0 until 2))[0].toUint8()
@@ -380,9 +356,9 @@ class MainApp : Application(), LifecycleObserver {
 		}
 	}
 
-	fun showResult(msg: String, activity: Activity) {
+	fun showResult(msg: String, activity: Activity?) {
 		Log.i(TAG, msg)
-		activity.runOnUiThread {
+		activity?.runOnUiThread {
 			Toast.makeText(activity, msg, Toast.LENGTH_LONG).show()
 		}
 	}
@@ -464,25 +440,90 @@ class MainApp : Application(), LifecycleObserver {
 				}
 	}
 
-	fun test(devices: List<ScannedDevice>, activity: Activity) {
+	fun testOldFirmware(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {
+		return bluenet.connect(device.address)
+				.then {
+					bluenet.deviceInfo(device.address).getFirmwareVersion()
+				}.unwrap()
+				.then {
+					showResult("Firmware version $it", activity)
+					return@then when (device.operationMode) {
+						OperationMode.SETUP -> setup(device, activity)
+						else -> Promise.ofFail<Unit, Exception>(Errors.NotInMode(CrownstoneMode.SETUP))
+					}
+				}.unwrap()
+				.then {
+					// Wait some time for the crownstone to reboot.
+					bluenet.waitPromise(1000)
+				}.unwrap()
+				.then {
+					bluenet.connect(device.address)
+				}.unwrap()
+				.then {
+					bluenet.state(device.address).getTime()
+				}.unwrap()
+				.then {
+					showResult("Time: $it", activity)
+					bluenet.control(device.address).setTime(1234U)
+				}.unwrap()
+				.then {
+					bluenet.config(device.address).setTxPower(0)
+				}.unwrap()
+				.then {
+					bluenet.config(device.address).getTxPower()
+				}.unwrap()
+				.then {
+					if (it.toInt() != 0) {
+						return@then Promise.ofFail<Unit, Exception>(Errors.ValueWrong("Expected TX power of 0"))
+					}
+					showResult("TX power: $it", activity)
+					bluenet.control(device.address).factoryReset()
+				}.unwrap()
+				.then {
+					setup(device, activity)
+				}.unwrap()
+				.then {
+					// Wait some time for the crownstone to reboot.
+					bluenet.waitPromise(1000)
+				}.unwrap()
+				.then {
+					bluenet.connect(device.address)
+				}.unwrap()
+				.then {
+					bluenet.control(device.address).goToDfu()
+				}.unwrap()
+				.success { showResult("Test success", activity) }
+				.fail { showResult("Test faileed: $it", activity) }
+	}
+
+	// Test connecting and reading multiple devices.
+	fun test(devices: List<ScannedDevice>, activity: Activity?) {
+//		handler.postDelayed(testBluenetRunnable, 100000)
 		devices.sortedByDescending { it.rssi }
-		val count = 5
+		val count = min(5, devices.size)
 
-//		// All non-auto connects, connect 1 by 1.
-//		connectNext(devices, activity, 0, count-1)
-
-		// 1 Non-auto, the others auto connect, do all in parallel.
+		// Connect to all in parallel.
+		val startTime = SystemClock.elapsedRealtime()
 		for (index in 0 until count) {
-			val auto = index != 0
+			val auto = true
+			Log.i(TAG, "connect to ${devices[index].address} rssi=${devices[index].rssi}")
 			bluenet.connect(devices[index].address, auto, 60*1000)
 					.success {
-						showResult("Connected to ${devices[index].address}", activity)
+						showResult("Connected to ${devices[index].address} after ${SystemClock.elapsedRealtime() - startTime} ms", activity)
 						readData(devices[index], activity)
 					}
 					.fail {
-						showResult("Failed to connect to ${devices[index].address}: ${it.message}", activity)
+						showResult("Failed to connect to ${devices[index].address}: ${it.message} after ${SystemClock.elapsedRealtime() - startTime} ms", activity)
 					}
 		}
+
+//		// Abort all connections after random amount of time
+//		bluenet.waitPromise((100L..3000L).random())
+//				.success {
+//					for (index in 0 until count) {
+//						bluenet.abort(devices[index].address)
+//					}
+//				}
 	}
 
 	private fun connectNext(devices: List<ScannedDevice>, activity: Activity, index: Int, maxIndex: Int) {
@@ -517,7 +558,7 @@ class MainApp : Application(), LifecycleObserver {
 		readNext(devices, activity, index + 1, maxIndex)
 	}
 
-	private fun readData(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {
+	private fun readData(device: ScannedDevice, activity: Activity?): Promise<Unit, Exception> {
 		val deferred = deferred<Unit, Exception>()
 		bluenet.debugData(device.address).getPowerSamples(PowerSamplesType.NOW_UNFILTERED)
 				.success {

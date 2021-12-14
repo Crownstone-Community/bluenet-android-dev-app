@@ -119,7 +119,7 @@ class ControlFragment : Fragment() {
 
 	private fun recover() {
 		val device = MainApp.instance.selectedDevice ?: return
-		MainApp.instance.bluenet.control(device.address).recover(device.address)
+		MainApp.instance.bluenet.control(device.address).recover()
 				.success { showResult("Recover success") }
 				.fail { showResult("Recover failed: ${it.message}") }
 	}

@@ -1,7 +1,5 @@
 package rocks.crownstone.dev_app
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,21 +8,15 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
 import rocks.crownstone.bluenet.encryption.KeySet
 import rocks.crownstone.bluenet.encryption.MeshKeySet
-import rocks.crownstone.bluenet.packets.UuidPacket
-import rocks.crownstone.bluenet.packets.behaviour.*
-import rocks.crownstone.bluenet.packets.other.IbeaconConfigIdPacket
-import rocks.crownstone.bluenet.packets.wrappers.v5.StatePacketV5
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
 import rocks.crownstone.bluenet.util.Conversion
-import rocks.crownstone.bluenet.util.Util
 import rocks.crownstone.bluenet.util.toUint8
 import java.util.*
 
@@ -94,6 +86,7 @@ class MainActivity : AppCompatActivity() {
 					MainApp.instance.bluenet.filterForIbeacons(true)
 					MainApp.instance.bluenet.filterForCrownstones(true)
 					Log.i(TAG, "start scanning")
+					MainApp.instance.bluenet.setScanInterval(ScanMode.BALANCED)
 					MainApp.instance.bluenet.startScanning()
 				}
 
@@ -238,6 +231,7 @@ class MainActivity : AppCompatActivity() {
 	}
 
 	enum class DeviceOption {
+		Test,
 		Setup,
 		FactoryReset,
 		Reset,
@@ -276,6 +270,9 @@ class MainActivity : AppCompatActivity() {
 				}.unwrap()
 				.then {
 					when (optionList[optionInd]) {
+						DeviceOption.Test -> {
+							MainApp.instance.testOldFirmware(device, activity)
+						}
 						DeviceOption.Setup -> {
 							MainApp.instance.setup(device, activity)
 						}
