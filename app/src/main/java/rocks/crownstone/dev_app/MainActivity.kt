@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
 
 	private val REQUEST_CODE_LOGIN = 1
 
+	val scanInterval = ScanMode.LOW_POWER
 	val deviceList = ArrayList<ScannedDevice>()
 	val deviceMap = HashMap<DeviceAddress, ScannedDevice>()
 	private lateinit var adapter: DeviceListAdapter
@@ -57,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 		buttonRefresh.setOnClickListener {
 			MainApp.instance.bluenet.filterForCrownstones(true)
 			MainApp.instance.bluenet.filterForIbeacons(true)
-			MainApp.instance.bluenet.setScanInterval(ScanMode.BALANCED)
+			MainApp.instance.bluenet.setScanInterval(scanInterval)
 			MainApp.instance.bluenet.startScanning()
 			deviceList.clear()
 			adapter.notifyDataSetChanged()
@@ -86,7 +87,7 @@ class MainActivity : AppCompatActivity() {
 					MainApp.instance.bluenet.filterForIbeacons(true)
 					MainApp.instance.bluenet.filterForCrownstones(true)
 					Log.i(TAG, "start scanning")
-					MainApp.instance.bluenet.setScanInterval(ScanMode.BALANCED)
+					MainApp.instance.bluenet.setScanInterval(scanInterval)
 					MainApp.instance.bluenet.startScanning()
 				}
 
