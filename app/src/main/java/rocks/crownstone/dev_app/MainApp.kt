@@ -31,6 +31,7 @@ import rocks.crownstone.bluenet.encryption.RC5
 import rocks.crownstone.bluenet.packets.behaviour.IndexedBehaviourPacket
 import rocks.crownstone.bluenet.packets.powerSamples.PowerSamplesType
 import rocks.crownstone.bluenet.scanhandling.NearestDeviceListEntry
+import rocks.crownstone.bluenet.scanparsing.CrownstoneServiceData
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
 import rocks.crownstone.bluenet.util.*
@@ -75,6 +76,7 @@ class MainApp : Application(), LifecycleObserver {
 
 	// Device selected from list.
 	var selectedDevice: ScannedDevice? = null
+	var selectedDeviceServiceData: CrownstoneServiceData? = null
 
 	// Dev sphere.
 	val devSphereId = "devSphere"
@@ -177,6 +179,14 @@ class MainApp : Application(), LifecycleObserver {
 		}
 		Log.v(TAG, "onScannedDevice $device")
 		deviceMap.put(device.address, device)
+
+		// Cache the latest service data of the selected device.
+		if (device.address == selectedDevice?.address) {
+			val serviceData = device.serviceData
+			if (device.validated && serviceData != null && !serviceData.flagExternalData) {
+				selectedDeviceServiceData = device.serviceData
+			}
+		}
 	}
 
 

@@ -26,7 +26,7 @@
 			android:textStyle="bold" />
 
 		<TextView
-			android:id="@+id/stondId"
+			android:id="@+id/stoneId"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_weight="3"

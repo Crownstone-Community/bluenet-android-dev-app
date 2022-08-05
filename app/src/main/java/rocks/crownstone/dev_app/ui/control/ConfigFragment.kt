@@ -20,8 +20,6 @@ import rocks.crownstone.bluenet.util.Util
 import rocks.crownstone.bluenet.util.toUint8
 import rocks.crownstone.dev_app.MainApp
 import rocks.crownstone.dev_app.R
-import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * Fragment with the config commands.
@@ -55,11 +53,15 @@ class ConfigFragment : Fragment() {
 		root.findViewById<Button>(R.id.buttonDisableDimming).setOnClickListener { enableDimming(false) }
 		root.findViewById<Button>(R.id.buttonEnableSwitchcraft).setOnClickListener { enableSwitchcraft(true) }
 		root.findViewById<Button>(R.id.buttonDisableSwitchcraft).setOnClickListener { enableSwitchcraft(false) }
+		root.findViewById<Button>(R.id.buttonEnableSwitchcraftDoubleTap).setOnClickListener { enableSwitchcraftDoubleTap(true) }
+		root.findViewById<Button>(R.id.buttonDisableSwitchcraftDoubleTap).setOnClickListener { enableSwitchcraftDoubleTap(false) }
 		root.findViewById<Button>(R.id.buttonGetTime).setOnClickListener { getTime(root.findViewById<EditText>(R.id.editTime)) }
 		root.findViewById<Button>(R.id.buttonSetTime).setOnClickListener { setTime(root.findViewById<EditText>(R.id.editTime)) }
 		root.findViewById<Button>(R.id.buttonSetCurrentTime).setOnClickListener { setTime(null) }
 		root.findViewById<Button>(R.id.buttonGetSoftOnSpeed).setOnClickListener { getSoftOnSpeed(root.findViewById<EditText>(R.id.editSoftOnSpeed)) }
 		root.findViewById<Button>(R.id.buttonSetSoftOnSpeed).setOnClickListener { setSoftOnSpeed(root.findViewById<EditText>(R.id.editSoftOnSpeed)) }
+		root.findViewById<Button>(R.id.buttonGetDefaultDimValue).setOnClickListener { getDefaultDimValue(root.findViewById<EditText>(R.id.editDefaultDimValue)) }
+		root.findViewById<Button>(R.id.buttonSetDefaultDimValue).setOnClickListener { setDefaultDimValue(root.findViewById<EditText>(R.id.editDefaultDimValue)) }
 		root.findViewById<Button>(R.id.buttonEnableUart).setOnClickListener { enableUart(true) }
 		root.findViewById<Button>(R.id.buttonDisableUart).setOnClickListener { enableUart(false) }
 		root.findViewById<Button>(R.id.buttonGetTxPower).setOnClickListener { getTxPower(root.findViewById<EditText>(R.id.editTxPower)) }
@@ -104,6 +106,16 @@ class ConfigFragment : Fragment() {
 				}.unwrap()
 				.success { showResult("Enable switchcraft success") }
 				.fail { showResult("Enable switchcraft failed: ${it.message}") }
+	}
+
+	private fun enableSwitchcraftDoubleTap(enable: Boolean) {
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.config(device.address).setSwitchCraftDoubleTapEnabled(enable)
+				}.unwrap()
+				.success { showResult("Enable switchcraft double tap success") }
+				.fail { showResult("Enable switchcraft double tap failed: ${it.message}") }
 	}
 
 	private fun getTime(editText: EditText) {
@@ -162,6 +174,31 @@ class ConfigFragment : Fragment() {
 				}.unwrap()
 				.success { showResult("Set soft on speed to $speed") }
 				.fail { showResult("Set soft on speed failed: ${it.message}") }
+	}
+
+	private fun getDefaultDimValue(editText: EditText) {
+		editText.setText("")
+		val device = MainApp.instance.selectedDevice ?: return
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.config(device.address).getDefaultDimValue()
+				}.unwrap()
+				.success {
+					editText.setText("$it")
+					showResult("Default dim value: $it")
+				}
+				.fail { showResult("Get default dim value failed: ${it.message}") }
+	}
+
+	private fun setDefaultDimValue(editText: EditText) {
+		val device = MainApp.instance.selectedDevice ?: return
+		val value: Uint8 = editText.text.toString().toUIntOrNull()?.toUint8() ?: 0U
+		MainApp.instance.bluenet.connect(device.address)
+				.then {
+					MainApp.instance.bluenet.config(device.address).setDefaultDimValue(value)
+				}.unwrap()
+				.success { showResult("Set default dim value to $value") }
+				.fail { showResult("Set default dim value failed: ${it.message}") }
 	}
 
 	private fun enableUart(enable: Boolean) {

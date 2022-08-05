@@ -64,6 +64,10 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 			DeviceType.GUIDESTONE -> "Guidestone"
 			DeviceType.CROWNSTONE_PLUG_ONE -> "Plug One"
 			DeviceType.CROWNSTONE_HUB -> "Hub"
+			DeviceType.PROTO_WITH_DIMMER -> "Proto"
+			DeviceType.PROTO_WITH_RELAY -> "Proto"
+			DeviceType.PROTO_WITHOUT_SWITCH -> "Proto"
+			DeviceType.SOCKET_F -> "Socket F"
 			DeviceType.UNKNOWN -> ""
 			null -> ""
 		}
@@ -127,7 +131,7 @@ class DeviceListAdapter(val deviceList: List<ScannedDevice>, onClick: (ScannedDe
 	inner class ViewHolder(val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 		val name:       TextView = view.findViewById(R.id.name)
 		val address:    TextView = view.findViewById(R.id.address)
-		val stoneId:    TextView = view.findViewById(R.id.stondId)
+		val stoneId:    TextView = view.findViewById(R.id.stoneId)
 		val rssi:       TextView = view.findViewById(R.id.rssi)
 		val stoneType:  TextView = view.findViewById(R.id.stoneType)
 		val iBeacon:    LinearLayout = view.findViewById(R.id.layIBeacon)

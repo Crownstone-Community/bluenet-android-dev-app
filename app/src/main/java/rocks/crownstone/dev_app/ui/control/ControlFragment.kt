@@ -161,7 +161,7 @@ class ControlFragment : Fragment() {
 	private fun broadcastSwitchOn() {
 		val device = MainApp.instance.selectedDevice ?: return
 		val sphereId = device.sphereId ?: return
-		val stoneId = device.serviceData?.crownstoneId ?: return
+		val stoneId = MainApp.instance.selectedDeviceServiceData?.crownstoneId ?: return
 		MainApp.instance.bluenet.broadCast.switchOn(sphereId, stoneId)
 //				.success { showResult("Broadcast switch success") }
 //				.fail { showResult("Broadcast switch failed: ${it.message}") }
@@ -170,7 +170,7 @@ class ControlFragment : Fragment() {
 	private fun broadcastSwitch(value: Uint8) {
 		val device = MainApp.instance.selectedDevice ?: return
 		val sphereId = device.sphereId ?: return
-		val stoneId = device.serviceData?.crownstoneId ?: return
+		val stoneId = MainApp.instance.selectedDeviceServiceData?.crownstoneId ?: return
 		MainApp.instance.bluenet.broadCast.switch(sphereId, stoneId, value)
 //				.success { showResult("Broadcast switch success") }
 //				.fail { showResult("Broadcast switch failed: ${it.message}") }

@@ -252,6 +252,14 @@ class MainActivity : AppCompatActivity() {
 			val intent = Intent(this, ControlActivity::class.java)
 			intent.putExtra("deviceAddress", device.address)
 			MainApp.instance.selectedDevice = device
+			MainApp.instance.selectedDeviceServiceData = null
+
+			// Cache the latest service data of the selected device.
+			val serviceData = device.serviceData
+			if (device.validated && serviceData != null && !serviceData.flagExternalData) {
+				MainApp.instance.selectedDeviceServiceData = device.serviceData
+			}
+
 			this.startActivity(intent)
 //			this.startActivityForResult(intent, REQUEST_CODE_LOGIN)
 			return
