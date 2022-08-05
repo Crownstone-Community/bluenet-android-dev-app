@@ -123,6 +123,8 @@ class MainApp : Application(), LifecycleObserver {
 		val testTemplate = TestTemplate()
 		testTemplate.test()
 
+		Log.i(TAG, "Timestamp=${Util.getLocalTimestamp()}")
+
 //		val uuid = UUID.fromString("0000C002-0000-1000-8000-00805F9B34FB")
 //		when (uuid) {
 //			null -> Log.i(TAG, "null")
@@ -308,13 +310,13 @@ class MainApp : Application(), LifecycleObserver {
 		}
 	}
 
-	fun factoryReset(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {
+	fun factoryReset(device: ScannedDevice, activity: Activity, autoConfirm: Boolean = false): Promise<Unit, Exception> {
 		if ((device.sphereId != devSphereId) && (device.sphereId != null)) {
 			Log.i(TAG, "Refuse factory reset. SphereId=${device.sphereId}")
 			showResult("Don't factory reset stones that are not in the dev sphere. SphereId=${device.sphereId}", activity)
 			return Promise.ofFail(Exception("Don't factory reset stones that are not in the dev sphere. SphereId=${device.sphereId}"))
 		}
-		return confirmAlert(activity, "factory reset", "Do you want to factory reset this device?")
+		return confirmAlert(activity, "factory reset", "Do you want to factory reset this device?", autoConfirm)
 				.then { confirmed ->
 					if (!confirmed) {
 						return@then Promise.ofSuccess<Unit, Exception>(Unit)
@@ -327,17 +329,6 @@ class MainApp : Application(), LifecycleObserver {
 								Log.i(TAG, "factory reset success")
 								showResult("factory reset success", activity)
 								bluenet.disconnect(device.address, true)
-										.then {
-											removeStoneFromCloud(device)
-										}.unwrap()
-										.success {
-											Log.i(TAG, "removed from cloud")
-											showResult("removed from cloud", activity)
-										}
-										.fail {
-											Log.e(TAG, "failed to remove from cloud: ${it.message}")
-											showResult("failed to remove from cloud: ${it.message}", activity)
-										}
 							}
 							.fail {
 								Log.e(TAG, "factory reset failed: ${it.message}")
@@ -374,7 +365,10 @@ class MainApp : Application(), LifecycleObserver {
 	}
 
 
-	fun confirmAlert(activity: Activity, title: String, question: String): Promise<Boolean, Exception> {
+	fun confirmAlert(activity: Activity, title: String, question: String, autoConfirm: Boolean = false): Promise<Boolean, Exception> {
+		if (autoConfirm) {
+			return Promise.ofSuccess(true)
+		}
 		return promiseOnUi {
 			val deferred = deferred<Boolean, Exception>()
 			val builder = AlertDialog.Builder(activity)
@@ -503,7 +497,7 @@ class MainApp : Application(), LifecycleObserver {
 					bluenet.control(device.address).goToDfu()
 				}.unwrap()
 				.success { showResult("Test success", activity) }
-				.fail { showResult("Test faileed: $it", activity) }
+				.fail { showResult("Test failed: $it", activity) }
 	}
 
 	// Test connecting and reading multiple devices.
@@ -511,6 +505,10 @@ class MainApp : Application(), LifecycleObserver {
 //		handler.postDelayed(testBluenetRunnable, 100000)
 		devices.sortedByDescending { it.rssi }
 		val count = min(5, devices.size)
+
+		if (activity == null) {
+			return
+		}
 
 		// Connect to all in parallel.
 		val startTime = SystemClock.elapsedRealtime()
@@ -520,7 +518,33 @@ class MainApp : Application(), LifecycleObserver {
 			bluenet.connect(devices[index].address, auto, 60*1000)
 					.success {
 						showResult("Connected to ${devices[index].address} after ${SystemClock.elapsedRealtime() - startTime} ms", activity)
-						readData(devices[index], activity)
+						if (devices[index].operationMode == OperationMode.SETUP) {
+							setup(devices[index], activity)
+									.then {
+										bluenet.connect(devices[index].address, !auto, 60 * 1000)
+									}.unwrap()
+									.then {
+										readData(devices[index], activity)
+									}.unwrap()
+									.then {
+										bluenet.disconnect(devices[index].address)
+									}.unwrap()
+									.then {
+										bluenet.connect(devices[index].address, auto, 60 * 1000)
+									}.unwrap()
+									.then {
+										factoryReset(devices[index], activity, true)
+									}.unwrap()
+									.then {
+										bluenet.connect(devices[index].address, !auto, 60 * 1000)
+									}.unwrap()
+									.then {
+										bluenet.control(devices[index].address).toggleSwitch(100U)
+									}.unwrap()
+									.always {
+										bluenet.disconnect(devices[index].address)
+									}
+						}
 					}
 					.fail {
 						showResult("Failed to connect to ${devices[index].address}: ${it.message} after ${SystemClock.elapsedRealtime() - startTime} ms", activity)
