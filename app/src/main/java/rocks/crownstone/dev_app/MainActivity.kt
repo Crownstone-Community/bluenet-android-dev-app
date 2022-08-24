@@ -132,6 +132,13 @@ class MainActivity : AppCompatActivity() {
 				MainApp.instance.test(deviceListCopy, this)
 				return true
 			}
+			R.id.action_quit -> {
+				Log.i(TAG, "quit")
+				MainApp.instance.quit()
+				// Can also use finishAffinity()
+				finishAndRemoveTask()
+				return true
+			}
 		}
 		return super.onOptionsItemSelected(item)
 	}

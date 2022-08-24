@@ -168,6 +168,10 @@ class MainApp : Application(), LifecycleObserver {
 		stopKovenant() // Stop thread(s)
 	}
 
+	fun quit() {
+		bluenet.destroy()
+	}
+
 	private fun onScannedDevice(device: ScannedDevice) {
 //		if (!device.validated) {
 //			return

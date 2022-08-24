@@ -8,4 +8,6 @@
         android:title="Localization"/>
     <item android:id="@+id/action_test"
         android:title="Test"/>
+    <item android:id="@+id/action_quit"
+        android:title="Quit"/>
 </menu>
