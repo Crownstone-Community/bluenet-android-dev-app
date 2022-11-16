@@ -80,7 +80,7 @@ class Sphere(context: Context, volleyQueue: RequestQueue) {
 				val sphereId = sphereJson.getInt("uid")
 				val name = sphereJson.getString("name")
 				val iBeaconUUID = sphereJson.getString("uuid")
-				val meshAccessAddress = sphereJson.getString("meshAccessAddress")
+				val meshAccessAddress = sphereJson.optString("meshAccessAddress", "f001ba11")
 				val sphere = SphereData(id, sphereId, name, null, meshAccessAddress, iBeaconUUID)
 				spheres[id] = sphere
 			}
