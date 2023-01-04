@@ -13,6 +13,12 @@ class TestKovenant {
 
 	fun test() {
 		Log.i(TAG, "test")
+
+		val deferred = deferred<Unit, Exception>()
+		Log.i(TAG, "done=${deferred.promise.isDone()}")
+		deferred.reject(Exception("foo"))
+		Log.i(TAG, "done=${deferred.promise.isDone()}")
+
 		fun1(1)
 				.then {
 					Log.i(TAG, "1: $it")

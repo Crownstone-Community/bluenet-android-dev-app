@@ -142,6 +142,7 @@ class MainApp : Application(), LifecycleObserver {
 			bluenet.filterForCrownstones(true)
 //			bluenet.filterForIbeacons(false)
 //			bluenet.startScanning()
+			bluenet.setScanInterval(ScanMode.LOW_LATENCY)
 		}
 	}
 
@@ -150,8 +151,9 @@ class MainApp : Application(), LifecycleObserver {
 		Log.i(TAG, "onAppBackgrounded")
 		if (bluenet.isScannerReady()) {
 //			bluenet.filterForIbeacons(true)
-			bluenet.filterForCrownstones(false)
+			bluenet.filterForCrownstones(true)
 //			bluenet.stopScanning()
+			bluenet.setScanInterval(ScanMode.BALANCED)
 		}
 	}
 
@@ -217,6 +219,7 @@ class MainApp : Application(), LifecycleObserver {
 		notificationIntent.action = Intent.ACTION_MAIN
 		notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
 		notificationIntent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+
 		if (Build.VERSION.SDK_INT >= 26) {
 			// Create the notification channel, must be done before posting any notification.
 			// It's safe to call this repeatedly because creating an existing notification channel performs no operation.
@@ -228,7 +231,8 @@ class MainApp : Application(), LifecycleObserver {
 			val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
 			notificationManager.createNotificationChannel(channel)
 		}
-		val pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+		val pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 		val notification = NotificationCompat.Builder(context, notificationChannelId)
 				.setSmallIcon(R.drawable.icon_notification)
 				.setContentTitle("Dev stone is running")
@@ -236,9 +240,31 @@ class MainApp : Application(), LifecycleObserver {
 				.setContentIntent(pendingIntent)
 				.setOngoing(true)
 				.setPriority(NotificationCompat.PRIORITY_LOW)
-				.setVisibility(Notification.VISIBILITY_PUBLIC)
+				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 				.build()
 		return notification
+	}
+
+	fun logout() {
+		user.forgetLogin(context)
+		sphere.clear()
+		setSphereSettings()
+	}
+
+	fun setSphereSettings() {
+		val spheres = sphere.spheres
+		val sphereSettings = SphereSettingsMap()
+		for (sphere in spheres.values) {
+			val keySet = KeySet(sphere.keySet?.adminKey, sphere.keySet?.memberKey, sphere.keySet?.guestKey, sphere.keySet?.serviceDataKey, sphere.keySet?.localizationKey)
+			val meshKeySet = MeshKeySet(null, sphere.keySet?.meshAppKey, sphere.keySet?.meshNetKey)
+			val iBeaconUuid = UUID.fromString(sphere.iBeaconUUID)
+			val deviceToken = 0.toUint8()
+			val sphereSetting = SphereSettings(keySet, meshKeySet, iBeaconUuid, Conversion.toUint8(sphere.uid), deviceToken)
+			sphereSettings.put(sphere.id, sphereSetting)
+			bluenet.iBeaconRanger.track(iBeaconUuid, sphere.id)
+		}
+		sphereSettings.put(devSphereId, devSphereSetting)
+		bluenet.setSphereSettings(sphereSettings)
 	}
 
 	fun setup(device: ScannedDevice, activity: Activity): Promise<Unit, Exception> {

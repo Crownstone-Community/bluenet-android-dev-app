@@ -16,6 +16,9 @@ class Sphere(context: Context, volleyQueue: RequestQueue) {
 
 	var spheres = HashMap<String, SphereData>(); private set // Map with: sphere id as key.
 
+	fun clear() {
+		spheres.clear()
+	}
 
 	fun getSpheres(user: User): Promise<Unit, Exception> {
 		return user.getUserData()
@@ -50,8 +53,6 @@ class Sphere(context: Context, volleyQueue: RequestQueue) {
 		}
 		return sb.toString()
 	}
-
-
 
 	private fun getAllSpheres(userData: UserData): Promise<JSONArray, Exception> {
 		spheres.clear()

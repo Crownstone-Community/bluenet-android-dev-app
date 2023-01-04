@@ -4,8 +4,8 @@
         android:title="Login"
         android:icon="@drawable/icon_notification"
         android:showAsAction="ifRoom"/>
-    <item android:id="@+id/action_localization"
-        android:title="Localization"/>
+    <item android:id="@+id/action_logout"
+        android:title="Logout"/>
     <item android:id="@+id/action_test"
         android:title="Test"/>
     <item android:id="@+id/action_quit"

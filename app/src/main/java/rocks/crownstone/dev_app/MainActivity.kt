@@ -1,5 +1,6 @@
 package rocks.crownstone.dev_app
 
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -12,11 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import nl.komponents.kovenant.then
 import nl.komponents.kovenant.unwrap
-import rocks.crownstone.bluenet.encryption.KeySet
-import rocks.crownstone.bluenet.encryption.MeshKeySet
 import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
-import rocks.crownstone.bluenet.util.Conversion
 import rocks.crownstone.bluenet.util.toUint8
 import java.util.*
 
@@ -77,6 +75,7 @@ class MainActivity : AppCompatActivity() {
 //		MainApp.instance.bluenet.init(this)
 		MainApp.instance.bluenet.init(applicationContext)
 				.then {
+					Log.i(TAG, "run in foreground")
 					MainApp.instance.bluenet.runInForeground(MainApp.instance.NOTIFICATION_ID, MainApp.instance.getNotification())
 				}
 				.then {
@@ -89,6 +88,9 @@ class MainActivity : AppCompatActivity() {
 					Log.i(TAG, "start scanning")
 					MainApp.instance.bluenet.setScanInterval(scanInterval)
 					MainApp.instance.bluenet.startScanning()
+				}
+				.fail {
+					Log.w(TAG, "Failed: $it")
 				}
 
 		if (MainApp.instance.user.loadLogin(this)) {
@@ -122,14 +124,26 @@ class MainActivity : AppCompatActivity() {
 				this.startActivityForResult(intent, REQUEST_CODE_LOGIN)
 				return true
 			}
-			R.id.action_localization -> {
-				MainApp.instance.showResult("This does nothing!", this)
+			R.id.action_logout -> {
+				MainApp.instance.logout()
+//				MainApp.instance.showResult("Logged out", this)
+				MainApp.instance.quit()
+				// Can also use finishAffinity()
+				finishAndRemoveTask()
 				return true
 			}
 			R.id.action_test -> {
-				val deviceListCopy = ArrayList<ScannedDevice>()
-				deviceListCopy.addAll(deviceList)
-				MainApp.instance.test(deviceListCopy, this)
+//				val deviceListCopy = ArrayList<ScannedDevice>()
+//				deviceListCopy.addAll(deviceList)
+//				MainApp.instance.test(deviceListCopy, this)
+
+				val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+
+//				this.startActivityForResult(intent, 456)
+
+				intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+				this.baseContext.startActivity(intent)
+
 				return true
 			}
 			R.id.action_quit -> {
@@ -163,23 +177,7 @@ class MainActivity : AppCompatActivity() {
 
 	fun onLogin(resultCode: Int) {
 		Log.i(TAG, "onLogin result=$resultCode")
-		setSphereSettings()
-	}
-
-	fun setSphereSettings() {
-		val spheres = MainApp.instance.sphere.spheres
-		val sphereSettings = SphereSettingsMap()
-		for (sphere in spheres.values) {
-			val keySet = KeySet(sphere.keySet?.adminKey, sphere.keySet?.memberKey, sphere.keySet?.guestKey, sphere.keySet?.serviceDataKey, sphere.keySet?.localizationKey)
-			val meshKeySet = MeshKeySet(null, sphere.keySet?.meshAppKey, sphere.keySet?.meshNetKey)
-			val iBeaconUuid = UUID.fromString(sphere.iBeaconUUID)
-			val deviceToken = 0.toUint8()
-			val sphereSetting = SphereSettings(keySet, meshKeySet, iBeaconUuid, Conversion.toUint8(sphere.uid), deviceToken)
-			sphereSettings.put(sphere.id, sphereSetting)
-			MainApp.instance.bluenet.iBeaconRanger.track(iBeaconUuid, sphere.id)
-		}
-		sphereSettings.put(MainApp.instance.devSphereId, MainApp.instance.devSphereSetting)
-		MainApp.instance.bluenet.setSphereSettings(sphereSettings)
+		MainApp.instance.setSphereSettings()
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -196,7 +194,7 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
 		Log.i(TAG, "onRequestPermissionsResult $requestCode")
-		if (MainApp.instance.bluenet.handlePermissionResult(requestCode, permissions, grantResults)) {
+		if (MainApp.instance.bluenet.handlePermissionResult(requestCode, permissions, grantResults, this)) {
 			return
 		}
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults)

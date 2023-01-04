@@ -111,6 +111,17 @@ class User(context: Context, volleyQueue: RequestQueue) {
 		prefsEditor.apply()
 	}
 
+	fun forgetLogin(context: Context) {
+		val prefs = getDefaultSharedPreferences(context)
+		val prefsEditor = prefs.edit()
+		val userData = this.userData ?: return
+		prefsEditor.remove("user.id")
+		prefsEditor.remove("user.accessToken")
+		prefsEditor.remove("user.ttl")
+		prefsEditor.remove("user.creationDate")
+		prefsEditor.apply()
+	}
+
 	fun loadLogin(context: Context): Boolean {
 		val prefs = getDefaultSharedPreferences(context)
 

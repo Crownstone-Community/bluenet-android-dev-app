@@ -30,8 +30,10 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, va
 			0 -> return ControlFragment.newInstance(position + 1, deviceAddress)
 			1 -> return ConfigFragment.newInstance(position + 1, deviceAddress)
 			2 -> return DebugFragment.newInstance(position + 1, deviceAddress)
-			3 -> return BehaviourFragment.newInstance(position + 1, deviceAddress)
-			4 -> return TestFragment.newInstance(position + 1, deviceAddress)
+			3 -> return ServiceDataFragment.newInstance(position + 1, deviceAddress)
+			4 -> return BehaviourFragment.newInstance(position + 1, deviceAddress)
+			5 -> return MicroappFragment.newInstance(position + 1, deviceAddress)
+			6 -> return TestFragment.newInstance(position + 1, deviceAddress)
 		}
 		return ControlFragment.newInstance(position + 1, deviceAddress)
 	}
@@ -43,14 +45,16 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, va
 			0 -> return "Control"
 			1 -> return "Config"
 			2 -> return "Debug"
-			3 -> return "Behaviour"
-			4 -> return "Test"
+			3 -> return "Service data"
+			4 -> return "Behaviour"
+			5 -> return "uApp"
+			6 -> return "Test"
 		}
 		throw Exception("Invalid position")
 	}
 
 	override fun getCount(): Int {
 		// Number of total pages.
-		return 5
+		return 7
 	}
 }
