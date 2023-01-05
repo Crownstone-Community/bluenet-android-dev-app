@@ -26,13 +26,17 @@ import rocks.crownstone.bluenet.packets.HubDataPacket
 import rocks.crownstone.bluenet.packets.StringPacket
 import rocks.crownstone.bluenet.packets.UuidPacket
 import rocks.crownstone.bluenet.packets.behaviour.*
+import rocks.crownstone.bluenet.packets.microapp.MicroappInfoPacket
 import rocks.crownstone.bluenet.packets.other.IbeaconConfigIdPacket
+import rocks.crownstone.bluenet.packets.powerSamples.PowerSamplesPacket
 import rocks.crownstone.bluenet.packets.powerSamples.PowerSamplesType
 import rocks.crownstone.bluenet.packets.wrappers.v5.StatePacketV5
+import rocks.crownstone.bluenet.scanparsing.ScannedDevice
 import rocks.crownstone.bluenet.structs.*
 import rocks.crownstone.bluenet.util.Util
 import rocks.crownstone.dev_app.MainApp
 import rocks.crownstone.dev_app.R
+import java.io.InputStream
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -118,9 +122,44 @@ class MicroappFragment : Fragment() {
 	}
 
 	private fun upload() {
+		val device = MainApp.instance.selectedDevice ?: return
+		lateinit var fileStream: InputStream
+		lateinit var info: MicroappInfoPacket
 		openFile()
 				.then {
-					showResult("Upload complete")
+					fileStream = this.context!!.contentResolver.openInputStream(it)
+							?: return@then Promise.ofFail<Unit, Exception>(Exception("Failed to open file"))
+
+					return@then MainApp.instance.bluenet.connect(device.address)
+				}.unwrap()
+				.then {
+					MainApp.instance.bluenet.microapp(device.address).getMicroappInfo()
+				}.unwrap()
+				.then {
+					info = it
+					if (info.appsStatus[0].tests.hasData) {
+						return@then MainApp.instance.bluenet.microapp(device.address).removeMicroapp(0)
+					}
+					return@then Promise.ofSuccess<Unit, Exception>(Unit)
+				}.unwrap()
+				.then {
+					val microappBinary = fileStream.readBytes()
+					if (microappBinary.size > info.maxAppSize.toInt()) {
+						return@then Promise.ofFail<Unit, Exception>(Exception("Microapp too large"))
+					}
+					if (microappBinary.size == 0) {
+						return@then Promise.ofFail<Unit, Exception>(Exception("Empty file"))
+					}
+					MainApp.instance.bluenet.microapp(device.address).uploadMicroapp(0, microappBinary, info.maxChunkSize.toInt())
+				}.unwrap()
+				.then {
+					MainApp.instance.bluenet.microapp(device.address).validateMicroapp(0)
+				}.unwrap()
+				.then {
+					MainApp.instance.bluenet.microapp(device.address).enableMicroapp(0)
+				}.unwrap()
+				.success {
+					showResult("Successfully uploaded microapp")
 				}
 				.fail {
 					showResult("Failed to upload: $it")
@@ -146,7 +185,7 @@ class MicroappFragment : Fragment() {
 					showResult("Successfully ${enableString}d microapp")
 				}
 				.fail {
-					showResult("Failed to ${enableString} microapp: $it")
+					showResult("Failed to ${enableString} microapp: ${it.message}")
 				}
 	}
 
